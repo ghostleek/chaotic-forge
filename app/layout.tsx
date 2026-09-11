@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Mechanic Forge — Behavior before build',
-  description: 'Turn a game-design instinct into a controlled, playable experiment.',
+  title: 'Mechanic Forge — Compose playable rules',
+  description: 'A visual node engine for composing, testing, and explaining game mechanics.',
 };
 
 export default function RootLayout({
