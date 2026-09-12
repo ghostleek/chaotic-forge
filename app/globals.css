@@ -32,6 +32,8 @@
 }
 
 :root {
+  --font-geist-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-geist-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --background: #101210;
   --foreground: #e9ebe7;
   --card: #171a18;
