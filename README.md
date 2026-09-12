@@ -4,7 +4,7 @@ Mechanic Forge is an evidence-oriented workspace for game-mechanic design.
 
 Instead of starting from a blank graph or a generic AI prompt, it starts with a design problem, shows sourced examples from real games, helps the designer compare trade-offs, then guides them toward a small testable decision.
 
-**Current repository status:** alpha Explore-first prototype with a ten-card validation corpus.  
+**Current repository status:** The repository is an alpha-stage Explore-first prototype with a ten-card validation corpus.  
 **Full docs:** [PRD.md](./PRD.md) · [PLAN.md](./PLAN.md) · [QUALITY.md](./QUALITY.md)
 
 ## Mini PRD
@@ -136,4 +136,3 @@ Available scripts:
 - `npm run lint`
 - `npm run build`
 - `npm test`
-
