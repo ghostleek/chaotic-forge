@@ -1,6 +1,7 @@
 import {
   COMPARISON_DIMENSIONS,
   COMPARISON_LABELS,
+  type ClaimOrigin,
   type ComparisonDimension,
   type MechanicFilters,
   type MechanicImplementationCard,
@@ -76,6 +77,7 @@ export type ComparisonRow = {
     score: 1 | 2 | 3;
     label: string;
     note: string;
+    origin: ClaimOrigin;
     sourceIds: string[];
   }>;
 };
@@ -97,6 +99,7 @@ export function buildComparisonRows(
       score: card.comparison[dimension].score,
       label: card.comparison[dimension].label,
       note: card.comparison[dimension].note.text,
+      origin: card.comparison[dimension].note.origin,
       sourceIds: [...card.comparison[dimension].note.sourceIds],
     })),
   }));

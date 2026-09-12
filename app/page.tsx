@@ -1,5 +1,5 @@
-import { MechanicForge } from '@/components/mechanic-forge';
+import { ExploreShell } from '@/components/explore-shell';
 
 export default function Home() {
-  return <MechanicForge />;
+  return <ExploreShell />;
 }

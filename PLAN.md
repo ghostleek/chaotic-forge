@@ -1,6 +1,6 @@
 # Mechanic Forge Delivery Plan
 
-**Status:** Proposed execution plan  
+**Status:** Active — paused at Checkpoint A
 **Last updated:** 2026-09-12  
 **Related specification:** [PRD.md](./PRD.md)
 
@@ -343,16 +343,16 @@ This workstream blocks trustworthy Explore, Compare, and AI grounding.
 ### Product definition
 
 - [ ] Select the initial action-game subgenre and ten anchor games.
-- [ ] Create a ten-card corpus for Stage 0 validation.
+- [x] Create a ten-card corpus for Stage 0 validation.
 - [ ] Expand to 15–20 patterns only after the Stage 0 gate passes.
 - [ ] Rewrite internal taxonomy labels into user-facing language.
-- [ ] Define source confidence and media rights fields.
-- [ ] Define the mechanic comparison dimensions.
-- [ ] Define the versioned Mechanic Forge JSON schema.
+- [x] Define source confidence and media rights fields.
+- [x] Define the mechanic comparison dimensions.
+- [x] Define the versioned Mechanic Forge JSON schema.
 
 ### Prototype
 
-- [ ] Replace the graph-first home concept with an Explore-first prototype.
+- [x] Replace the graph-first home concept with an Explore-first prototype.
 - [ ] Create behavior-query, results, mechanic-detail, and comparison screens.
 - [ ] Create a fork-to-specification interaction.
 - [ ] Reintroduce the dash arena as a microplay template rather than the main workspace.
@@ -405,3 +405,10 @@ Record future recommendations and scope changes in `PRD.md` under its changelog,
 - Replaced subjective stage gates with owned, time-bounded cohorts and explicit denominators and thresholds.
 - Bounded P0 links and raw-data retention, made withdrawal available throughout the retained lifecycle, and constrained abuse metadata.
 - Made additional template selection demand-led and the read-only System Map an independently insertable optional PR.
+
+### 2026-09-12 — PR 1–4 implementation checkpoint
+
+- Completed the quality baseline, product specification, versioned domain schema, ten-card validation corpus, and Explore-first prototype.
+- Verified the Explore prototype with automated domain/state tests and desktop/mobile browser interaction checks.
+- Paused production corpus expansion at Checkpoint A; PR 5 remains blocked until the signed Stage 0 study passes its predeclared thresholds.
+- Kept Compare, Forge, microplays, and the System Map out of the prototype so the study measures the Explore wedge without downstream feature effects.

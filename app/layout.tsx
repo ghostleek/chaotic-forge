@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Mechanic Forge — Compose playable rules',
-  description: 'A visual node engine for composing, testing, and explaining game mechanics.',
+  title: 'Mechanic Forge — Find patterns worth testing',
+  description:
+    'Find sourced game-mechanic patterns, understand their trade-offs, and choose the smallest credible test.',
 };
 
 export default function RootLayout({

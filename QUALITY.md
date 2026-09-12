@@ -8,7 +8,7 @@ Every product change is reviewed against the same minimum gate before it is merg
 4. Independent adversarial review of the complete diff
 5. A second lint, build, and focused-test run after review fixes
 
-The test suite uses Node's built-in test runner with native type stripping. This keeps domain and query tests dependency-free while exercising the same TypeScript modules used by the application. Browser interaction tests should be added when the Explore shell begins changing visible behavior.
+`npm test` runs both layers: Node's built-in test runner exercises the domain, query, schema, and reducer modules with native type stripping, then Playwright operates the Explore shell in desktop and mobile Chrome. The browser suite covers search, keyboard focus and reset, every filter dimension, chip removal, empty-state recovery, provenance labels, source links, and horizontal overflow.
 
 ## Scoped lint exceptions
 

@@ -1045,7 +1045,7 @@ export const VALIDATION_CORPUS: MechanicImplementationCard[] = [
       sourceIds: [SOURCES.ghost.id],
     },
     summary: sourced(
-      'Four switchable stances map to core enemy archetypes, and the correct stance breaks the matching defense faster.',
+      'Switchable stances are each designed to be particularly effective against a subset of enemy types.',
       SOURCES.ghost.id,
     ),
     causal: {
@@ -1062,7 +1062,7 @@ export const VALIDATION_CORPUS: MechanicImplementationCard[] = [
         SOURCES.ghost.id,
       ),
       transform: sourced(
-        'Matched stance attacks stagger the corresponding enemy type faster.',
+        'Switching to a stance suited to the enemy type amplifies the player’s effectiveness.',
         SOURCES.ghost.id,
       ),
       interaction: synthesis(
