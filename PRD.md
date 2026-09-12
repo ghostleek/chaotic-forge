@@ -4,7 +4,7 @@
 
 **Version:** 0.2
 
-**Last updated:** 2026-09-12  
+**Last updated:** 2026-09-13
 **Initial target:** Solo developers and small PC/console game teams, beginning with action-game combat and mobility mechanics
 
 ## 1. Product decision
@@ -349,6 +349,12 @@ The safe default publish contract is blind variants, two 45-second runs, desktop
 
 The tester journey is consent, Run 1, reset, Run 2, structured response, and completion. The report separates observed behavior from preference, states sample limitations, and lets the creator record **Keep**, **Revise**, **Reject**, or **Inconclusive** without the product choosing for them.
 
+#### Astra and submission boundary
+
+The hackathon build uses Astra as a development collaborator for implementation, debugging, test design, accessibility review, and refinement. Maintain a short build log connecting material Astra-assisted decisions to commits or visible product changes so the 90-second submission can explain that contribution concretely.
+
+The current prototype does not need an in-product model request. Its mechanic decomposition and microplay are fixed, deterministic demonstrations, and the interface must say so. Add a runtime model dependency only if the organizers explicitly require one or a user-facing task cannot be delivered credibly without it. Any later runtime generation must preserve the Source / Forge interpretation / User decision boundary, validate structured output, expose failure honestly, and provide a deterministic fallback.
+
 #### Golden-flow acceptance criteria
 
 - A user can enter through Returnal or the behavior “move through danger” and reach the same dash breakdown.
@@ -359,6 +365,7 @@ The tester journey is consent, Run 1, reset, Run 2, structured response, and com
 - The creator can preview A and B under the same stated conditions without builder assistance.
 - Publishing is labelled as a demo until ownership, storage, expiry, withdrawal, and result access are functional.
 - The final report never presents preference as behavioral evidence or a small sample as a general conclusion.
+- Deterministic product behavior never implies that Astra or another model was called at runtime.
 
 ## 9. End-to-end acceptance scenario
 
@@ -456,6 +463,14 @@ Only add a new playable template when it supports a repeated design question and
 7. Are studios comfortable sharing unlisted prototypes, and which privacy controls are mandatory?
 
 ## 14. Changelog
+
+### 2026-09-13 — Hackathon hardening and Astra boundary
+
+- Marked G1–G4 complete and scoped one final hardening PR before cold testing.
+- Isolated Playwright's Next.js output so browser verification can run beside a local development session.
+- Aligned the project on Node.js 24 and added repository-level hackathon guardrails.
+- Clarified that Astra supports the build process while the current product experience is deterministic and makes no runtime model call.
+- Added a 90-second submission plan and required an evidence-backed Astra build log.
 
 ### 2026-09-12 — Golden-flow PR G4 implementation
 

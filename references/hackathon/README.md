@@ -44,6 +44,7 @@ Treat menus, accounts, inventories, procedural generation, online multiplayer, n
 | The room, enemies, or pacing feel random      | [04-encounters-levels-and-pacing.md](./04-encounters-levels-and-pacing.md)       |
 | You need to test, triage, or prepare the demo | [05-playtesting-scope-and-demo.md](./05-playtesting-scope-and-demo.md)           |
 | You need a mechanic with clear tuning knobs   | [06-mechanic-pattern-cards.md](./06-mechanic-pattern-cards.md)                   |
+| You need the Astra build story and submission | [07-astra-build-and-submission.md](./07-astra-build-and-submission.md)           |
 
 ## Five questions before adding a feature
 

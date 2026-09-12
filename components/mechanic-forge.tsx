@@ -568,7 +568,7 @@ export function MechanicForge() {
     const value = (nextIntent ?? intent).trim();
     if (!value) return { ok: false, error: 'intent must be a non-empty string' };
     setForging(true);
-    setNotice('Astra is decomposing intent into atomic rules…');
+    setNotice('Applying the deterministic atom scaffold…');
     await pause(650);
     setAtoms((current) => current.map((atom) => atom.kind === 'intent' ? { ...atom, summary: value } : atom));
     setPreviewSampleId(null);
@@ -786,7 +786,7 @@ export function MechanicForge() {
             <Button type="submit" size="sm" disabled={forging}>
               {forging ? <LoaderCircle className="spin" /> : <Sparkles />}{forging ? 'Forging atoms…' : 'Forge atom chain'}
             </Button>
-            <small>Astra-assisted decomposition · deterministic demo</small>
+            <small>Deterministic decomposition demo · no model call</small>
           </form>
 
           <section className="sample-picker">

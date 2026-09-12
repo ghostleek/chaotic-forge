@@ -8,7 +8,7 @@ Every product change is reviewed against the same minimum gate before it is merg
 4. Independent adversarial review of the complete diff
 5. A second lint, build, and focused-test run after review fixes
 
-`npm test` runs both layers: Node's built-in test runner exercises the domain, query, schema, and reducer modules with native type stripping, then Playwright operates the Explore shell in desktop and mobile Chrome. The browser suite covers search, keyboard focus and reset, every filter dimension, chip removal, empty-state recovery, provenance labels, source links, and horizontal overflow.
+`npm test` runs both layers: Node's built-in test runner exercises the domain, query, schema, reducer, dash experiment, preview-runtime, and tester-session modules with native type stripping. Playwright then operates the complete golden flow in desktop and mobile Chrome: Explore, Returnal and dash reference pages, one-rule adaptation, creator preview, demo publishing, blind tester runs, response, evidence limitations, and decision capture.
 
 ## Scoped lint exceptions
 
