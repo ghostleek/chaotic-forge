@@ -4,11 +4,11 @@ Every product change is reviewed against the same minimum gate before it is merg
 
 1. `npm run lint`
 2. `npm run build`
-3. Focused automated tests for changed behavior, when a test target exists
+3. `npm test`
 4. Independent adversarial review of the complete diff
 5. A second lint, build, and focused-test run after review fixes
 
-The repository does not yet have an automated test script. Adding focused product tests is required before the first behavior-changing feature PR merges.
+The test suite uses Node's built-in test runner with native type stripping. This keeps domain and query tests dependency-free while exercising the same TypeScript modules used by the application. Browser interaction tests should be added when the Explore shell begins changing visible behavior.
 
 ## Scoped lint exceptions
 

@@ -9,6 +9,7 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
+    "test": "node --test --experimental-strip-types tests/*.test.mjs",
     "lint": "oxlint",
     "format": "oxfmt"
   },
