@@ -162,6 +162,26 @@ const isNonEmptyString = (value: unknown): value is string =>
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.length > 0 && value.every(isNonEmptyString);
 
+function isValidHttpsUrl(value: unknown): value is string {
+  if (!isNonEmptyString(value)) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && Boolean(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function isValidIsoDate(value: unknown): value is string {
+  if (!isNonEmptyString(value) || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+  const date = new Date(`${value}T00:00:00Z`);
+  return (
+    !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === value
+  );
+}
+
 function validateStatement(
   value: unknown,
   path: string,
@@ -289,7 +309,7 @@ export function validateMechanicCard(value: unknown): ValidationIssue[] {
       }
     }
 
-    if (!isNonEmptyString(source.url) || !source.url.startsWith('https://')) {
+    if (!isValidHttpsUrl(source.url)) {
       issues.push({ path: `${path}.url`, message: 'must be an HTTPS URL' });
     }
     if (!SOURCE_KINDS.includes(source.kind as SourceKind)) {
@@ -304,10 +324,7 @@ export function validateMechanicCard(value: unknown): ValidationIssue[] {
         message: 'must be medium or high',
       });
     }
-    if (
-      !isNonEmptyString(source.accessedAt) ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(source.accessedAt)
-    ) {
+    if (!isValidIsoDate(source.accessedAt)) {
       issues.push({
         path: `${path}.accessedAt`,
         message: 'must use YYYY-MM-DD',
@@ -329,7 +346,8 @@ export function validateMechanicCard(value: unknown): ValidationIssue[] {
     }
     if (
       !Number.isInteger(value.game.releaseYear) ||
-      Number(value.game.releaseYear) < 1970
+      Number(value.game.releaseYear) < 1970 ||
+      Number(value.game.releaseYear) > new Date().getUTCFullYear() + 1
     ) {
       issues.push({
         path: 'game.releaseYear',
