@@ -17,6 +17,11 @@ import {
   serializeDashExperimentMarkdown,
 } from '../lib/mechanics/dash-experiment.ts';
 import {
+  DASH_DEMO_ORDER,
+  buildDashDemoReport,
+  recordDashDemoDecision,
+} from '../lib/mechanics/dash-demo.ts';
+import {
   DASH_ARENA,
   advanceDashPreviewRun,
   createDashPreviewRun,
@@ -177,6 +182,54 @@ test('dash preview completes at 45 seconds and excludes every event from evidenc
   assert.equal(complete.events.at(-1)?.type, 'run_completed');
   assert.ok(complete.events.every((event) => event.preview === true));
   assert.equal(complete.preview, true);
+});
+
+test('local demo report reveals the fixed blind order without claiming external evidence', () => {
+  const firstRun = runDashPreviewToCompletion(
+    createDashPreviewRun({ variant: DASH_DEMO_ORDER[0] }),
+  );
+  const secondRun = runDashPreviewToCompletion(
+    createDashPreviewRun({
+      variant: DASH_DEMO_ORDER[1],
+      seed: firstRun.seed,
+    }),
+  );
+  const report = buildDashDemoReport({
+    firstRun,
+    secondRun,
+    preference: 'run-1',
+    response: '  Recharge made the return to pressure clearer.  ',
+  });
+
+  assert.deepEqual(report.order, ['mutation', 'control']);
+  assert.equal(report.mapping['run-1'], 'Variant B — on enemy elimination');
+  assert.equal(report.mapping['run-2'], 'Control A — after 3 seconds');
+  assert.equal(report.scope, 'local-demo');
+  assert.equal(report.sampleSize, 1);
+  assert.equal(report.validExternalEvidence, false);
+  assert.equal(
+    report.response,
+    'Recharge made the return to pressure clearer.',
+  );
+  assert.equal(report.runs[0].label, 'Run 1');
+  assert.equal(report.runs[1].label, 'Run 2');
+  assert.ok(report.limitations.every((limitation) => limitation.length > 0));
+  assert.ok(
+    [...firstRun.events, ...secondRun.events].every((event) => event.preview),
+  );
+});
+
+test('demo decisions remain explicitly local, non-durable records', () => {
+  const record = recordDashDemoDecision(
+    'revise',
+    '  Run five durable external sessions next.  ',
+  );
+
+  assert.equal(record.decision, 'revise');
+  assert.equal(record.rationale, 'Run five durable external sessions next.');
+  assert.equal(record.scope, 'local-demo');
+  assert.equal(record.durable, false);
+  assert.equal(new Date(record.recordedAt).toISOString(), record.recordedAt);
 });
 
 test('every causal and comparison claim resolves to visible source metadata', () => {

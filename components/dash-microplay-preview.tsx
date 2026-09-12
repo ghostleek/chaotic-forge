@@ -9,10 +9,12 @@ import {
   Crosshair,
   Play,
   RotateCcw,
+  Share2,
   ShieldCheck,
   Sparkles,
   Timer,
 } from 'lucide-react';
+import Link from 'next/link';
 import {
   useEffect,
   useMemo,
@@ -418,6 +420,23 @@ export function DashMicroplayPreview({
             </ol>
           )}
         </div>
+      </section>
+
+      <section
+        className="demo-publish-invite"
+        aria-labelledby="demo-publish-title"
+      >
+        <div>
+          <span>Next · validate the handoff</span>
+          <h2 id="demo-publish-title">Preview a blind tester journey.</h2>
+          <p>
+            Use a fixed demo route to test comprehension before adding durable
+            sharing infrastructure.
+          </p>
+        </div>
+        <Link className="primary-action" href="/microplays/dash/publish">
+          <Share2 aria-hidden="true" /> Prepare demo share
+        </Link>
       </section>
     </>
   );
