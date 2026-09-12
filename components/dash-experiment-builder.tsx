@@ -7,8 +7,10 @@ import {
   Download,
   FlaskConical,
   LockKeyhole,
+  Play,
   Save,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -42,6 +44,10 @@ export function DashExperimentBuilder() {
     [goal, mutationId],
   );
   const changedRule = experiment.changedRules[0];
+  const previewHref = `/microplays/dash/preview?${new URLSearchParams({
+    goal: experiment.goal,
+    mutation: mutationId,
+  }).toString()}`;
 
   const updateMutation = (value: string) => {
     const isKnownOption = DASH_RECHARGE_OPTIONS.some(
@@ -206,6 +212,11 @@ export function DashExperimentBuilder() {
             )}
             {saved ? 'Experiment saved' : 'Save experiment contract'}
           </Button>
+          {saved ? (
+            <Link className="primary-action" href={previewHref}>
+              <Play aria-hidden="true" /> Preview matched A/B
+            </Link>
+          ) : null}
           <Button
             type="button"
             variant="outline"

@@ -1,6 +1,6 @@
 # Mechanic Forge Delivery Plan
 
-**Status:** Active — golden-flow prototype in progress; Checkpoint A remains pending
+**Status:** Active — G1 and G2 merged; G3 playable preview in progress; Checkpoint A remains pending
 **Last updated:** 2026-09-12  
 **Related specification:** [PRD.md](./PRD.md)
 
