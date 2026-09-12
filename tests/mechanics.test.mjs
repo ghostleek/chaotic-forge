@@ -10,6 +10,13 @@ import {
   getMechanicPath,
 } from '../lib/mechanics/catalog.ts';
 import {
+  DASH_LOCKED_CONDITIONS,
+  DASH_RECHARGE_OPTIONS,
+  buildDashExperiment,
+  serializeDashExperimentJson,
+  serializeDashExperimentMarkdown,
+} from '../lib/mechanics/dash-experiment.ts';
+import {
   INITIAL_EXPLORE_STATE,
   buildFilterOptions,
   exploreReducer,
@@ -56,6 +63,41 @@ test('catalog groups concrete implementations into stable game and mechanic path
     getMechanicPath('returnal-projectile-dash'),
     '/mechanics/returnal-projectile-dash',
   );
+});
+
+test('dash adaptation changes one user rule while preserving every invariant', () => {
+  for (const option of DASH_RECHARGE_OPTIONS) {
+    const experiment = buildDashExperiment(
+      'Test aggressive movement',
+      option.id,
+    );
+
+    assert.equal(experiment.changedRules.length, 1);
+    assert.equal(experiment.changedRules[0].field, 'Dash recharge');
+    assert.equal(experiment.changedRules[0].control.origin, 'forge-defined');
+    assert.equal(experiment.changedRules[0].mutation.origin, 'user-decision');
+    assert.equal(experiment.changedRules[0].mutation.id, option.id);
+    assert.deepEqual(experiment.lockedConditions, DASH_LOCKED_CONDITIONS);
+    assert.equal(experiment.reference.origin, 'source');
+  }
+});
+
+test('dash exports retain provenance, diff, risks, and evidence plan', () => {
+  const experiment = buildDashExperiment();
+  const markdown = serializeDashExperimentMarkdown(experiment);
+  const json = JSON.parse(serializeDashExperimentJson(experiment));
+
+  assert.match(markdown, /From the source: Returnal/);
+  assert.match(
+    markdown,
+    /Experiment baseline: After 3 seconds \(Forge-defined\)/,
+  );
+  assert.match(markdown, /Your decision: On enemy elimination/);
+  assert.match(markdown, /## Locked conditions/);
+  assert.match(markdown, /## Evidence plan/);
+  assert.equal(json.changedRules.length, 1);
+  assert.equal(json.reference.origin, 'source');
+  assert.equal(json.risks.length, 2);
 });
 
 test('every causal and comparison claim resolves to visible source metadata', () => {

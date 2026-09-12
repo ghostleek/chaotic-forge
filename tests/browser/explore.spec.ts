@@ -128,17 +128,59 @@ test('game-first and behavior-first paths converge on the dash breakdown', async
 
   await page.getByRole('link', { name: 'Adapt this mechanic' }).first().click();
   await expect(page).toHaveURL(/\/forge\/dash$/);
+  await expect(page.getByRole('textbox', { name: 'Design goal' })).toHaveValue(
+    'Reward aggressive movement without increasing weapon damage.',
+  );
   await expect(
     page.getByRole('heading', {
-      name: 'Reward aggressive movement without increasing weapon damage.',
+      name: 'One rule changes. Everything else stays matched.',
     }),
   ).toBeVisible();
   await expect(
-    page.getByText('Experiment baseline · Forge-defined', { exact: true }),
+    page
+      .getByText('Experiment baseline · Forge-defined', { exact: true })
+      .first(),
   ).toBeVisible();
   await expect(
-    page.getByText('On enemy elimination', { exact: true }),
+    page.getByRole('cell', { name: 'On enemy elimination' }),
   ).toBeVisible();
+});
+
+test('dash adaptation remains a one-rule diff and exports its trust boundary', async ({
+  page,
+}) => {
+  await page.goto('/forge/dash');
+
+  const goal = page.getByRole('textbox', { name: 'Design goal' });
+  await goal.fill('Reward committed movement through projectile pressure.');
+  await page
+    .getByLabel('Variant B · Your decision')
+    .selectOption('projectile-crossing');
+
+  await expect(page.locator('.experiment-count strong')).toHaveText('1');
+  await expect(
+    page.getByText('After a successful projectile crossing', { exact: true }),
+  ).toHaveCount(2);
+  await expect(page.getByText('Returnal control', { exact: true })).toHaveCount(
+    0,
+  );
+
+  await page.getByRole('button', { name: 'Save experiment contract' }).click();
+  await expect(
+    page.getByText('Saved in this session', { exact: true }),
+  ).toBeVisible();
+
+  const markdownDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download Markdown' }).click();
+  expect((await markdownDownload).suggestedFilename()).toBe(
+    'dash-aggression-loop.md',
+  );
+
+  const jsonDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download JSON' }).click();
+  expect((await jsonDownload).suggestedFilename()).toBe(
+    'dash-aggression-loop.json',
+  );
 });
 
 test('a behavior suggestion focuses its filtered result set', async ({

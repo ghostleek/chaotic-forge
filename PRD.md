@@ -457,6 +457,13 @@ Only add a new playable template when it supports a repeated design question and
 
 ## 14. Changelog
 
+### 2026-09-12 — Golden-flow PR G2 implementation
+
+- Made the dash design goal and the single Variant B recharge decision editable.
+- Added three bounded recharge choices while preserving one changed field and seven locked conditions.
+- Added session-local save feedback plus Markdown and JSON experiment exports.
+- Required both exports to retain the source boundary, Forge-defined baseline, user decision, risks, invariants, and evidence plan.
+
 ### 2026-09-12 — Returnal dash golden flow
 
 - Added a Mobbin-inspired browse hierarchy from popular games to mechanics while retaining behavior-first search.
