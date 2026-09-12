@@ -1,13 +1,11 @@
 'use client';
 
 import {
+  ArrowRight,
   ArrowUpRight,
-  BookOpen,
   CheckCircle2,
   ChevronRight,
   CircleGauge,
-  GitCompareArrows,
-  Hammer,
   Search,
   SlidersHorizontal,
   Sparkles,
@@ -16,6 +14,12 @@ import {
 import Link from 'next/link';
 import { useEffect, useMemo, useReducer, useRef } from 'react';
 
+import { ProductHeader } from '@/components/product-header';
+import {
+  buildGameCollections,
+  getGamePath,
+  getMechanicPath,
+} from '@/lib/mechanics/catalog';
 import { VALIDATION_CORPUS } from '@/lib/mechanics/corpus';
 import {
   EXPLORE_FILTER_KEYS,
@@ -33,6 +37,11 @@ import {
 import type { MechanicImplementationCard } from '@/lib/mechanics/schema';
 
 const FILTER_OPTIONS = buildFilterOptions(VALIDATION_CORPUS);
+const GAME_COLLECTIONS = buildGameCollections(VALIDATION_CORPUS);
+const PRIMARY_FILTER_KEYS: ExploreFilterKey[] = ['behavior', 'systemFamily'];
+const ADVANCED_FILTER_KEYS = EXPLORE_FILTER_KEYS.filter(
+  (key) => !PRIMARY_FILTER_KEYS.includes(key),
+);
 const SEARCH_SUGGESTIONS = [
   'Reward precise defensive timing',
   'Recover after taking damage',
@@ -137,14 +146,19 @@ function ImplementationCard({
         <span>
           <Sparkles aria-hidden="true" /> Pattern: product synthesis
         </span>
-        <a
-          href={source.url}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={`Open source for ${card.implementationName}: ${source.title}`}
-        >
-          View source <ArrowUpRight aria-hidden="true" />
-        </a>
+        <div className="reference-card__actions">
+          <a
+            href={source.url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Open source for ${card.implementationName}: ${source.title}`}
+          >
+            Source <ArrowUpRight aria-hidden="true" />
+          </a>
+          <Link href={getMechanicPath(card.id)}>
+            Open breakdown <ArrowRight aria-hidden="true" />
+          </Link>
+        </div>
       </footer>
     </article>
   );
@@ -153,6 +167,7 @@ function ImplementationCard({
 export function ExploreShell() {
   const [state, dispatch] = useReducer(exploreReducer, INITIAL_EXPLORE_STATE);
   const searchRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const results = useMemo(
     () => getExploreResults(VALIDATION_CORPUS, state),
     [state],
@@ -185,59 +200,48 @@ export function ExploreShell() {
 
   const hasActiveSearch = Boolean(state.query || activeFilterCount);
 
+  const commitQuery = (query: string) => {
+    dispatch({ type: 'suggestion.chosen', query });
+    requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+      resultsRef.current?.focus({ preventScroll: true });
+    });
+  };
+
   return (
     <main className="explore-app">
       <a className="skip-link" href="#explore-results">
         Skip to results
       </a>
 
-      <header className="explore-header">
-        <Link
-          className="explore-brand"
-          href="/"
-          aria-label="Mechanic Forge home"
-        >
-          <span aria-hidden="true">
-            <Hammer />
-          </span>
-          <strong>Mechanic Forge</strong>
-          <em>ALPHA</em>
-        </Link>
-
-        <nav aria-label="Primary navigation">
-          <a href="#explore-results" aria-current="page">
-            <BookOpen aria-hidden="true" /> Explore
-          </a>
-          <span aria-disabled="true">
-            <GitCompareArrows aria-hidden="true" /> Compare
-            <small>Next</small>
-          </span>
-          <span aria-disabled="true">
-            <Hammer aria-hidden="true" /> Forge
-            <small>Later</small>
-          </span>
-        </nav>
-
-        <div className="corpus-status">
-          <i aria-hidden="true" /> 10 sourced examples
-        </div>
-      </header>
+      <ProductHeader />
 
       <section className="explore-hero" aria-labelledby="explore-title">
         <div className="explore-hero__copy">
           <p className="eyebrow">
             <CircleGauge aria-hidden="true" /> Behavior-first mechanic research
           </p>
-          <h1 id="explore-title">Start with the behavior you want.</h1>
+          <h1 id="explore-title">
+            Start with a game. Leave with a testable mechanic.
+          </h1>
           <p>
-            Find sourced combat and mobility patterns, see how real games
-            implement them, and understand the trade-offs before you build.
+            Browse familiar games, unpack one mechanic, then adapt a single rule
+            into a focused playtest.
           </p>
 
-          <div className="explore-search">
+          <form
+            className="explore-search"
+            onSubmit={(event) => {
+              event.preventDefault();
+              commitQuery(state.query);
+            }}
+          >
             <Search aria-hidden="true" />
             <label className="sr-only" htmlFor="mechanic-search">
-              Search mechanics, desired behavior, or reference game
+              Search a game, mechanic, or player behavior
             </label>
             <input
               ref={searchRef}
@@ -247,20 +251,22 @@ export function ExploreShell() {
               onChange={(event) =>
                 dispatch({ type: 'query.changed', query: event.target.value })
               }
-              placeholder="Try “reward aggression without more damage”"
+              placeholder="Search a game, mechanic, or player behavior"
             />
             <kbd aria-label="Keyboard shortcut: slash">/</kbd>
-          </div>
+          </form>
 
-          <div className="search-suggestions" aria-label="Suggested searches">
+          <div
+            className="search-suggestions"
+            id="behavior-searches"
+            aria-label="Suggested searches"
+          >
             <span>Try</span>
             {SEARCH_SUGGESTIONS.map((suggestion) => (
               <button
                 type="button"
                 key={suggestion}
-                onClick={() =>
-                  dispatch({ type: 'suggestion.chosen', query: suggestion })
-                }
+                onClick={() => commitQuery(suggestion)}
               >
                 {suggestion}
               </button>
@@ -269,18 +275,63 @@ export function ExploreShell() {
         </div>
 
         <aside className="validation-note">
-          <span>Stage 0 validation corpus</span>
-          <strong>Evidence before inventory</strong>
+          <span>Curated beta library</span>
+          <strong>Concrete examples before abstraction</strong>
           <p>
-            This deliberately narrow set tests whether designers can find a
-            useful action-game reference faster than starting from a blank
-            graph.
+            Ten source-linked implementations show what a mechanic does before
+            Forge helps you adapt it.
           </p>
           <div>
-            <b>5</b> games <i /> <b>10</b> implementations <i /> <b>9</b>{' '}
-            filters
+            <b>5</b> games <i /> <b>10</b> implementations <i /> <b>1</b> golden
+            flow
           </div>
         </aside>
+      </section>
+
+      <section className="browse-library" aria-labelledby="browse-title">
+        <div className="browse-library__heading">
+          <div>
+            <p>Browse the library</p>
+            <h2 id="browse-title">Popular game breakdowns</h2>
+          </div>
+          <nav aria-label="Browse modes">
+            <a href="#popular-games" aria-current="page">
+              Popular games
+            </a>
+            <a href="#explore-results">Mechanics</a>
+            <a href="#behavior-searches">Behaviors</a>
+          </nav>
+        </div>
+
+        <div className="game-grid" id="popular-games">
+          {GAME_COLLECTIONS.map((game) => (
+            <Link
+              className={
+                game.slug === 'returnal'
+                  ? 'game-card game-card--featured'
+                  : 'game-card'
+              }
+              href={getGamePath(game.name)}
+              key={game.slug}
+            >
+              <span className="game-card__mark" aria-hidden="true">
+                {game.name
+                  .split(/\s+/)
+                  .slice(0, 2)
+                  .map((word) => word[0])
+                  .join('')}
+              </span>
+              <span className="game-card__copy">
+                <small>
+                  {game.releaseYear} · {game.genres[0].replaceAll('-', ' ')}
+                </small>
+                <strong>{game.name}</strong>
+                <span>{game.implementations.length} mechanic breakdowns</span>
+              </span>
+              <ArrowRight aria-hidden="true" />
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section
@@ -302,8 +353,8 @@ export function ExploreShell() {
           )}
         </div>
 
-        <div className="filter-grid">
-          {EXPLORE_FILTER_KEYS.map((key) => (
+        <div className="filter-grid filter-grid--primary">
+          {PRIMARY_FILTER_KEYS.map((key) => (
             <label key={key}>
               <span>{formatFilterLabel(key)}</span>
               <select
@@ -327,6 +378,34 @@ export function ExploreShell() {
           ))}
         </div>
 
+        <details className="advanced-filters">
+          <summary>More filters · {ADVANCED_FILTER_KEYS.length}</summary>
+          <div className="filter-grid">
+            {ADVANCED_FILTER_KEYS.map((key) => (
+              <label key={key}>
+                <span>{formatFilterLabel(key)}</span>
+                <select
+                  value={state.filters[key]}
+                  onChange={(event) =>
+                    dispatch({
+                      type: 'filter.changed',
+                      key,
+                      value: event.target.value,
+                    })
+                  }
+                >
+                  <option value="">{FILTER_PLACEHOLDERS[key]}</option>
+                  {FILTER_OPTIONS[key].map((option) => (
+                    <option value={option} key={option}>
+                      {formatOption(option)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
+        </details>
+
         {activeFilterCount > 0 && (
           <div className="active-filters" aria-label="Active filters">
             <span>{activeFilterCount} active</span>
@@ -346,7 +425,12 @@ export function ExploreShell() {
           </div>
         )}
 
-        <div className="results-heading" id="explore-results">
+        <div
+          className="results-heading"
+          id="explore-results"
+          ref={resultsRef}
+          tabIndex={-1}
+        >
           <div>
             <p>Implementation references</p>
             <h2>

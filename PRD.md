@@ -1,7 +1,9 @@
 # Mechanic Forge Product Requirements Document
 
-**Status:** Directional product specification  
-**Version:** 0.1  
+**Status:** Golden-flow implementation specification
+
+**Version:** 0.2
+
 **Last updated:** 2026-09-12  
 **Initial target:** Solo developers and small PC/console game teams, beginning with action-game combat and mobility mechanics
 
@@ -289,19 +291,88 @@ The initial release exports:
 
 Engine-specific resources and plugins follow only after validation of the core workflow.
 
+### 8.10 Hackathon golden flow
+
+The first complete product slice uses one recognizable game and one mechanic:
+
+```text
+Popular games
+  -> Returnal
+  -> Projectile-phasing dash
+  -> mechanic breakdown
+  -> adapt one rule
+  -> creator A/B preview
+  -> blind tester flow
+  -> evidence report
+  -> keep, revise, reject, or inconclusive
+```
+
+This slice is a product prototype, not evidence that the Stage 0 or Stage 1 gates have passed. It may use fixed content and a single supported template, but every visible action must be honest about whether it is functional, simulated, or pending durable infrastructure.
+
+#### Discovery model
+
+Explore borrows Mobbin's information-architecture pattern without copying its visual design: users can browse recognizable games first, then inspect the mechanics contained within each game. The default browse modes are **Popular games**, **Mechanics**, and **Behaviors**. Search continues to accept game names, mechanic names, and desired player behavior as equivalent entry points into the same detail records.
+
+The first viewport must prioritize useful browsing over internal research language. It uses the promise **Start with a game. Leave with a testable mechanic.** and describes the corpus as a curated beta library. Behavior, Game, and System are the default refinement controls; advanced taxonomy remains available through progressive disclosure.
+
+#### Reference-to-adaptation trust model
+
+Every mechanic breakdown visibly separates:
+
+1. **From the source:** statements directly supported by the linked first-party or publisher material.
+2. **Forge interpretation:** causal structure, trade-offs, risks, dependencies, and evidence suggestions inferred by the product.
+3. **Your decision:** the creator's adaptation or experiment rule.
+
+The initial Returnal reference supports projectile-phasing dash behavior. It does not establish the experimental recharge rules. The timer control must therefore be labelled **Experiment baseline — Forge-defined**, while elimination recharge is labelled **Your decision**. Neither may be presented as Returnal's implementation.
+
+#### Returnal and dash pages
+
+The Returnal page groups its two current implementation records—Projectile-phasing dash and Adrenaline tiers—under one recognizable game context. It uses original interface diagrams rather than unlicensed gameplay captures and links back to the official source.
+
+The dash page presents the sourced behavior followed by a plain-language causal breakdown: goal, activation, availability, state change, interaction, feedback, trade-off, invariants, tunables, and observable evidence. Its primary action is **Adapt this mechanic**; **View official source** remains secondary.
+
+#### One-rule experiment contract
+
+The adapted goal is **Reward aggressive movement without increasing weapon damage.** Only dash recharge changes:
+
+- Control A: recharge after three seconds.
+- Variant B: recharge on enemy elimination.
+- Locked conditions: dash distance, protected window, player speed, weapon damage, arena, enemies, seed, and run duration.
+
+The interface states **One rule changes. Everything else stays matched.** Before preview, it surfaces the win-more and recovery-lockout risks created by elimination recharge.
+
+#### Preview, sharing, and evidence
+
+The creator plays sequential runs rather than side-by-side arenas. The task is to cross projectile lanes and eliminate three targets. Preview runs are explicitly excluded from evidence, use the same seed, and explain the single changed rule before play.
+
+The safe default publish contract is blind variants, two 45-second runs, desktop keyboard, unlisted access, seven-day expiry, no tester account, and creator previews excluded. Until creator ownership and durable experiment storage exist, this screen must say **Demo publish preview** and must not imply that an external test or evidence collection is live.
+
+The tester journey is consent, Run 1, reset, Run 2, structured response, and completion. The report separates observed behavior from preference, states sample limitations, and lets the creator record **Keep**, **Revise**, **Reject**, or **Inconclusive** without the product choosing for them.
+
+#### Golden-flow acceptance criteria
+
+- A user can enter through Returnal or the behavior “move through danger” and reach the same dash breakdown.
+- Search submission and suggestion selection move focus to the updated result set and announce the match count.
+- Every reference card has a clear next action; no primary journey terminates at an external source.
+- A user can correctly identify sourced fact, Forge interpretation, and their own decision in an unaided review.
+- The adaptation screen shows exactly one changed rule and every locked condition.
+- The creator can preview A and B under the same stated conditions without builder assistance.
+- Publishing is labelled as a demo until ownership, storage, expiry, withdrawal, and result access are functional.
+- The final report never presents preference as behavioral evidence or a small sample as a general conclusion.
+
 ## 9. End-to-end acceptance scenario
 
 Given the intent “make dashing reward aggressive play without increasing weapon damage,” a new user can:
 
-1. Find relevant patterns and implementations using that sentence.
-2. Compare at least three approaches to movement-as-reward.
-3. Fork one approach into a sourced mechanic specification.
-4. Change dash recharge from a timer to an elimination event.
-5. Review the resulting win-more and discoverability risks.
-6. Configure a matched dash microplay with locked movement speed, damage, arena, and opponent behavior.
-7. Publish an unlisted blind A/B link.
-8. Collect valid sessions without requiring tester accounts.
-9. Review observed behavioral and preference evidence.
+1. Browse Returnal or search for “move through danger.”
+2. Open the Projectile-phasing dash implementation and distinguish its sourced behavior from Forge interpretation.
+3. Choose **Adapt this mechanic** and start from a readable mechanic contract.
+4. Change dash recharge from a Forge-defined timer baseline to an elimination event.
+5. Verify that one rule changed while movement speed, damage, dash behavior, arena, opponents, seed, and duration remain locked.
+6. Review the resulting win-more and recovery-lockout risks.
+7. Preview both variants sequentially under the same conditions.
+8. Prepare or publish an honestly labelled unlisted blind A/B test.
+9. Review observed behavioral evidence separately from preference.
 10. Record a keep, revise, reject, or inconclusive decision and export the result.
 
 ## 10. Success metrics
@@ -385,6 +456,15 @@ Only add a new playable template when it supports a repeated design question and
 7. Are studios comfortable sharing unlisted prototypes, and which privacy controls are mandatory?
 
 ## 14. Changelog
+
+### 2026-09-12 — Returnal dash golden flow
+
+- Added a Mobbin-inspired browse hierarchy from popular games to mechanics while retaining behavior-first search.
+- Selected Returnal's projectile-phasing dash as the single hackathon golden path.
+- Defined the source, Forge interpretation, and user-decision trust states.
+- Clarified that timer and elimination recharge rules are Forge experiment variants, not sourced claims about Returnal.
+- Specified the one-rule A/B contract, locked conditions, creator preview, demo publishing boundary, tester sequence, evidence separation, and decision states.
+- Added explicit acceptance criteria for every transition from discovery through decision.
 
 ### 2026-09-12 — Adversarial review amendments
 
