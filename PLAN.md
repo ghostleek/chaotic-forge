@@ -1,6 +1,6 @@
 # Mechanic Forge Delivery Plan
 
-**Status:** Active — paused at Checkpoint A
+**Status:** Active — golden-flow prototype in progress; Checkpoint A remains pending
 **Last updated:** 2026-09-12  
 **Related specification:** [PRD.md](./PRD.md)
 
@@ -88,6 +88,20 @@ Evidence checkpoints are required stops, not implementation PRs. A failed checkp
 An optional read-only System Map PR may be inserted at any branch boundary after Checkpoint C only when independent Checkpoint E in Stage 3 also passes. It is still developed, reviewed, and merged sequentially before the next numbered PR begins. Template evidence never authorizes System Map investment, and System Map evidence never authorizes another template.
 
 PRs after 13 are selected from observed P1/P2 demand rather than committed in advance.
+
+### Hackathon golden-flow prototype series
+
+The following narrow series may proceed before Checkpoint A because it uses the existing ten-card corpus and fixed Returnal content rather than expanding the production corpus. It validates interaction continuity, not the market wedge, and does not satisfy or bypass any evidence checkpoint.
+
+| Sequence      | Scope                                                                                                      | Required evidence before merge                                                                                                                                                 |
+| ------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| PR G1         | Popular-game browse, Returnal page, projectile-dash breakdown, and source/interpretation/decision labels   | Browser tests prove both game-first and behavior-first entry paths reach the same breakdown; every visible primary action has a destination                                    |
+| PR G2         | Adapted dash contract, one-rule control/variant diff, invariant locks, risk disclosure, and export preview | Unit and browser tests prove exactly one rule changes, locked fields remain unchanged, and experiment rules are never attributed to Returnal                                   |
+| PR G3         | Deterministic sequential creator preview for the fixed dash microplay                                      | Runtime tests cover the same seed, reset, input, completion, variant isolation, event capture, and preview exclusion                                                           |
+| PR G4         | Demo publish preview, blind tester walkthrough, descriptive evidence report, and recorded decision         | End-to-end tests cover the no-account journey and confirm simulated or local-only states are never presented as durable external evidence                                      |
+| Checkpoint GF | Cold-test the complete golden flow with five designers unfamiliar with the project                         | At least four reach the dash breakdown unaided, identify the provenance boundary, create the one-rule adaptation, and explain what the resulting report can and cannot support |
+
+After this series, resume Checkpoint A. Production corpus expansion remains blocked until the canonical Stage 0 thresholds pass. Production sharing remains blocked until creator ownership and durable storage are implemented.
 
 ## 5. Delivery stages
 

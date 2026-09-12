@@ -3,6 +3,13 @@ import test from 'node:test';
 
 import { VALIDATION_CORPUS } from '../lib/mechanics/corpus.ts';
 import {
+  buildGameCollections,
+  findGameCollection,
+  findMechanicImplementation,
+  getGamePath,
+  getMechanicPath,
+} from '../lib/mechanics/catalog.ts';
+import {
   INITIAL_EXPLORE_STATE,
   buildFilterOptions,
   exploreReducer,
@@ -31,6 +38,24 @@ test('validation corpus has ten unique, versioned implementation cards', () => {
   );
   assert.ok(new Set(VALIDATION_CORPUS.map((card) => card.game.name)).size >= 5);
   assert.deepEqual(validateMechanicCorpus(VALIDATION_CORPUS), []);
+});
+
+test('catalog groups concrete implementations into stable game and mechanic paths', () => {
+  const games = buildGameCollections(VALIDATION_CORPUS);
+  const returnal = findGameCollection(VALIDATION_CORPUS, 'returnal');
+
+  assert.equal(games.length, 5);
+  assert.equal(returnal?.implementations.length, 2);
+  assert.equal(
+    findMechanicImplementation(VALIDATION_CORPUS, 'returnal-projectile-dash')
+      ?.game.name,
+    'Returnal',
+  );
+  assert.equal(getGamePath('Ghost of Tsushima'), '/games/ghost-of-tsushima');
+  assert.equal(
+    getMechanicPath('returnal-projectile-dash'),
+    '/mechanics/returnal-projectile-dash',
+  );
 });
 
 test('every causal and comparison claim resolves to visible source metadata', () => {
