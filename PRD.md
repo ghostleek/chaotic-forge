@@ -457,6 +457,13 @@ Only add a new playable template when it supports a repeated design question and
 
 ## 14. Changelog
 
+### 2026-09-12 — Golden-flow PR G4 implementation
+
+- Added a fixed demo-publish capability gate that separates the working tester walkthrough from blocked production sharing infrastructure.
+- Added a no-account blind Run 1 / Run 2 journey with consent, matched 45-second runs, and a post-play response.
+- Added a descriptive local report that reveals the variants only after response and states its sample, scope, and limitations.
+- Added a local-only keep/revise/reject/inconclusive decision record that disappears on reload.
+
 ### 2026-09-12 — Golden-flow PR G3 implementation
 
 - Added a deterministic 45-second creator preview for the fixed dash experiment.

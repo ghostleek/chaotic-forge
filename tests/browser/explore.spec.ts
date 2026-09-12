@@ -235,6 +235,74 @@ test('saved dash contract becomes a deterministic preview-only A/B microplay', a
   ).toHaveAttribute('aria-pressed', 'true');
 });
 
+test('demo publish completes a blind local-only tester loop without claiming durable evidence', async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await page.clock.install();
+  await page.goto('/microplays/dash/preview');
+  await page.getByRole('link', { name: 'Prepare demo share' }).click();
+
+  await expect(page).toHaveURL(/\/microplays\/dash\/publish$/);
+  await expect(
+    page.getByRole('heading', {
+      name: 'Test the handoff without faking the infrastructure.',
+    }),
+  ).toBeVisible();
+  await expect(page.getByText('Blocked for production')).toBeVisible();
+
+  await page.getByRole('link', { name: 'Open tester walkthrough' }).click();
+  await expect(page).toHaveURL(/\/play\/dash-demo$/);
+  await expect(
+    page.getByRole('heading', { name: 'A two-run movement test' }),
+  ).toBeVisible();
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'Begin two-run demo' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Run 1 of 2' })).toBeVisible();
+  await expect(page.getByText('Variant B')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Start Run 1' }).click();
+  await page.clock.runFor(45_100);
+  await page.getByRole('button', { name: 'Continue to Run 2' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Run 2 of 2' })).toBeVisible();
+  await expect(page.getByText('Control A')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Start Run 2' }).click();
+  await page.clock.runFor(45_100);
+  await page.getByRole('button', { name: 'Answer one question' }).click();
+
+  await page.getByRole('radio', { name: 'Run 1' }).check();
+  await page
+    .getByRole('textbox', { name: 'What made it feel different? (optional)' })
+    .fill('The faster return to pressure felt clearer.');
+  await page
+    .getByRole('button', { name: 'Submit local demo response' })
+    .click();
+
+  await expect(
+    page.getByRole('heading', { name: 'Useful for QA. Not a design verdict.' }),
+  ).toBeVisible();
+  await expect(page.getByText('n = 1')).toBeVisible();
+  await expect(
+    page.getByText('Local demo · invalid as external evidence'),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Variant B — on enemy elimination'),
+  ).toBeVisible();
+
+  await page.getByLabel('Decision').selectOption('revise');
+  await page
+    .getByRole('textbox', { name: 'Rationale / next step' })
+    .fill('Run real sessions after durable sharing exists.');
+  await page.getByRole('button', { name: 'Save local decision' }).click();
+  await expect(page.getByText(/Saved only in this tab/)).toBeVisible();
+
+  await page.reload();
+  await expect(
+    page.getByRole('heading', { name: 'A two-run movement test' }),
+  ).toBeVisible();
+});
+
 test('a behavior suggestion focuses its filtered result set', async ({
   page,
 }) => {
@@ -255,6 +323,8 @@ test('layout stays operable without horizontal overflow', async ({ page }) => {
     '/mechanics/returnal-projectile-dash',
     '/forge/dash',
     '/microplays/dash/preview',
+    '/microplays/dash/publish',
+    '/play/dash-demo',
   ]) {
     await page.goto(route);
     const hasOverflow = await page.evaluate(
