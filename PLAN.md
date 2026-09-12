@@ -1,7 +1,7 @@
 # Mechanic Forge Delivery Plan
 
-**Status:** Active — G1–G3 merged; G4 implemented and pending merge; Checkpoint A remains pending
-**Last updated:** 2026-09-12  
+**Status:** Active — G1–G4 merged; hackathon hardening and Checkpoint GF remain pending; Checkpoint A remains pending
+**Last updated:** 2026-09-13
 **Related specification:** [PRD.md](./PRD.md)
 
 ## 1. Planning rule
@@ -100,6 +100,20 @@ The following narrow series may proceed before Checkpoint A because it uses the 
 | PR G3         | Deterministic sequential creator preview for the fixed dash microplay                                      | Runtime tests cover the same seed, reset, input, completion, variant isolation, event capture, and preview exclusion                                                           |
 | PR G4         | Demo publish preview, blind tester walkthrough, descriptive evidence report, and recorded decision         | End-to-end tests cover the no-account journey and confirm simulated or local-only states are never presented as durable external evidence                                      |
 | Checkpoint GF | Cold-test the complete golden flow with five designers unfamiliar with the project                         | At least four reach the dash breakdown unaided, identify the provenance boundary, create the one-rule adaptation, and explain what the resulting report can and cannot support |
+
+#### Hackathon hardening PR
+
+One final pre-demo PR follows G4 before Checkpoint GF:
+
+- isolate Playwright's Next.js output in `.next-playwright` so the browser suite can run beside the local app;
+- pin Node.js 24 for local and hosted parity;
+- add project guardrails for provenance, scope, deterministic behavior, and quality gates;
+- remove UI copy that implies a live Astra call where the demo is deterministic;
+- document how Astra supports the build and how to present that contribution truthfully;
+- run the complete quality gate once, then one independent adversarial review and post-review verification;
+- verify the deployed golden flow and rehearse a 90-second fallback capture.
+
+Runtime model integration remains deferred unless the hackathon organizers explicitly require it. The published brief requires Astra to be used throughout the build and explained in the submission video, but does not state that the prototype must call Astra at runtime. Reliability and an honest build log therefore outrank adding an API dependency tonight.
 
 After this series, resume Checkpoint A. Production corpus expansion remains blocked until the canonical Stage 0 thresholds pass. Production sharing remains blocked until creator ownership and durable storage are implemented.
 

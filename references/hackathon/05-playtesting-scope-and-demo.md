@@ -137,7 +137,7 @@ Keep a last-known-good build before risky integration work.
 6. **Evidence:** state what playtesting changed.
 7. **Close:** name the product direction, not a backlog.
 
-Prepare a 60–90 second fallback recording. Live demos fail for reasons unrelated to design.
+Prepare a rehearsed 90-second fallback recording that also satisfies the submission requirement. Live demos fail for reasons unrelated to design.
 
 ## 9. Final readiness checklist
 

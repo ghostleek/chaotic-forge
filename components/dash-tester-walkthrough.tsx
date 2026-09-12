@@ -94,6 +94,15 @@ export function DashTesterWalkthrough() {
   const touchAxis = useRef<Pick<DashRuntimeInput, 'x' | 'y'>>({ x: 0, y: 0 });
   const queuedDash = useRef(false);
   const queuedAttack = useRef(false);
+  const stageHeading = useRef<HTMLHeadingElement>(null);
+  const focusStep = `${stage}:${stage === 'run' ? runIndex : ''}`;
+  const previousFocusStep = useRef(focusStep);
+
+  useEffect(() => {
+    if (previousFocusStep.current === focusStep) return;
+    previousFocusStep.current = focusStep;
+    stageHeading.current?.focus();
+  }, [focusStep]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -202,7 +211,9 @@ export function DashTesterWalkthrough() {
             <p className="reference-kicker">
               <EyeOff aria-hidden="true" /> Blind local demo
             </p>
-            <h1 id="tester-title">A two-run movement test</h1>
+            <h1 id="tester-title" ref={stageHeading} tabIndex={-1}>
+              A two-run movement test
+            </h1>
             <p>
               Play two 45-second runs, then choose which felt more supportive of
               aggressive movement. Rule names stay hidden until you answer.
@@ -253,7 +264,7 @@ export function DashTesterWalkthrough() {
           <p className="reference-kicker">
             <Check aria-hidden="true" /> Both runs complete
           </p>
-          <h1 id="response-title">
+          <h1 id="response-title" ref={stageHeading} tabIndex={-1}>
             Which run better supported forward pressure?
           </h1>
           <fieldset>
@@ -304,7 +315,9 @@ export function DashTesterWalkthrough() {
             <p className="reference-kicker">
               <FileWarning aria-hidden="true" /> Descriptive local report
             </p>
-            <h1 id="report-title">Useful for QA. Not a design verdict.</h1>
+            <h1 id="report-title" ref={stageHeading} tabIndex={-1}>
+              Useful for QA. Not a design verdict.
+            </h1>
           </div>
           <div className="report-scope">
             <strong>n = {report.sampleSize}</strong>
@@ -442,7 +455,9 @@ export function DashTesterWalkthrough() {
           <p className="reference-kicker">
             <EyeOff aria-hidden="true" /> Variant identity hidden
           </p>
-          <h1 id="blind-run-title">Run {runIndex + 1} of 2</h1>
+          <h1 id="blind-run-title" ref={stageHeading} tabIndex={-1}>
+            Run {runIndex + 1} of 2
+          </h1>
           <p>
             Move toward the pressure zone. Dash through projectiles and strike
             the target when close.

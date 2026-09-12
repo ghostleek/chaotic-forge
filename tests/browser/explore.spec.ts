@@ -259,17 +259,25 @@ test('demo publish completes a blind local-only tester loop without claiming dur
   await page.getByRole('checkbox').check();
   await page.getByRole('button', { name: 'Begin two-run demo' }).click();
 
-  await expect(page.getByRole('heading', { name: 'Run 1 of 2' })).toBeVisible();
+  const runOneHeading = page.getByRole('heading', { name: 'Run 1 of 2' });
+  await expect(runOneHeading).toBeFocused();
   await expect(page.getByText('Variant B')).toHaveCount(0);
   await page.getByRole('button', { name: 'Start Run 1' }).click();
   await page.clock.runFor(45_100);
   await page.getByRole('button', { name: 'Continue to Run 2' }).click();
 
-  await expect(page.getByRole('heading', { name: 'Run 2 of 2' })).toBeVisible();
+  const runTwoHeading = page.getByRole('heading', { name: 'Run 2 of 2' });
+  await expect(runTwoHeading).toBeFocused();
   await expect(page.getByText('Control A')).toHaveCount(0);
   await page.getByRole('button', { name: 'Start Run 2' }).click();
   await page.clock.runFor(45_100);
   await page.getByRole('button', { name: 'Answer one question' }).click();
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'Which run better supported forward pressure?',
+    }),
+  ).toBeFocused();
 
   await page.getByRole('radio', { name: 'Run 1' }).check();
   await page
@@ -281,7 +289,7 @@ test('demo publish completes a blind local-only tester loop without claiming dur
 
   await expect(
     page.getByRole('heading', { name: 'Useful for QA. Not a design verdict.' }),
-  ).toBeVisible();
+  ).toBeFocused();
   await expect(page.getByText('n = 1')).toBeVisible();
   await expect(
     page.getByText('Local demo · invalid as external evidence'),
