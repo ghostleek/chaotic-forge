@@ -457,6 +457,13 @@ Only add a new playable template when it supports a repeated design question and
 
 ## 14. Changelog
 
+### 2026-09-12 — Golden-flow PR G3 implementation
+
+- Added a deterministic 45-second creator preview for the fixed dash experiment.
+- Kept Control A and Variant B sequential, with the same seed, arena, inputs, protected window, and encounter rules.
+- Added keyboard and touch controls, explicit recharge feedback, reset-to-same-seed behavior, and preview event capture.
+- Marked all creator-preview events as local-only and excluded from evidence.
+
 ### 2026-09-12 — Golden-flow PR G2 implementation
 
 - Made the dash design goal and the single Variant B recharge decision editable.

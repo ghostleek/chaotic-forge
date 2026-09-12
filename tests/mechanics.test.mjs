@@ -17,6 +17,13 @@ import {
   serializeDashExperimentMarkdown,
 } from '../lib/mechanics/dash-experiment.ts';
 import {
+  DASH_ARENA,
+  advanceDashPreviewRun,
+  createDashPreviewRun,
+  runDashPreviewToCompletion,
+  startDashPreviewRun,
+} from '../lib/mechanics/dash-runtime.ts';
+import {
   INITIAL_EXPLORE_STATE,
   buildFilterOptions,
   exploreReducer,
@@ -98,6 +105,78 @@ test('dash exports retain provenance, diff, risks, and evidence plan', () => {
   assert.equal(json.changedRules.length, 1);
   assert.equal(json.reference.origin, 'source');
   assert.equal(json.risks.length, 2);
+});
+
+test('dash preview uses the same deterministic seed and resets exactly', () => {
+  const initial = createDashPreviewRun();
+  const first = startDashPreviewRun(initial);
+  const second = startDashPreviewRun(createDashPreviewRun());
+  const firstTick = advanceDashPreviewRun(first, 1_000, { x: 1 });
+  const secondTick = advanceDashPreviewRun(second, 1_000, { x: 1 });
+
+  assert.deepEqual(firstTick, secondTick);
+  assert.equal(firstTick.projectiles.length, 1);
+  assert.notDeepEqual(firstTick, initial);
+  assert.deepEqual(createDashPreviewRun(), initial);
+});
+
+test('dash preview isolates timer and mutation recharge rules', () => {
+  const controlDash = advanceDashPreviewRun(
+    startDashPreviewRun(createDashPreviewRun({ variant: 'control' })),
+    50,
+    { dash: true },
+  );
+  const mutationDash = advanceDashPreviewRun(
+    startDashPreviewRun(createDashPreviewRun({ variant: 'mutation' })),
+    50,
+    { dash: true },
+  );
+
+  assert.equal(controlDash.dashReady, false);
+  assert.equal(controlDash.dashRechargeAtMs, 3_050);
+  assert.equal(mutationDash.dashReady, false);
+  assert.equal(mutationDash.dashRechargeAtMs, null);
+  assert.equal(advanceDashPreviewRun(controlDash, 3_000).dashReady, true);
+  assert.equal(advanceDashPreviewRun(mutationDash, 3_000).dashReady, false);
+});
+
+test('projectile-crossing mutation recharges only after a protected crossing', () => {
+  let state = advanceDashPreviewRun(
+    startDashPreviewRun(
+      createDashPreviewRun({
+        variant: 'mutation',
+        mutationId: 'projectile-crossing',
+      }),
+    ),
+    50,
+    { dash: true },
+  );
+  state = {
+    ...state,
+    projectiles: [{ id: 99, x: state.player.x, y: state.player.y }],
+  };
+  state = advanceDashPreviewRun(state, 50);
+
+  assert.equal(state.metrics.projectileCrossings, 1);
+  assert.equal(state.dashReady, true);
+  assert.equal(state.player.hp, 3);
+  assert.ok(
+    state.events.some(
+      (event) =>
+        event.type === 'dash_recharged' &&
+        event.detail === 'projectile-crossing',
+    ),
+  );
+});
+
+test('dash preview completes at 45 seconds and excludes every event from evidence', () => {
+  const complete = runDashPreviewToCompletion(createDashPreviewRun());
+
+  assert.equal(complete.status, 'complete');
+  assert.equal(complete.elapsedMs, DASH_ARENA.runDurationMs);
+  assert.equal(complete.events.at(-1)?.type, 'run_completed');
+  assert.ok(complete.events.every((event) => event.preview === true));
+  assert.equal(complete.preview, true);
 });
 
 test('every causal and comparison claim resolves to visible source metadata', () => {

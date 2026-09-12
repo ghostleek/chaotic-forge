@@ -183,6 +183,58 @@ test('dash adaptation remains a one-rule diff and exports its trust boundary', a
   );
 });
 
+test('saved dash contract becomes a deterministic preview-only A/B microplay', async ({
+  page,
+}) => {
+  await page.goto('/forge/dash');
+  await page
+    .getByLabel('Variant B · Your decision')
+    .selectOption('projectile-crossing');
+  await page.getByRole('button', { name: 'Save experiment contract' }).click();
+  await page.getByRole('link', { name: 'Preview matched A/B' }).click();
+
+  await expect(page).toHaveURL(
+    /\/microplays\/dash\/preview\?.*mutation=projectile-crossing/,
+  );
+  await expect(
+    page.getByRole('heading', {
+      name: 'Feel the rule change before you share it.',
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Events are excluded from evidence.'),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Same arena · seed 4127 · one rule changed'),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: '1 · Control A' }),
+  ).toHaveAttribute('aria-pressed', 'true');
+
+  await page.getByRole('button', { name: 'Start 45-second preview' }).click();
+  await page.getByRole('button', { name: 'Dash · Space' }).click();
+  await expect(
+    page.getByText('Dash attempts').locator('..').locator('strong'),
+  ).toHaveText('1');
+  await expect(page.getByText('Not evidence', { exact: true })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Reset same seed' }).click();
+  await expect(
+    page.getByText('Start Control A', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel('45 seconds remaining')).toBeVisible();
+
+  await page.getByRole('button', { name: '2 · Variant B' }).click();
+  await expect(
+    page.getByRole('heading', {
+      name: 'After a successful projectile crossing',
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: '2 · Variant B' }),
+  ).toHaveAttribute('aria-pressed', 'true');
+});
+
 test('a behavior suggestion focuses its filtered result set', async ({
   page,
 }) => {
@@ -202,6 +254,7 @@ test('layout stays operable without horizontal overflow', async ({ page }) => {
     '/games/returnal',
     '/mechanics/returnal-projectile-dash',
     '/forge/dash',
+    '/microplays/dash/preview',
   ]) {
     await page.goto(route);
     const hasOverflow = await page.evaluate(
