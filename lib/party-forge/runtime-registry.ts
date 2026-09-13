@@ -1,3 +1,5 @@
+import { DINO_RESOURCE, loadDinoBuild } from './runtimes/dino-runner-v2/manifest.ts';
+import { createDinoRuntime } from './runtimes/dino-runner-v2/retained/engine.js';
 import { buildManifestSchema, type BuildManifest } from './contracts.ts';
 import { ARCHIVE_POLICY, createArchiveRuntime, loadArchiveBuild } from './runtimes/kitchen-chaos-v1/archive-runtime.ts';
 import { createPixelRuntime } from './runtimes/pixel-arcade-v1/retained/engine.js';
@@ -14,6 +16,7 @@ const kitchenAssets: BuildManifest['assets'] = ARCHIVE_POLICY.manifest.assets;
  * Registry keys never become fetch URLs, dynamic imports, or executable input.
  */
 export const RETAINED_RUNTIMES = freezeJson([
+  { runtime: DINO_RESOURCE, resolverVersion: null, presetVersion: null, validatorVersion: null, assets: [] as BuildManifest['assets'] },
   { runtime: PIXEL_RUNTIME_V2, resolverVersion: null, presetVersion: null, validatorVersion: null, assets: [] as BuildManifest['assets'] },
   { runtime: PIXEL_RUNTIME_RESOURCE, resolverVersion: null, presetVersion: null, validatorVersion: null, assets: [] as BuildManifest['assets'] },
   {
@@ -57,7 +60,7 @@ export function checkRuntimeAvailability(value: unknown): RuntimeAvailability {
   if (retained.assets.some((resource) => !build.assets.some((asset) => asset.key === resource.key))) {
     throw new Error('The saved manifest omits an asset required by its retained version');
   }
-  if (build.catalogVersion === 'pixel-arcade/1') return { status: 'available' }; // Version-owned loader validates generated policy and recipe.
+  if (build.catalogVersion === 'pixel-arcade/1' || build.catalogVersion === 'dino-runner/2') return { status: 'available' }; // Version-owned loader validates generated policy and recipe.
   if (build.resolverVersion !== retained.resolverVersion ||
       build.validation.validatorVersion !== retained.validatorVersion ||
       build.origin.kind !== 'preset' || build.origin.presetVersion !== retained.presetVersion) {
@@ -79,10 +82,10 @@ export async function loadRetainedBuild(value: unknown) {
   const availability = checkRuntimeAvailability(build);
   if (availability.status === 'unavailable') throw new UnavailableRuntimeError(availability.reason);
   // v1 validates exact authored rules, qualification hashes and asset references.
-  return build.runtime.version === 'pixel-arcade-v2' ? loadPixelBuildV2(build) : build.catalogVersion === 'pixel-arcade/1' ? loadPixelBuild(build) : loadArchiveBuild(build);
+  return build.runtime.version === 'dino-runner-v2' ? loadDinoBuild(build) : build.runtime.version === 'pixel-arcade-v2' ? loadPixelBuildV2(build) : build.catalogVersion === 'pixel-arcade/1' ? loadPixelBuild(build) : loadArchiveBuild(build);
 }
 
 export async function createRetainedRuntime(value: unknown, seed: number) {
   const { build } = await loadRetainedBuild(value);
-  return build.runtime.version === 'pixel-arcade-v2' ? createPixelRuntimeV2(build, seed) : build.catalogVersion === 'pixel-arcade/1' ? createPixelRuntime(build, seed) : createArchiveRuntime(build, seed);
+  return build.runtime.version === 'dino-runner-v2' ? createDinoRuntime(build, seed) : build.runtime.version === 'pixel-arcade-v2' ? createPixelRuntimeV2(build, seed) : build.catalogVersion === 'pixel-arcade/1' ? createPixelRuntime(build, seed) : createArchiveRuntime(build, seed);
 }

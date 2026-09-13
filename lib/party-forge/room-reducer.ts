@@ -124,7 +124,7 @@ export function joinRoom(record: RoomRecord, participantId: string, nickname: st
   room.votes = []; // A newly active participant must participate in any End decision.
   if (room.phase === 'end-vote') room.phase = 'results';
   if (room.phase === 'lobby' && room.fork?.mode === 'play-again' &&
-      room.build.status === 'playable' && room.participants.length === DEMO_POLICY.players) {
+      room.build.status === 'playable' && room.participants.length >= minimumPlayers(room)) {
     prepareRound(next, room.build.manifest, now);
   }
   return finish(next, now);
@@ -420,7 +420,7 @@ export async function reduceRoom(
         requireCondition(now <= room.round.startsAt, 'deadline', 'Ready expired; acknowledge again to reopen the window');
         requireCondition(room.acknowledgments.length === room.round.roster.length && room.participants.every(p =>
           p.presence === 'present' && now - p.lastSeenAt < DEMO_POLICY.hostGraceMs), 'unavailable', 'Every participant in the frozen roster must be present and acknowledge');
-        const startsAt = now + (room.build.status === 'playable' && room.build.manifest.catalogVersion === 'pixel-arcade/1' ? 6000 : ROUND_START_LEAD_MS);
+        const startsAt = now + (room.build.status === 'playable' && ['pixel-arcade/1', 'dino-runner/2'].includes(room.build.manifest.catalogVersion) ? 6000 : ROUND_START_LEAD_MS);
         room.round.startsAt = startsAt;
         room.round.submissionDeadline = startsAt + 60_000;
         room.round.transportDeadline = startsAt + 60_000 + DEMO_POLICY.transportGraceMs;
@@ -441,7 +441,7 @@ export async function reduceRoom(
         if (next.submissions.length === room.round.roster.length) {
           const ranked = rankResults(room.round, next.submissions);
           const result = completedResultSchema.parse({
-            protocolVersion: PROTOCOL_VERSION, round: room.round,
+            protocolVersion: PROTOCOL_VERSION, round: room.round, completedAt: now,
             results: next.submissions.map(s => ({ ...s, rank: ranked.ranks[s.participantId] })),
             editors: ranked.editors, nextTieCursor: ranked.nextTieCursor,
           });

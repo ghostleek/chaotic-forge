@@ -87,7 +87,7 @@ export function InstructionEditor({
         <p>
           Starters only prefill your card; confirm it when ready. The exact
           Snake + Space Invaders pair, in either order (including a repeated
-          third card), reuses the saved demo. Edits and other combinations need
+          third card), reuses the saved demo. Chrome Dino + Mario selects the authored runner. Only the listed Dino scoring modifiers match its remix. Other edits and combinations need
           API access.
         </p>
       </details>

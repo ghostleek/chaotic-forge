@@ -28,12 +28,16 @@ export class TrialInputCapture {
   private current: Controls = { buttons: 0, yaw: 0, pitch: 0 };
   private sampled: Controls = { ...this.current };
   private changes = new Map<number, Controls>();
+  private pulses = new Map<number, number>();
   readonly frames: RuntimeInput[] = [];
   readonly start: number;
-  constructor(start: number) {
+  private edgeMask: number;
+  constructor(start: number, edgeMask = 0) {
+    this.edgeMask = edgeMask;
     this.start = start;
   }
   change(at: number, controls: Partial<Controls>) {
+    const rising = (controls.buttons ?? this.current.buttons) & ~this.current.buttons & this.edgeMask;
     this.current = { ...this.current, ...controls };
     this.current.yaw = wrapYaw(this.current.yaw);
     this.current.pitch = clampPitch(this.current.pitch);
@@ -42,8 +46,10 @@ export class TrialInputCapture {
       0,
       Math.ceil(((at - this.start) * 60) / 1000),
     );
-    if (tick < DEMO_POLICY.trialTicks)
+    if (tick < DEMO_POLICY.trialTicks) {
       this.changes.set(tick, { ...this.current });
+      if (rising) this.pulses.set(tick, (this.pulses.get(tick) ?? 0) | rising);
+    }
   }
   clear(at: number) {
     this.change(at, { buttons: 0 });
@@ -72,7 +78,8 @@ export class TrialInputCapture {
       this.sampled = change;
       this.changes.delete(tick);
     }
-    const frame = { tick, ...this.sampled };
+    const frame = { tick, ...this.sampled, buttons: this.sampled.buttons | (this.pulses.get(tick) ?? 0) };
+    this.pulses.delete(tick);
     this.frames.push(frame);
     return frame;
   }

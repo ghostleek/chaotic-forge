@@ -147,7 +147,7 @@ export const buildManifestSchema = z
     buildId: id,
     contentHash: hash,
     parent: z.strictObject({ buildId: id, contentHash: hash }).nullable(),
-    catalogVersion: z.enum(['kitchen-chaos/1', 'pixel-arcade/1']),
+    catalogVersion: z.enum(['kitchen-chaos/1', 'pixel-arcade/1', 'dino-runner/2']),
     resolverVersion: id,
     origin: z.discriminatedUnion('kind', [
       z.strictObject({ kind: z.literal('preset'), presetVersion: id }),
@@ -181,6 +181,7 @@ export const buildManifestSchema = z
       .max(24),
     objective: text,
     pixelRules: pixelRecipeSchema.optional(),
+    runnerRules: z.strictObject({ stompBonus: z.number().int().min(0).max(100), meatBonus: z.number().int().min(0).max(50), finishBonus: z.number().int().min(0).max(250) }).optional(),
     controls: z.enum(['desktop-keyboard-mouse/1', 'direction-pad/1']),
     scoringVersion: scoringVersionSchema,
     adaptation: z.literal('off'),
@@ -197,10 +198,12 @@ export const buildManifestSchema = z
   })
   .superRefine((build, ctx) => {
     const pixel = isPixelHistory(build.contributions);
-    if ((build.catalogVersion === 'pixel-arcade/1') !== pixel ||
+    const runner = build.catalogVersion === 'dino-runner/2';
+    if ((build.catalogVersion === 'pixel-arcade/1' || runner) !== pixel ||
         (build.controls === 'direction-pad/1') !== pixel ||
         (build.scoringVersion === 'points-then-hits/1') !== pixel ||
-        (build.pixelRules !== undefined) !== pixel) {
+        (build.pixelRules !== undefined) !== (pixel && !runner) ||
+        (build.runnerRules !== undefined) !== runner) {
       ctx.addIssue({ code: 'custom', message: 'Catalog, controls, scoring, rules and all contributions must use one runtime family' });
     }
     const ids = build.contributions.map((c) => c.id);
@@ -470,6 +473,7 @@ const scoreSchema = z.strictObject({
 });
 export const completedResultSchema = z
   .strictObject({
+    completedAt: integer.optional(),
     protocolVersion: version,
     round: roundSchema,
     results: z
@@ -489,6 +493,9 @@ export const completedResultSchema = z
     nextTieCursor: integer.max(2),
   })
   .superRefine((result, ctx) => {
+    if (result.completedAt !== undefined && (result.completedAt < result.round.startsAt || result.completedAt > result.round.transportDeadline)) {
+      ctx.addIssue({ code: 'custom', message: 'Completion time must fall within the frozen round' });
+    }
     if (
       result.results.length !== result.round.roster.length ||
       !unique(result.results.map((s) => s.participantId)) ||

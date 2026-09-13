@@ -11,6 +11,12 @@ export function RecipeSummary({room}:{room:RoomSnapshot}){
       <p>{c.kind==='initial'&&c.choice.slot==='instruction'?c.choice.text:c.kind==='addition'&&c.cardId==='instruction'?c.text:CARDS[cardIdFor(c)].title}</p>
       <details><summary>Source & interpretation</summary><p>Source: {c.provenance.source.reference}</p><p>Forge: {build?.effects.find(e=>e.contributionId===c.id)?.explanation??c.provenance.forgeInterpretation}</p><small>Decision: {c.provenance.userDecision.decisionId}</small></details>
     </li>)}</ol>
+    {build?.runnerRules ? <div className={styles.gameRules}>
+      <span className={styles.eyebrow}>SIMULATED AUTHORED REMIX · NO AI CALL</span><h3>Dino × Mario</h3><p>{build.objective}</p>
+      <ol>{build.effects.map(e=><li key={e.contributionId}>{e.explanation}</li>)}</ol>
+      <p>Three starting lives; meat adds a life up to four. Finish the 30-second course or stop at zero lives. Score: 10/sec, {100 + build.runnerRules.stompBonus}/stomp, {50 + build.runnerRules.meatBonus}/meat, {500 + build.runnerRules.finishBonus} for finishing plus 100/life.</p>
+      <p>Next round: winner and loser may each add one unused modifier — Double stomp points, Double meat points, or Finish bonus.</p>
+    </div> : null}
     {build?.pixelRules ? <div className={styles.gameRules}>
       <span className={styles.eyebrow}>YOUR GAME</span><h3>{build.pixelRules.title}</h3><p>{build.objective}</p>
       <ol>{build.effects.map(e=><li key={e.contributionId}>{e.explanation}</li>)}</ol>

@@ -15,7 +15,8 @@ export async function scoreTrial(manifest: unknown, round: FrozenRound, trial: u
   }
   const runtime = await createRetainedRuntime(build, input.seed);
   let score;
-  if (input.endedEarly) {
+  if (build.runtime.version === 'dino-runner-v2') score = runtime.validateScore(build, input);
+  else if (input.endedEarly) {
     if (build.runtime.version !== 'pixel-arcade-v2') throw new Error('This runtime requires a complete timed trace');
     for (const frame of input.frames) {
       if (runtime.snapshot().state.gameOver === true) throw new Error('Early trace must stop at elimination');

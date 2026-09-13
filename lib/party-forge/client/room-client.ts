@@ -165,7 +165,7 @@ export class RoomClient {
         data.snapshot?.participants.find(
           (p) => p.id === this.state.access?.participantId,
         )?.lastSeenAt;
-      const pixel = data.snapshot?.build.status === 'playable' && data.snapshot.build.manifest.catalogVersion === 'pixel-arcade/1';
+      const pixel = data.snapshot?.build.status === 'playable' && ['pixel-arcade/1', 'dino-runner/2'].includes(data.snapshot.build.manifest.catalogVersion);
       const serverTime = Number(response.headers.get('x-party-server-time'));
       // Processing time is not network transit. Anchor to response time, then keep
       // the active pixel round's monotonic clock fixed despite slow later polls.

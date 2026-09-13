@@ -1,3 +1,4 @@
+import { createDinoBuild } from '../runtimes/dino-runner-v2/manifest.ts';
 import { z } from 'zod';
 import { contributionHistorySchema, isPixelHistory, type BuildManifest } from '../contracts.ts';
 import { resolveBuild, type ResolveRequest, type ResolveResult } from '../resolve-build.ts';
@@ -24,6 +25,9 @@ export async function resolveInstructionRequest(request:ResolveRequest, db:D1Dat
   }
   const fail=(reason:string):ResolveResult=>({status:'incompatible',previous,reason});
   if(previous && ((contributions.length<=previous.contributions.length || contributions.length>previous.contributions.length+2) || canonicalJson(contributions.slice(0,previous.contributions.length))!==canonicalJson(previous.contributions))) return fail('Keep previous instructions unchanged and add one or two remix cards within the five-instruction cap.');
+  const dino = await createDinoBuild(contributions, previous ? {buildId:previous.buildId,contentHash:previous.contentHash} : null);
+  if(dino) return {status:'playable',manifest:dino};
+  if(previous?.runtime.version === 'dino-runner-v2') return fail('Keep the Dino and Mario cards. Add one unused modifier: Double stomp points, Double meat points, or Finish bonus.');
   const cards=contributions.map(c=>({participantId:c.participantId,text:c.kind==='initial' && c.choice.slot==='instruction' ? c.choice.text : c.kind==='addition' ? c.text : '',ordinal:c.ordinal}));
   const unsupported=unsupportedInstructionReason(cards.map(card=>card.text??''));
   if(unsupported) return fail(unsupported);

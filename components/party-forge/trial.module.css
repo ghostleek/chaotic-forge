@@ -12,3 +12,6 @@
 .dpad{display:grid;grid-template-columns:repeat(3,44px);gap:4px;flex-shrink:0}.game .dpad button{color:#192326;background:#c9f589;width:44px;height:44px;min-height:44px;padding:0!important;margin:0!important;font-size:24px;touch-action:none;user-select:none}.dpad button[data-dir='Up']{grid-column:2}.dpad button[data-dir='Left']{grid-column:1;grid-row:2}.dpad button[data-dir='Down']{grid-column:2;grid-row:2}.dpad button[data-dir='Right']{grid-column:3;grid-row:2}
 .game output{display:block;font-size:12px;line-height:1.5;color:#e6d7a6}
 @media(max-width:600px){.game{padding:10px}.hud{gap:10px}.scores{gap:18px}.scores strong{font-size:22px}.controlRow{flex-wrap:wrap;justify-content:center}.controls{width:100%}.label{font-size:9px}.overlay{font-size:12px}}
+
+.viewport canvas[data-runner]{aspect-ratio:9/4}
+.game .dpad button[data-dir='Jump']{grid-column:1 / -1;width:100%;font-size:18px}

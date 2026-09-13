@@ -1,5 +1,10 @@
 /** Exact text is intentional: edits never silently match the saved-demo shortcut. */
 export const INSTRUCTION_STARTERS = [
+  { title: 'Chrome Dino', text: 'Chrome offline Dino run', sprite: 'snake', hint: 'Running and spike jumps. Pair with Mario for the authored online remix; no API call.' },
+  { title: 'Mario', text: 'Mario', sprite: 'bounce', hint: 'Stomps, meat power-ups and extra lives. Pair with Chrome Dino; confirm your card.' },
+  { title: 'Double stomp points', text: 'Double stomp points', sprite: 'alien', hint: 'Dino remix: each stomp adds 200 points. Choose once after a round.' },
+  { title: 'Double meat points', text: 'Double meat points', sprite: 'food', hint: 'Dino remix: meat adds 100 points. Choose once after a round.' },
+  { title: 'Finish bonus', text: 'Finish bonus', sprite: 'bounce', hint: 'Dino remix: completing the course adds another 250 points. Choose once after a round.' },
   {
     title: 'Snake',
     text: 'Snake',

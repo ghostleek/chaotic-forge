@@ -4,7 +4,7 @@ import {
   createDinoMarioGame,
   stepDinoMarioGame,
   DINO_MARIO as C,
-} from '../lib/party-forge/demos/dino-mario.ts';
+} from '../lib/party-forge/demos/dino-mario-v1.ts';
 
 const start = (patch = {}) => ({
   ...createDinoMarioGame(),

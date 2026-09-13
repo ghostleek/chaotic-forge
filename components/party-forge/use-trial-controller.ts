@@ -121,6 +121,8 @@ class TrialController {
       this.update({
         status: 'ready',
         snapshot: runtime.snapshot(),
+        seconds: runtime.snapshot().state.kind === 'dino' ? 30 : 60,
+        feedback: runtime.snapshot().state.kind === 'dino' ? 'JUMP · STOMP · EAT' : '',
         message:
           'Ready when you are.',
       });
@@ -226,10 +228,11 @@ class TrialController {
     this.attemptId = crypto.randomUUID();
     this.capture = new TrialInputCapture(
       performance.now() + room.round.startsAt - serverNow,
+      this.state.snapshot?.state.kind === 'dino' ? 17 : 0,
     );
     this.update({
       status: 'countdown',
-      message: 'Starting together. Use the arrows or direction pad.',
+      message: this.state.snapshot?.state.kind === 'dino' ? 'Starting together. Space, Up or Jump to leap.' : 'Starting together. Use the arrows or direction pad.',
     });
   }
   private tick() {
@@ -247,7 +250,7 @@ class TrialController {
     const serverNow = this.client.serverNow();
     const projectedServer = this.round.startsAt + now - this.capture.start;
     // Pixel rounds keep the monotonic start anchor. Poll latency is not a clock interruption.
-    if (this.state.snapshot?.state.kind !== 'pixel' && this.capture.frames.length < 3600 && serverNow !== null && Math.abs(serverNow - projectedServer) > 500) {
+    if (!['pixel', 'dino'].includes(String(this.state.snapshot?.state.kind)) && this.capture.frames.length < 3600 && serverNow !== null && Math.abs(serverNow - projectedServer) > 500) {
       this.clearInput();
       this.update({
         status: 'incomplete',
@@ -268,7 +271,7 @@ class TrialController {
       while (this.capture.frames.length < due && this.runtime.snapshot().state.gameOver !== true) {
         this.runtime.input(this.capture.next());
         const step = this.runtime.step();
-        if (step.state.kind === 'pixel') feedback = String(step.state.feedback);
+        if (step.state.kind === 'pixel' || step.state.kind === 'dino') feedback = String(step.state.feedback);
         else {
           const events = step.state.events as { type: string }[] | undefined;
           const last = events?.at(-1);
@@ -283,7 +286,7 @@ class TrialController {
         snapshot,
         feedback,
         status: complete ? 'complete' : 'running',
-        seconds: Math.ceil((3600 - snapshot.tick) / 60),
+        seconds: Math.max(0, Math.ceil(((snapshot.state.kind === 'dino' ? 1800 : 3600) - snapshot.tick) / 60)),
         countdown: 0,
         message: complete
           ? 'Round complete. Confirming scores…'

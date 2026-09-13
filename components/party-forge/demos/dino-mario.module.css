@@ -448,3 +448,24 @@
     backdrop-filter: none;
   }
 }
+
+.stepLabel { font: 12px/1.5 ui-monospace, monospace; letter-spacing: 1px; margin: 18px 0 12px; }
+.contributionDiagram { margin: 28px 0; }
+.contributionCards { display: grid; grid-template-columns: 1fr 24px 1fr; gap: 10px; align-items: center; }
+.contributionCards article { align-self: stretch; border: 2px solid #456850; background: #e6edde; padding: 20px 16px; border-radius: 5px; }
+.contributionCards article:last-child { border-color: #79648b; background: #ede5f0; }
+.contributionCards article > span { font: 12px/1.5 ui-monospace, monospace; }
+.contributionCards h3 { font-size: 23px; line-height: 1.15; margin: 20px 0 12px; letter-spacing: -1px; }
+.contributionCards p { font-size: 16px; line-height: 1.5; margin: 0; }
+.combineSign { font-size: 26px; text-align: center; }
+.mergeLines { text-align: center; font-size: 34px; letter-spacing: 34px; padding-left: 34px; }
+.contributionDiagram figcaption { background: #283b30; color: #f7f4e9; text-align: center; padding: 20px 12px; }
+.contributionDiagram figcaption strong { display: block; font: 12px/1.6 ui-monospace, monospace; letter-spacing: 1px; }
+.contributionDiagram figcaption span { display: block; font-size: 16px; margin-top: 6px; }
+@media (max-width: 540px) {
+  .contributionCards { gap: 6px; grid-template-columns: 1fr 18px 1fr; }
+  .contributionCards article { padding: 16px 10px; }
+  .contributionCards h3 { font-size: 20px; }
+  .contributionCards p { font-size: 14px; }
+  .introduction .actions { flex-wrap: wrap; }
+}

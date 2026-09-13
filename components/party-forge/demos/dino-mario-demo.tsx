@@ -1,82 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { drawDino } from '@/lib/party-forge/presentation/dino-view';
 import { useEffect, useRef, useState, type FocusEvent } from 'react';
 import {
   createDinoMarioGame,
   stepDinoMarioGame,
-  encounterSize,
+  dinoScore,
   DINO_MARIO as C,
-  type DinoMarioState,
 } from '@/lib/party-forge/demos/dino-mario';
 import { DemoIntroduction, DemoProvenance } from './demo-introduction';
 import styles from './dino-mario.module.css';
-
-function draw(canvas: HTMLCanvasElement, game: DinoMarioState) {
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.fillStyle = '#f7f4e9';
-  ctx.fillRect(0, 0, C.width, C.height);
-  ctx.strokeStyle = '#e2dfd2';
-  ctx.lineWidth = 1;
-  for (let x = 0; x < C.width; x += 40) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, C.ground);
-    ctx.stroke();
-  }
-  for (let y = 18; y < C.ground; y += 40) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(C.width, y);
-    ctx.stroke();
-  }
-  ctx.strokeStyle = '#384c3f';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(0, C.ground);
-  ctx.lineTo(C.width, C.ground);
-  ctx.stroke();
-  ctx.fillStyle = '#d5d2c3';
-  for (let x = -((game.tick * C.speed) % 64); x < C.width; x += 64)
-    ctx.fillRect(x, C.ground + 13, 18, 2);
-  for (const e of game.encounters) {
-    const size = encounterSize(e.kind),
-      y = C.ground - size.height;
-    if (e.x > C.width) continue;
-    if (e.kind === 'block') {
-      ctx.fillStyle = '#ba7841';
-      ctx.fillRect(e.x, y, size.width, size.height);
-      ctx.strokeStyle = '#f7f4e9';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(e.x + 5, y + 5, size.width - 10, size.height - 10);
-    } else {
-      ctx.fillStyle = '#79648b';
-      ctx.fillRect(e.x + 5, y, 20, 5);
-      ctx.fillRect(e.x, y + 5, size.width, 17);
-      ctx.fillRect(e.x + 3, y + 22, 8, 6);
-      ctx.fillRect(e.x + 19, y + 22, 8, 6);
-      ctx.fillStyle = '#f7f4e9';
-      ctx.fillRect(e.x + 7, y + 9, 4, 4);
-      ctx.fillRect(e.x + 19, y + 9, 4, 4);
-    }
-  }
-  const x = C.playerX,
-    y = game.feet - C.playerHeight;
-  ctx.fillStyle = game.status === 'lost' ? '#a14c3b' : '#456850';
-  ctx.fillRect(x + 8, y, 20, 18);
-  ctx.fillRect(x + 2, y + 14, 19, 19);
-  ctx.fillRect(x, y + 30, 8, 10);
-  ctx.fillRect(x + 15, y + 30, 7, 10);
-  ctx.fillStyle = '#f7f4e9';
-  ctx.fillRect(x + 20, y + 5, 4, 4);
-  const finishX = C.playerX + (C.finishTick - game.tick) * C.speed;
-  if (finishX < C.width) {
-    ctx.fillStyle = '#456850';
-    ctx.fillRect(finishX, C.ground - 85, 3, 85);
-    ctx.fillRect(finishX, C.ground - 85, 30, 18);
-  }
-}
 
 export function DinoMarioDemo() {
   const [game, setGame] = useState(createDinoMarioGame);
@@ -139,7 +73,7 @@ export function DinoMarioDemo() {
     };
   }, []);
   useEffect(() => {
-    if (canvas.current) draw(canvas.current, game);
+    if (canvas.current) drawDino(canvas.current, game);
   }, [game]);
 
   const message =
@@ -148,10 +82,10 @@ export function DinoMarioDemo() {
       : game.status === 'won'
         ? 'Course complete! Same jump, two uses.'
         : game.status === 'lost'
-          ? 'You hit an obstacle. Restart and try a different jump timing.'
+          ? 'No lives left. Restart for another run.'
           : paused
             ? 'Paused. Resume when you are ready.'
-            : 'Jump over blocks. Land on walkers from above.';
+            : game.protection > 0 ? 'Ouch! One life lost. Keep running.' : game.big ? 'Powered up! Bigger dino, bonus life.' : 'Jump over spikes. Stomp walkers. Eat meat to grow.';
 
   return (
     <main className={styles.page}>
@@ -181,7 +115,8 @@ export function DinoMarioDemo() {
             <span>
               LOCAL STOMPS <b data-testid="stomps">{game.stomps}</b>
             </span>
-            <span className={styles.version}>AUTHORED v1</span>
+            <span>LIVES <b data-testid="lives" aria-label={`${game.lives} lives`}>{'♥'.repeat(game.lives)}{'♡'.repeat(C.maxLives - game.lives)}</b></span>
+            <span>SCORE <b data-testid="score">{dinoScore(game)}</b></span>
           </div>
           <canvas
             ref={canvas}
@@ -193,6 +128,8 @@ export function DinoMarioDemo() {
             data-tick={game.tick}
             data-feet={game.feet.toFixed(2)}
             data-status={game.status}
+            data-big={game.big}
+            data-lives={game.lives}
             aria-label="Dino Mario course. Space jumps. Escape pauses. A Jump button is available below."
             onKeyDown={(event) => {
               if (event.code === 'Space') {
@@ -272,15 +209,15 @@ export function DinoMarioDemo() {
             Simulated demo · fixed authored example
           </p>
           <h2>
-            Two ideas.
+            Run. Eat.
             <br />
-            One new rule.
+            Grow. Compete.
           </h2>
           <div className={styles.rule}>
             <span className={styles.blockSymbol} aria-hidden="true" />
             <p>
-              <b>Dino / Clear the blocks</b>Keep moving. Time your jump to pass
-              over every block.
+              <b>Dino / Dodge the spikes</b>Keep moving. Time your jump to pass
+              over the red spike traps.
             </p>
           </div>
           <div className={styles.rule}>
@@ -291,18 +228,19 @@ export function DinoMarioDemo() {
             </p>
           </div>
           <p className={styles.disclosure}>
-            Space or Jump. Side contact loses. Reach the end to win. Results
-            stay in this run; restarting uses the same course.
+            Start with three lives. Meat makes you bigger and adds one life, up to four. A hit shrinks you and costs one life. Brief protection prevents repeated damage.
           </p>
           <p className={styles.disclosure}>
             This prepared game does not call AI or generate a new game.
           </p>
+          <p className={styles.disclosure}>Score: 10 points per second, 100 per stomp and 50 per meat. Finish for 500 plus 100 per remaining life. More points wins; fewer hits breaks ties.</p>
+<p className={styles.disclosure}>For online competition, open a room and choose the Chrome Dino and Mario starters. Each player confirms a card before the shared round.</p>
           <DemoProvenance />
         </aside>
       </div>
       <footer className={styles.footer}>
         <span>ONE JUMP. A NEW WAY THROUGH.</span>
-        <Link href="/party">Explore the separate party experience →</Link>
+        <Link href="/">Compete with friends →</Link>
       </footer>
     </main>
   );
