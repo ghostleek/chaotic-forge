@@ -3,6 +3,7 @@ import { pixelRecipeSchema } from '../runtimes/pixel-arcade-v1/rules.ts';
 
 export const PIXEL_OUTPUT_TOKENS = 6000;
 export const PIXEL_GENERATION_POLICY = 'pixel-output-v2';
+export const MESH_GENERATION_POLICY = 'pixel-mesh-v3';
 export const LEGACY_OUTPUT_FAILURE = 'Generation did not finish within the output limit.';
 export const outputSchema = z.strictObject({
   supported: z.boolean(),
@@ -24,4 +25,14 @@ export function shouldRecoverLegacyOutputFailure(stored: {status:string; result:
   if (stored?.status !== 'failed' || !stored.result) return false;
   try { return JSON.parse(stored.result).reason === LEGACY_OUTPUT_FAILURE; }
   catch { return false; }
+}
+
+/** Retry the known misinterpretation once under the corrected meshing policy. */
+export function shouldRecoverReferenceConflict(stored: {status:string; result:string|null} | null) {
+  if (stored?.status !== 'failed' || !stored.result) return false;
+  try {
+    const reason=JSON.parse(stored.result).reason;
+    return typeof reason === 'string' && /snake/i.test(reason) && /invaders/i.test(reason) &&
+      /movement|control/i.test(reason) && /conflict|incompatib|cannot.*both/i.test(reason);
+  } catch { return false; }
 }
