@@ -1,0 +1,465 @@
+.root {
+  color-scheme: light dark;
+  --fw-paper: light-dark(#fcfaf6, #242321);
+  --fw-ink: light-dark(#292823, #f4f1e9);
+  --fw-muted: light-dark(#716b60, #bcb6aa);
+  --fw-line: light-dark(#e5e0d5, #49463f);
+  --fw-well: light-dark(#f0ede6, #36332d);
+  --fw-green: light-dark(#167448, #85d4a8);
+  --fw-green-soft: light-dark(#e3f1e7, #244335);
+  --fw-orange: light-dark(#9c5809, #f0b568);
+  --fw-orange-soft: light-dark(#fff0d5, #483820);
+  --fw-red: light-dark(#b43e39, #f3a29b);
+  --fw-red-soft: light-dark(#f9e7e3, #482d2a);
+  color: var(--fw-ink);
+  font-family: ui-rounded, 'Avenir Next', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.root * {
+  box-sizing: border-box;
+}
+.root button,
+.root select {
+  font: inherit;
+}
+.root button {
+  cursor: pointer;
+}
+.root button:disabled {
+  cursor: default;
+}
+.root .fw-surface {
+  background: var(--fw-paper);
+  border: 1px solid var(--fw-line);
+  border-radius: 24px;
+  overflow: hidden;
+}
+.root .fw-header {
+  padding: 25px 28px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+.root .fw-wordmark {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.root .fw-round {
+  font-size: 12px;
+  color: var(--fw-muted);
+}
+.root .fw-intro {
+  padding: 28px 28px 14px;
+  text-align: center;
+}
+.root h2 {
+  color: var(--fw-ink);
+  font-size: 25px;
+  letter-spacing: -0.6px;
+  line-height: 1.18;
+  font-weight: 650;
+  margin: 0 0 9px;
+}
+.root .fw-summary {
+  color: var(--fw-muted);
+  margin: 0;
+}
+.root .fw-roster {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 16px 22px 26px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 12px;
+}
+.root .fw-player {
+  text-align: center;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.root .fw-portrait {
+  width: 102px;
+  height: 102px;
+  background: var(--fw-well);
+  border-radius: 50%;
+  position: relative;
+  margin-bottom: 13px;
+}
+.root .fw-cat {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.root .fw-avatar-action {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  color: inherit;
+  background: transparent;
+}
+.root .fw-avatar-action:not(:disabled):hover {
+  outline: 2px solid var(--fw-ink);
+  outline-offset: 3px;
+}
+.root .fw-avatar-action:disabled {
+  cursor: default;
+}
+.root .fw-mark {
+  pointer-events: none;
+}
+
+.root[data-layout='table'] .fw-header {
+  display: none;
+}
+.root[data-layout='table'] .fw-surface {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+}
+.root[data-layout='table'] .fw-intro {
+  text-align: left;
+  align-self: center;
+  padding: 24px;
+}
+.root[data-layout='table'] .fw-roster {
+  margin: 0;
+  padding: 24px;
+}
+.root[data-layout='table'] .fw-bottom {
+  grid-column: 1 / -1;
+}
+.root[data-layout='table'] .fw-avatar-section {
+  margin-top: 16px;
+}
+.root[data-layout='table'] .fw-cat-option img {
+  width: 48px;
+  height: 48px;
+}
+@media (max-width: 650px) {
+  .root[data-layout='table'] .fw-surface {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .root[data-layout='table'] .fw-intro {
+    padding: 20px 16px 0;
+  }
+  .root[data-layout='table'] .fw-roster {
+    padding: 20px 12px;
+  }
+}
+.root .fw-mark {
+  position: absolute;
+  right: -3px;
+  bottom: 0;
+  width: 29px;
+  height: 29px;
+  border: 3px solid var(--fw-paper);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 16px;
+  background: var(--fw-state-soft);
+  color: var(--fw-state);
+  line-height: 1;
+}
+.root .fw-player[data-status='chosen'] {
+  --fw-state: var(--fw-green);
+  --fw-state-soft: var(--fw-green-soft);
+}
+.root .fw-player[data-status='deciding'],
+.root .fw-player[data-status='sending'] {
+  --fw-state: var(--fw-orange);
+  --fw-state-soft: var(--fw-orange-soft);
+}
+.root .fw-player[data-status='away'],
+.root .fw-player[data-status='reconnecting'] {
+  --fw-state: var(--fw-red);
+  --fw-state-soft: var(--fw-red-soft);
+}
+.root .fw-player[data-status='watching'],
+.root .fw-player[data-status='up-next'] {
+  --fw-state: var(--fw-muted);
+  --fw-state-soft: var(--fw-well);
+}
+.root[data-indicator='ring'] .fw-portrait {
+  outline: 3px solid var(--fw-state);
+  outline-offset: 3px;
+}
+.root .fw-name {
+  font-size: 15px;
+  font-weight: 600;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.root .fw-you {
+  font-weight: 400;
+  color: var(--fw-muted);
+  font-size: 12px;
+}
+.root .fw-state {
+  margin-top: 6px;
+  color: var(--fw-state);
+  font-size: 12px;
+  background: var(--fw-state-soft);
+  padding: 4px 9px;
+  border-radius: 7px;
+}
+.root .fw-saved {
+  color: var(--fw-green);
+  font-size: 12px;
+  margin-top: 5px;
+}
+.root .fw-choice {
+  min-height: 66px;
+  border-top: 1px solid var(--fw-line);
+  padding: 16px 24px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+.root .fw-local {
+  min-width: 0;
+}
+.root .fw-local-label {
+  color: var(--fw-muted);
+  display: block;
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+.root .fw-action {
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 14px;
+  min-height: 40px;
+  background: var(--fw-ink);
+  color: var(--fw-paper);
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.root .fw-action:disabled {
+  background: var(--fw-well);
+  color: var(--fw-muted);
+}
+.root .fw-bottom {
+  background: var(--fw-well);
+  border-top: 1px solid var(--fw-line);
+  padding: 13px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.root .fw-count {
+  white-space: nowrap;
+  color: var(--fw-ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+.root .fw-wait-for {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  color: var(--fw-muted);
+  text-align: right;
+}
+.root .fw-avatar-section {
+  margin-top: 24px;
+}
+.root .fw-avatar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.root .fw-avatar-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+.root .fw-avatar-note {
+  color: var(--fw-muted);
+  font-size: 12px;
+}
+.root .fw-cats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+.root .fw-cat-option {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fw-muted);
+  padding: 8px 2px;
+  border-radius: 12px;
+  min-width: 0;
+  font-size: 12px;
+}
+.root .fw-cat-option img {
+  display: block;
+  width: 64px;
+  max-width: 100%;
+  margin: 0 auto 6px;
+}
+.root .fw-cat-option[aria-pressed='true'] {
+  border-color: var(--fw-ink);
+  background: var(--fw-paper);
+  color: var(--fw-ink);
+}
+.root .fw-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--fw-muted);
+}
+.root .fw-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.root .fw-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.root .fw-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 480px) {
+  .root .fw-header {
+    padding: 20px 18px 0;
+  }
+  .root .fw-intro {
+    padding: 24px 18px 10px;
+  }
+  .root h2 {
+    font-size: 22px;
+  }
+  .root .fw-roster {
+    padding: 16px 10px 24px;
+    gap: 20px 5px;
+  }
+  .root .fw-portrait {
+    width: 76px;
+    height: 76px;
+  }
+  .root .fw-name {
+    font-size: 14px;
+  }
+  .root .fw-state {
+    font-size: 12px;
+    padding: 4px 5px;
+  }
+  .root .fw-choice {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+  .root .fw-bottom {
+    padding: 12px 16px;
+    align-items: flex-start;
+  }
+  .root .fw-cats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .root .fw-avatar-head {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
+@media (pointer: coarse) {
+  .root select,
+  .root button {
+    min-height: 44px;
+  }
+  .root select {
+    font-size: 16px;
+  }
+}
+
+.root .fw-dot[data-color='green'] {
+  background: var(--fw-green);
+}
+.root .fw-dot[data-color='orange'] {
+  background: var(--fw-orange);
+}
+.root .fw-dot[data-color='red'] {
+  background: var(--fw-red);
+}
+.root .fw-error {
+  color: var(--fw-red);
+  margin: 6px 0 0;
+}
+.root button:focus-visible {
+  outline: 2px solid var(--fw-ink);
+  outline-offset: 3px;
+}
+.root .fw-local {
+  overflow-wrap: anywhere;
+}
+.root .fw-header {
+  flex-wrap: wrap;
+}
+
+/* Reserve all three dots so the . / .. / ... cycle never shifts text. */
+.root .fw-waiting-dots {
+  display: inline-flex;
+  inline-size: 1em;
+  flex-shrink: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+.root .fw-waiting-dots > span {
+  flex: 1;
+}
+.root .fw-waiting-dots > span:nth-child(2) {
+  animation: waiting-second-dot 1.5s step-end infinite;
+}
+.root .fw-waiting-dots > span:nth-child(3) {
+  animation: waiting-third-dot 1.5s step-end infinite;
+}
+@keyframes waiting-second-dot {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  33.333% {
+    opacity: 1;
+  }
+}
+@keyframes waiting-third-dot {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  66.667% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .root .fw-waiting-dots > span:nth-child(n) {
+    animation: none;
+    opacity: 1;
+  }
+}
+/* Pixel card-room theme. State logic and announcements are shared with the existing room. */
+.root{font-family:'Courier New',monospace;color:#192226;background:transparent}.root .fw-surface{border:0;border-radius:0;background:transparent;box-shadow:none;padding:0}.root .fw-header,.root .fw-intro,.root .fw-legend{display:none}.root .fw-roster{gap:12px;margin:12px 0}.root .fw-player{border:2px solid #b8c1ab;border-radius:0;background:#e7ebde;padding:16px 8px;box-shadow:none}.root .fw-portrait{border:0;background:none;border-radius:0;box-shadow:none;filter:none;height:72px;width:72px;overflow:visible;color:#526c3b}.root .fw-portrait svg{width:48px;height:48px;margin:8px}.root .fw-player:nth-child(2) .fw-portrait{color:#94675e}.root .fw-player:nth-child(3) .fw-portrait{color:#66898c}.root .fw-mark{border-radius:0;box-shadow:none}.root .fw-name{font-family:'Courier New',monospace;font-size:14px;font-weight:700}.root .fw-bottom{border:0;font-size:11px;padding:12px 0}.root .fw-you{border-radius:0}.root .fw-player[data-status='deciding'] svg{animation:pixelWait 1s steps(2,end) infinite}.root .fw-avatar-action{border:0!important;background:none!important;box-shadow:none!important;padding:0!important;margin:0!important}.root .fw-state{font-size:11px}@keyframes pixelWait{50%{transform:translateY(-4px)}}@media(prefers-reduced-motion:reduce){.root .fw-player[data-status='deciding'] svg{animation:none}}

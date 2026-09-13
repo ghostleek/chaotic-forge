@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" data-presentation="2d">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chaotic Forge — Try the cards</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./cards.css"><link rel="stylesheet" href="./study.css"><link rel="stylesheet" href="./player-wait.css"><link rel="stylesheet" href="./presentation.css"><link rel="stylesheet" href="./onboarding.css">
+  <script type="module" src="./study.js"></script>
+</head>
+<body>
+  <a class="skip" href="#hand-heading">Skip to your cards</a>
+  <main class="shell">
+    <header class="masthead"><a class="wordmark" href="./">CHAOTIC<br>FORGE<span>✳</span></a><span class="eyebrow mast-center">THE SHARED TABLE</span><div class="mast-actions"><span class="preview-badge">Preview room</span><button id="show-onboarding" class="text-button" type="button">How to play</button><a class="study-badge" href="./play.html">Try card selection →</a></div></header>
+    <div id="onboarding"></div>
+    <section class="table-layout" aria-label="Shared Forge table">
+      <div class="table-stage">
+        <div class="stage-top"><div><p class="eyebrow">01 / MAKE SOMETHING STRANGE</p><h1>A little strange.<br>Entirely ours.</h1><p class="subtitle">Different ideas. One shared world.</p></div></div>
+        <div id="world" class="world"></div>
+        <div class="stage-bottom"><span class="round-note">Round 01 · one idea each</span></div>
+      </div>
+      <aside class="contributions" aria-labelledby="game-title"><p class="eyebrow">OUR GAME</p><h2 id="game-title">The mix<br>starts here.</h2><p class="aside-intro">Your ideas, together.<br>Try adding one from your hand.</p><ol id="contribution-list"></ol><div id="empty-mix" class="empty-mix"><span>＋</span><p>Your contribution<br>goes here.</p></div><button id="reset" class="text-button" type="button">Start again ↺</button></aside>
+    </section>
+    <section id="player-status" aria-labelledby="wait-title"></section>
+    <section class="hand-section" aria-labelledby="hand-heading">
+      <div class="hand-header"><div><p class="eyebrow">02 / YOUR HAND</p><h2 id="hand-heading" tabindex="-1">One choice. A shared recipe.</h2><p>Choose one option. Our recipe needs one FPS, one zombie, and one cooking choice.</p></div><span class="hand-bound">Fixed demo choices · choose one</span></div>
+      <div class="hand fixed-choices" id="hand" aria-label="Your choices"></div>
+      <div class="action-bar"><div><strong id="selection-title">Which idea would you add?</strong><p id="selection-help">Select a card to preview its contribution.</p></div><button type="button" id="preview" class="primary" disabled>Preview contribution <span>→</span></button></div>
+    </section>
+  </main>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+  <dialog id="inspect-dialog" class="inspect-dialog" aria-labelledby="inspect-title"><button type="button" class="dialog-close" id="inspect-close" aria-label="Close card details">×</button><p class="eyebrow">GET TO KNOW THE IDEA</p><h2 id="inspect-title"></h2><p id="inspect-effect" class="dialog-lead"></p><div id="demo-slot"></div><dl class="provenance"><div><dt>Source concept</dt><dd id="inspect-source"></dd></div><div><dt>Forge interpretation</dt><dd id="inspect-interpretation"></dd></div><div><dt>User decision</dt><dd id="inspect-decision"></dd></div></dl><p class="support-note">Authored preset · this screen previews choices, not gameplay.</p><div class="dialog-actions"><button type="button" id="inspect-select" class="primary">Select this card →</button></div></dialog>
+  <dialog id="confirm-dialog" class="confirm-dialog" aria-labelledby="confirm-title"><button type="button" id="confirm-close" class="dialog-close" aria-label="Close contribution preview">×</button><p class="eyebrow">REVIEW YOUR CONTRIBUTION</p><h2 id="confirm-title">Add this idea?</h2><p class="dialog-lead" id="confirm-card"></p><dl class="provenance"><div><dt>Source concept</dt><dd id="confirm-source"></dd></div><div><dt>Forge interpretation</dt><dd id="confirm-interpretation"></dd></div></dl><p class="support-note">Your choice is added to this preview table.</p><div class="dialog-actions"><button type="button" id="confirm-add" class="primary">Confirm contribution →</button><button type="button" id="confirm-cancel" class="outline-button">Keep choosing</button></div></dialog>
+</body>
+</html>

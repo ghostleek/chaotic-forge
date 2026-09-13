@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="marmalade-title marmalade-desc">
+  <title id="marmalade-title">Marmalade the tabby cat</title>
+  <desc id="marmalade-desc">A cheerful orange cat with toasted brown stripes, round eyes and a cream chest. Original flat vector artwork authored by Codex.</desc>
+  <g stroke="#292735" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#EDA66B" d="M43 88C31 94 25 107 25 121h78c0-14-6-27-18-33Z"/>
+    <path fill="#FFF0D4" stroke="none" d="M46 95c5 6 10 9 18 9s13-3 18-9l7 26H39Z"/>
+    <path fill="#EDA66B" d="m25 48-1-31q0-7 6-2l18 18q16-6 32 0l18-18q6-5 6 2l-1 31q9 11 6 26c-4 19-22 28-45 28S23 93 19 74q-3-15 6-26Z"/>
+    <path fill="#D4816F" stroke="none" d="m32 25 2 21 11-8Zm64 0-13 13 11 8Z"/>
+    <path fill="none" stroke="#AC693E" stroke-width="5" d="m54 35 2 11m18-11-2 11m-8-13v14M23 59l10 3M22 72l10-1m73-12-10 3m11 10-10-1"/>
+    <path fill="#FFF0D4" stroke="none" d="M45 78q6-10 19-3 13-7 19 3c4 10-8 17-19 15-11 2-23-5-19-15Z"/>
+    <ellipse cx="46" cy="65" rx="4" ry="5" fill="#292735" stroke="none"/>
+    <ellipse cx="82" cy="65" rx="4" ry="5" fill="#292735" stroke="none"/>
+    <path fill="#292735" stroke-width="2" d="m60 78 4 4 4-4Z"/>
+    <path fill="none" stroke-width="2.5" d="M64 82v3m0 0q-5 5-9 0m9 0q5 5 9 0M41 114v7m46-7v7"/>
+  </g>
+</svg>

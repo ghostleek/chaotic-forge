@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="tuxedo-title tuxedo-desc">
+  <title id="tuxedo-title">Tuxedo the dapper cat</title>
+  <desc id="tuxedo-desc">A charcoal cat with a cream face blaze, cream muzzle and neat white bib. Original flat vector artwork authored by Codex.</desc>
+  <g stroke="#292735" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#454653" d="M43 88C31 94 25 107 25 121h78c0-14-6-27-18-33Z"/>
+    <path fill="#F8EEDB" stroke="none" d="m46 95 18 7 18-7-6 26H52Z"/>
+    <path fill="#454653" d="m25 48-1-31q0-7 6-2l18 18q16-6 32 0l18-18q6-5 6 2l-1 31q9 11 6 26c-4 19-22 28-45 28S23 93 19 74q-3-15 6-26Z"/>
+    <path fill="#BA949E" stroke="none" d="m32 25 2 21 11-8Zm64 0-13 13 11 8Z"/>
+    <path fill="#F8EEDB" stroke="none" d="m64 45 9 22c5 5 18 4 20 14 2 10-12 19-29 19S33 91 35 81c2-10 15-9 20-14Z"/>
+    <ellipse cx="45" cy="64" rx="6" ry="7" fill="#F8EEDB" stroke="none"/>
+    <ellipse cx="83" cy="64" rx="6" ry="7" fill="#F8EEDB" stroke="none"/>
+    <ellipse cx="45" cy="64" rx="2.5" ry="4" fill="#292735" stroke="none"/>
+    <ellipse cx="83" cy="64" rx="2.5" ry="4" fill="#292735" stroke="none"/>
+    <path fill="#B87889" stroke-width="2" d="m60 77 4 4 4-4Z"/>
+    <path fill="none" stroke-width="2.5" d="M64 81v3m0 0q-5 5-9 0m9 0q5 5 9 0"/>
+    <path fill="none" stroke="#8F909F" stroke-width="2.5" d="M41 114v7m46-7v7"/>
+  </g>
+</svg>

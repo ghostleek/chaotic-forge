@@ -1,442 +1,121 @@
-# Mechanic Forge Delivery Plan
+# Competitive Forge delivery plan
 
-**Status:** Active — G1–G4 merged; hackathon hardening and Checkpoint GF remain pending; Checkpoint A remains pending
-**Last updated:** 2026-09-13
-**Related specification:** [PRD.md](./PRD.md)
+## Latest user decision — pixel instruction demo (13 September 2026)
 
-## 1. Planning rule
+This decision supersedes the fixed Kitchen demo and exactly-three-player defaults below for new pixel rooms. Two players can create and start; a third is optional, with a hard cap of three. Each connected player confirms one custom instruction card, optionally filled from a starter. The host explicitly asks Forge to mesh them into a single bounded pixel game. The model returns executable rule configuration for the retained Snake/Invaders/Bounce engine, including scoring weights and an interpretation for each card. It does not generate arbitrary JavaScript or satisfy all of PC-09.
 
-Prioritize the shortest complete loop that proves users will move from reference discovery to a defensible mechanic decision:
+Players run concurrently in separate arenas with matching rules, seed and server start time. Highest points wins, with fewer hits as the next comparison. Existing room capabilities, captured inputs, server replay, results and archive contracts are reused. Winner and loser may each propose a further instruction while the bounded recipe has space. Source text, model interpretation and user confirmation stay distinct. Legacy Kitchen and G1–G4 remain retained.
 
-```text
-Explore -> Compare -> Fork -> Test -> Share -> Observe -> Decide
+User authorized implementation and GPT Sites deployment on the PC-05 stack; broad edge-case suites remain paused, with one real local golden flow requested. Full QUALITY.md gates and independent acceptance remain required before merging. See [current handoff](docs/design/pc-05-handoff.md).
+
+
+**Updated:** 2026-09-13
+**Status:** Product planning; GitHub publication in progress. PC-01 is [issue #30](https://github.com/ghostleek/chaotic-forge/issues/30), assigned to Lance (@Leoendithas). PC-02–11 remain drafts pending publication after the main-branch sync. Implementation has not started.
+**Specification:** [PRD.md](./PRD.md)
+**Preserved prior plan:** [Mechanic-lab v0.2](./archive/2026-09-13-mechanic-lab/PLAN-v0.2-mechanic-lab.md)
+
+## Product outcome and scope
+
+Friends choose game-concept cards, play the resulting game, and change it through the competition itself. After the first round, the winner and loser each receive one opportunity to add a mechanic. Everyone plays the next version. The group chooses when to end and can save the last played game for future play or remix.
+
+The target product generates playable mashups from the chosen concepts. The first demonstration uses clearly identified authored combinations through the same versioned build-manifest interface. Eight preset combinations do not fulfill the live-generation milestone. PC-09 is required for the broader target. Its qualification starts after PC-01 in parallel with early demo work; product integration follows the accepted core baseline. PC-10 and PC-11 remain separate optional work.
+
+Proposed first-demo defaults are exactly three people, each in their own desktop browser, with keyboard/mouse controls and separate matched 60-second trials in one synchronized room. The later target supports three to six people. Each participant selects one variant in a visible concept slot: FPS, Zombies, or Cooking. Two authored variants per slot produce eight supported initial combinations. Subsequent eligible additions use the bounded Dinnerbell, Hot Potato, and Zombie Pantry cards. Pass remains available at a cap so a finite deck never silently ends the session.
+
+Both extrema receive one card opportunity. Their order alternates by round. Ties allocate two distinct slots by a documented deterministic rotation; a DNF does not earn a slot. The active roster freezes for a round. Stored trusted time governs a disclosed 30-second host-absence grace and deterministic succession by remaining roster order. Host status grants no edit right. After an absent editor's grace, the remaining group may explicitly abort unplayed evolution, preserve the last completed build, and wait for a valid three-person roster at a round boundary or archive; it cannot transfer that edit right or start a two-player demo trial. The group can unanimously end at results before edits; the saved artifact is the last actually played build. For a saved remix, the proposed new-match setup lets each new player keep or replace an inherited initial concept slot while retaining inherited later cards. Replacements become new fork decisions; unchanged choices are Play again. These defaults must agree with the PRD before contract acceptance.
+
+## Contracts that survive the pivot
+
+The existing G1–G4 Returnal journey remains a regression surface. Its one-rule A/B contract and provenance labels remain valid for that lab. Competitive rounds accumulate mechanics and do not claim causal experiment evidence. Gameplay scores are actual local trial outcomes submitted to the room authority; fixture results and authored demo recipes must retain their real provenance.
+
+A build manifest binds selected cards, resolved rules, assets, controls, seed policy, scoring version, resolver version, and executable runtime version. Room commands, run inputs/results, and saved artifacts consume that same contract. Failed resolution preserves the last known playable build. Saved-game play never silently regenerates a different recipe or swaps in a newer incompatible runtime.
+
+Source references, Forge interpretation, participant decisions, and preset/live-generation origin remain distinguishable. No runtime model claim is permitted without an actual verified call. The first demo introduces no broad source-corpus expansion, generic editor, user accounts, or arbitrary same-origin executable code.
+
+## Two people and shared ownership
+
+| Person | Accountable scope | Independent reviewer |
+| --- | --- | --- |
+| Lance | Domain contracts, recipe resolution, simulation/scoring, room authority, D1, archives, later generation | Kahhow |
+| Kahhow | Lobby/cards, player lifecycle UI, first-person rendering/input, assets, complete experience | Lance |
+
+The user confirmed Kahhow (@ghostleek) and Lance (@Leoendithas) and requested GitHub assignments. PC-01 is published and assigned; see the [publication index](./docs/issues/README.md) for the remaining drafts. An agent may implement within a person's packet, but that person remains accountable and accepts the result. If the named reviewer materially coauthors the diff, use another independent reviewer for the final review requirement.
+
+Lance owns `package.json`, lockfile, build/test configuration, hosting manifest, database schema/migrations, shared contract, and versioned runtime interfaces. Kahhow owns the party route composition and scoped styles. Shared-file changes require an explicit handoff and one owner; neither stack edits a shared barrel or global stylesheet casually. Each issue lists its allowed files.
+
+## Core demo packets
+
+| Packet | Outcome | Owner | Hard dependencies | Implementation estimate |
+| --- | --- | --- | --- | --- |
+| [PC-01](./docs/issues/PC-01.md) | Shared protocol and verified Worker/D1 foundation | Lance | Selected clean baseline | 8–12 h |
+| [PC-02](./docs/issues/PC-02.md) | Typed manifest resolver and executable FPS/zombie/cooking demo | Lance | PC-01 | 24–40 h |
+| [PC-03](./docs/issues/PC-03.md) | Authoritative online rooms and competition lifecycle | Lance | PC-01, PC-02 | 16–24 h |
+| [PC-04](./docs/issues/PC-04.md) | Room client, lobby, and visible concept-card choices | Kahhow | PC-01 | 8–12 h |
+| [PC-05](./docs/issues/PC-05.md) | First-person playable viewport, actual aiming, and input capture | Kahhow | PC-02, PC-04 | 12–20 h |
+| [PC-06](./docs/issues/PC-06.md) | Durable immutable saves, future play, and remix | Lance | PC-01, PC-02, PC-03 | 8–12 h |
+| [PC-07](./docs/issues/PC-07.md) | Complete three-browser product journey | Kahhow | PC-03, PC-04, PC-05, PC-06 | 8–16 h |
+| [PC-08](./docs/issues/PC-08.md) | Independent acceptance and release candidate | Lance | PC-07 | 8–12 h |
+
+```mermaid
+flowchart LR
+  P01[PC-01 Contract and host] --> P02[PC-02 Resolver and runtime]
+  P01 --> P04[PC-04 Room and cards UI]
+  P01 -. early qualification .-> P09A[PC-09A Actual generation benchmark]
+  P02 --> P03[PC-03 Room authority]
+  P02 --> P05[PC-05 Playable viewport]
+  P04 --> P05
+  P03 --> P06[PC-06 Durable artifacts]
+  P03 --> P07[PC-07 Complete experience]
+  P04 --> P07
+  P05 --> P07
+  P06 --> P07
+  P07 --> P08[PC-08 Acceptance and release]
+  P08 --> P09B[PC-09B Live generation integration]
+  P09A -. qualification decision .-> P09B
 ```
 
-A feature moves earlier when it:
-
-1. Tests a core product assumption.
-2. Removes a dependency from the end-to-end loop.
-3. Produces observable user behavior rather than more presentation polish.
-4. Can serve several mechanic patterns instead of one bespoke example.
-5. Improves trust, provenance, or test validity.
-
-Catalog breadth, canvas flexibility, and generative spectacle do not outrank completing this loop.
-
-## 2. Priority definitions
-
-- **P0 — Prove the product:** Required to test the core thesis with target users.
-- **P1 — Create retention:** Added after users complete the P0 loop and reveal repeat usage.
-- **P2 — Scale and defend:** Added after repeated usage justifies integrations, automation, and network effects.
-- **Not now:** High-cost work that does not yet reduce product risk.
-
-## 3. Feature priority
-
-| Order | Priority | Feature                                          | Why now                                                                                  | Dependency / exit signal                                                               |
-| ----- | -------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| 1     | P0       | Ten-card validation corpus                       | Provides enough credible examples to test the wedge without premature catalog investment | Ten cards span several behavior queries and comparison dimensions                      |
-| 2     | P0       | Behavior-first Explore prototype                 | Tests whether the Mobbin-like front door solves a real research task                     | 8/12 evaluators find a useful reference in under three minutes                         |
-| 3     | P0       | Production corpus expansion                      | Makes the validated search and comparison experience credible                            | Stage 0 passes before expansion to 15–20 patterns and 50–75 implementations            |
-| 4     | P0       | Mechanic and game pages                          | Establishes source trust and a reusable canonical record                                 | Users save examples and can explain why an implementation matches                      |
-| 5     | P0       | Structured Compare                               | Differentiates the product from wikis and generic AI summaries                           | Users compare before choosing and identify a meaningful trade-off                      |
-| 6     | P0       | Fork into Forge specification                    | Tests whether research converts into design work                                         | At least 5/12 evaluators fork a reference                                              |
-| 7     | P0       | Markdown, JSON, and test-plan export             | Gives supported and unsupported mechanics an honest production handoff                   | Export preserves sources, assumptions, variables, and evidence state                   |
-| 8     | P0       | Control/mutation builder                         | Creates the one-change test contract needed by microplays                                | Changed and locked variables are explicit and reviewable                               |
-| 9     | P0       | One templated microplay                          | Tests whether Forge can cross from reasoning into experience                             | Stage 1 microplay-demand gate passes before runtime investment                         |
-| 10    | P0       | Unlisted blind share link                        | Makes asynchronous human validation part of the core flow                                | A tester completes both assigned variants without an account                           |
-| 11    | P0       | Telemetry and structured response                | Converts sharing into evidence instead of opinions in chat                               | Valid, partial, duplicate, automated, preview, and repeat sessions are distinguishable |
-| 12    | P0       | Evidence report and decision log                 | Completes the product's promised outcome                                                 | Creator records keep/revise/reject/inconclusive from a real test                       |
-| 13    | P1       | Demand-selected microplay families               | Tests whether the workflow generalizes beyond dashing                                    | Each family is requested by five creators and passes its gated usage cohort            |
-| 14    | P1       | Generated read-only System Map                   | Gives expert users the graph without blank-canvas tax                                    | Independent Checkpoint E passes                                                        |
-| 15    | P1       | Collections and project workspaces               | Supports repeat research and team continuity                                             | Users return to multiple mechanic decisions in the same project                        |
-| 16    | P1       | Reviewer comments and decision requests          | Adds asynchronous collaboration around evidence                                          | Comments lead to a revision or recorded decision                                       |
-| 17    | P1       | Remix/fork from a shared result                  | Turns sharing into a permission-aware acquisition loop                                   | Testers become creators without exposing private project details                       |
-| 18    | P1       | Embed and presentation mode                      | Makes microplays easier to review in design docs and meetings                            | Repeated demand from active teams                                                      |
-| 19    | P2       | Editable System Map                              | Useful only after the structured spec and generated map prove valuable                   | Repeated user need to alter topology rather than fields                                |
-| 20    | P2       | Engine-specific exports                          | Deepens production integration after schemas stabilize                                   | Demand clusters around a specific engine and artifact type                             |
-| 21    | P2       | Bring-your-own telemetry/build ingestion         | Connects Forge decisions to external prototypes                                          | Teams repeatedly return with external playtest data                                    |
-| 22    | P2       | Community contributions and public pattern pages | Can expand the corpus after moderation and rights workflows exist                        | Proven contributor supply and review quality                                           |
-| 23    | P2       | Tester exchange or panel integration             | Solves cold-start distribution once creators demonstrate demand                          | Shared links consistently fail only because testers are unavailable                    |
-| 24    | Not now  | Generalized executable graph simulator           | Very high semantic and validation cost; directly overlaps Machinations                   | Reconsider only after narrow microplays prove demand for formal simulation             |
-| 25    | Not now  | Prompt-to-full-game generation                   | Crowded category and outside the evidence-oriented wedge                                 | No planned dependency                                                                  |
-
-## 4. Sequential PR series
-
-Each PR is merged before the next branch is created so its tests and review run against the exact new baseline.
-
-Evidence checkpoints are required stops, not implementation PRs. A failed checkpoint changes the next scope before more code is merged.
-
-| Sequence     | Scope                                                                               | Required evidence before merge or continuation                                                                        |
-| ------------ | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| PR 1         | Quality baseline                                                                    | Repository lint and build are green; exceptions are narrow and documented                                             |
-| PR 2         | Product specification and delivery plan                                             | Adversarial review finds no contradictory scope, sequencing, privacy, or experiment contract                          |
-| PR 3         | Test harness, versioned domain schema, and ten-card validation corpus               | Unit tests cover schema validity, source attribution, filters, and comparison dimensions                              |
-| PR 4         | Explore-first application shell and behavior search                                 | Interaction tests cover queries, filters, empty results, reset, and keyboard operation                                |
-| Checkpoint A | Run the Stage 0 wedge study                                                         | Stage 0 exit criteria pass before production corpus expansion                                                         |
-| PR 5         | Production corpus expansion                                                         | Corpus reaches 15–20 patterns and 50–75 sourced implementations inside the validated vertical                         |
-| PR 6         | Mechanic/game detail and structured Compare                                         | Tests cover canonical links, comparison limits, missing fields, and source visibility                                 |
-| PR 7         | Forked Forge specification, control/mutation diff, test-plan-only path, and exports | Tests prove provenance, invariant locks, diff accuracy, and Markdown, JSON, and test-plan output                      |
-| Checkpoint B | Run the Stage 1 artifact-demand study                                               | Stage 1 exits pass, including one-third of eligible designers selecting a browser microplay as next artifact          |
-| PR 8         | Creator authentication, project ownership, and durable experiment storage           | Authorization tests prevent cross-owner reads/writes and cascade deletion satisfies the data contract                 |
-| PR 9         | Dash microplay creator preview                                                      | Deterministic runtime tests cover variant isolation, reset, completion, and telemetry events                          |
-| PR 10        | Unlisted sharing and blind tester crossover                                         | Integration tests cover consent, stable assignment, AB/BA balance, resume, withdrawal, expiry, and preview            |
-| PR 11        | Evidence report and decision log                                                    | Tests cover validity/exclusion rules, partial data, repeats, aggregation, withdrawal, and decision history            |
-| Checkpoint C | Run the canonical Stage 2 measurement cohort                                        | Every Stage 2 exit criterion passes, and at least five distinct creators request the same next mechanic family        |
-| PR 12        | Most-requested second microplay family selected at Checkpoint C                     | Cross-template contract tests pass and the template isolates the selected mechanic family                             |
-| Checkpoint D | Run a 60-day second-template cohort with the same eligibility rules                 | Both shipped template families meet the Stage 2 publish and decision thresholds; five creators request a third family |
-| PR 13        | Most-requested third microplay family, conditional on Checkpoint D                  | Cross-template contract tests pass and the template isolates the selected mechanic family                             |
-
-An optional read-only System Map PR may be inserted at any branch boundary after Checkpoint C only when independent Checkpoint E in Stage 3 also passes. It is still developed, reviewed, and merged sequentially before the next numbered PR begins. Template evidence never authorizes System Map investment, and System Map evidence never authorizes another template.
-
-PRs after 13 are selected from observed P1/P2 demand rather than committed in advance.
+The useful parallel period is Lance implementing rules/rooms while Kahhow builds against the accepted protocol. The runtime interface must land before playable rendering can be accepted; the room and archive must work before the complete journey can be accepted. Fixtures enable independent development but are test-only and never replace those integration dependencies.
 
-### Hackathon golden-flow prototype series
-
-The following narrow series may proceed before Checkpoint A because it uses the existing ten-card corpus and fixed Returnal content rather than expanding the production corpus. It validates interaction continuity, not the market wedge, and does not satisfy or bypass any evidence checkpoint.
-
-| Sequence      | Scope                                                                                                      | Required evidence before merge                                                                                                                                                 |
-| ------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| PR G1         | Popular-game browse, Returnal page, projectile-dash breakdown, and source/interpretation/decision labels   | Browser tests prove both game-first and behavior-first entry paths reach the same breakdown; every visible primary action has a destination                                    |
-| PR G2         | Adapted dash contract, one-rule control/variant diff, invariant locks, risk disclosure, and export preview | Unit and browser tests prove exactly one rule changes, locked fields remain unchanged, and experiment rules are never attributed to Returnal                                   |
-| PR G3         | Deterministic sequential creator preview for the fixed dash microplay                                      | Runtime tests cover the same seed, reset, input, completion, variant isolation, event capture, and preview exclusion                                                           |
-| PR G4         | Demo publish preview, blind tester walkthrough, descriptive evidence report, and recorded decision         | End-to-end tests cover the no-account journey and confirm simulated or local-only states are never presented as durable external evidence                                      |
-| Checkpoint GF | Cold-test the complete golden flow with five designers unfamiliar with the project                         | At least four reach the dash breakdown unaided, identify the provenance boundary, create the one-rule adaptation, and explain what the resulting report can and cannot support |
+## Stacked branches and serialized merges
 
-#### Hackathon hardening PR
+The user explicitly requested mostly independent stacked PRs. This authorizes an exception to the prior sequential-branch policy for this series. Merges remain serialized and every merged result receives the full quality gate.
 
-One final pre-demo PR follows G4 before Checkpoint GF:
+The inspected planning baseline is `c39ddb8a7b428585e2ab0e6c59fe0b670c2803c7`. It is not a dispatch-ready base: the checkout contains uncommitted planning, guidance, and imported reference files. Before implementation, reconcile those files deliberately and record the accepted complete base SHA and actual parent PR links in each issue. PC IDs are local packet IDs, not GitHub issue numbers.
 
-- isolate Playwright's Next.js output in `.next-playwright` so the browser suite can run beside the local app;
-- pin Node.js 24 for local and hosted parity;
-- add project guardrails for provenance, scope, deterministic behavior, and quality gates;
-- remove UI copy that implies a live Astra call where the demo is deterministic;
-- document how Astra supports the build and how to present that contribution truthfully;
-- run the complete quality gate once, then one independent adversarial review and post-review verification;
-- verify the deployed golden flow and rehearse a 90-second fallback capture.
+Use `codex/pc-XX-description` branches. A child may branch from its explicitly accepted parent head; record that exact SHA and review the child's incremental diff. Do not use an implicit moving branch tip, invent a parent link, or cherry-pick another lane's unaccepted work. Cross-lane interfaces require the accepted shared commit. After a parent merges, rebase its children onto accepted main, reconcile the combined diff, and rerun the relevant gates. No two PRs merge concurrently.
 
-Runtime model integration remains deferred unless the hackathon organizers explicitly require it. The published brief requires Astra to be used throughout the build and explained in the submission video, but does not state that the prototype must call Astra at runtime. Reliability and an honest build log therefore outrank adding an API dependency tonight.
+One permitted sequence is PC-01 → PC-02 → PC-04 → PC-03 → PC-05 → PC-06 → PC-07 → PC-08. Independent ready packets may exchange order when all hard dependencies are satisfied. The graph, not priority labels or available tokens, controls dependency closure.
 
-After this series, resume Checkpoint A. Production corpus expansion remains blocked until the canonical Stage 0 thresholds pass. Production sharing remains blocked until creator ownership and durable storage are implemented.
+## Host proof and quality
 
-## 5. Delivery stages
+The current Site already uses Vinext/Cloudflare configuration, but npm build/dev and browser tests currently run Next. PC-01 must resolve this mismatch explicitly. The Sites build helper invokes the configured build script; it cannot manufacture a Worker from a Next-only build. D1 is currently undeclared. Use logical `DB`, `db/schema.ts`, generated `drizzle/**` migrations, raw prepared statements, and a narrow server binding helper. R2 is unnecessary for compact preset records; consider it only when later dynamic artifacts require blob storage.
 
-Stages are gated by evidence rather than fixed calendar promises. The product lead owns each checkpoint decision and records its cohort, observation window, numerator, denominator, exclusions, and pass/fail outcome in the PRD changelog. A missed minimum sample is “insufficient evidence,” not a pass.
+Prove the built Worker entrypoint, local D1 migration path, concurrent revision checks, restart durability, and a production-equivalent browser test harness. Preserve all golden-flow tests. Verify participant audience access before claiming a publicly joinable room; a private Site can require platform sign-in. Never use a memory/localStorage fallback as durable or multi-browser proof.
 
-### Stage 0 — Validate the wedge
+Every implementation PR must run the exact [QUALITY.md](./QUALITY.md) gates:
 
-**Goal:** Confirm the research problem and initial vertical before building corpus infrastructure.
+1. `npm run lint`
+2. `npm run build`
+3. `npm test`
+4. Independent adversarial review of the complete diff
+5. A second lint, build, and focused-test run after review fixes
 
-Deliverables:
+PC-01 introduces and documents the additional built-Worker/D1 commands and target-specific suite. Until they exist, their checks are planned rather than runnable npm claims. Network/storage packets must run that suite; UI packets additionally verify real browser behavior; PC-08 exercises three separate participants against the actual host. Screenshots, old merged commits, imported harness results, and mocked transport are not fresh quality passes.
 
-- Recruit 12 solo developers, hands-on designers, or small-team design leads.
-- Test three starting prompts: desired behavior, named mechanic, and reference game.
-- Show a lightweight Explore prototype with at least ten representative implementation cards.
-- Compare library-first and canvas-first task completion.
-- Ask participants to produce a mechanic decision artifact using their current process for baseline comparison.
+## Timeboxes, cuts, and later work
 
-Exit criteria:
+The eight core packets total 92–148 implementation hours. Reserve another 24–40 person-hours for cross-review, full gates, fixes, and integration: 116–188 person-hours overall, roughly 15–24 person-days. With two people and the serial runtime/room chain, allow roughly 8–15 working days. These are planning ranges, not commitments; re-estimate after PC-01 and PC-02. Each packet stops at its timebox to reduce scope or revise the estimate, never to waive its gates.
 
-- 8/12 participants find a useful reference within three minutes.
-- At least 7/12 complete the assigned decision task more successfully from examples than from a blank graph, using a predeclared rubric for relevance, completion, and time.
-- At least five participants identify a current project decision they would test with the product.
-- At least 4/12 independently describe a current or recent decision in the same narrow vertical, spanning at least three distinct behavior queries.
+Preserve a coherent demo if scope shrinks: three own-browser participants, one real FPS/zombie/cooking mashup, honest card effects, both extrema changing it, another played round, group end, durable save, and future play/remix. Cut optional art, extra variants, presentation polish, and additional families first. Reducing the declared eight-combination deck requires a visible PRD/deck revision. If hosting is unavailable, continue independent work but keep online acceptance blocked; hotseat is not an equivalent completion. If no later card is available, Pass preserves the loop. Never save an unplayed failed build as the group's finished game.
 
-Run the Stage 0 study as one 12-participant round completed within four weeks. The product lead classifies verticals from transcripts captured before participants see the proposed roadmap and signs the checkpoint record.
+| Later packet | Role in direction | Exit evidence |
+| --- | --- | --- |
+| [PC-09](./docs/issues/PC-09.md) | Required target: qualify after PC-01; integrate after accepted PC-02/03/05/06/07/08 | Actual generation of an initial build plus two additive remixes outside the authored list, retained prior contributions, bounded latency/cost, isolated execution, immutable playable artifacts |
+| [PC-10](./docs/issues/PC-10.md) | Optional AR/hand-sign jump-quest feasibility | Real gesture input, explicit camera/AR limits, accessible fallback, measured compatibility |
+| [PC-11](./docs/issues/PC-11.md) | Adaptive-difficulty idea retained for later evaluation | Visible fair rules, preserved edit rights, tested score comparability and sandbagging risks |
 
-If these criteria fail, do not expand the database. Revisit the target persona and problem language.
+PC-09 cannot be marked fulfilled by PC-01–08. A pending capability, unsupported API, or failed generation job must remain explicit. See the [capability assessment](./docs/openai-capability-fit.md) before selecting any live integration. PC-10/11 are not dependencies of the core demo or permission to broaden it.
 
-### Stage 1 — Explore, Compare, Forge
+## Planning validation
 
-**Goal:** Prove that reference discovery converts into an owned mechanic specification.
-
-Deliverables:
-
-- Curated corpus and source workflow.
-- Search, filters, and match explanations.
-- Mechanic and game pages.
-- Comparison workspace.
-- Forked mechanic specification.
-- Control/mutation diff and locked invariants.
-- Test-plan-only path for every specification, including mechanics without a supported microplay.
-- Markdown, JSON, and test-plan export.
-
-Exit criteria:
-
-- At least 5/12 evaluators fork after browsing or comparing.
-- At least 8/12 correctly classify at least four of five sampled fields as sourced fact, product inference, or user decision in an unaided check.
-- At least three evaluators use an exported artifact in an actual project discussion or prototype task.
-- At least one-third of eligible designers with a supported mechanic choose a browser microplay as the next artifact over a test-plan-only or engine-ready handoff. At least six eligible designers are required for a valid result.
-
-Run the Stage 1 study as one 12-participant round completed within four weeks. The product lead verifies real-project export use and signs the checkpoint record.
-
-Do not begin the microplay runtime if the final criterion fails. Continue improving the specification and export workflow or retest the initial vertical instead.
-
-### Stage 2 — Microplay validation loop
-
-**Goal:** Prove that a constrained browser experiment creates useful evidence before an engine prototype.
-
-Deliverables:
-
-- Dash microplay template reconstructed from the earlier A/B arena concept.
-- Variable mapping and invariant locking.
-- Creator preview for both variants.
-- Publish validation and capability checks.
-- Unlisted, expiring share link.
-- Blind, balanced within-subject A/B tester flow.
-- Stable anonymous participant identity and balanced within-subject `AB`/`BA` assignment.
-- Event telemetry and post-play response.
-- Evidence report and decision record.
-
-Exit criteria:
-
-- At least 8/10 newly recruited designers complete configuration and publishing without team assistance.
-- At least 8/10 newly recruited testers complete the experience in under six minutes without an account.
-- In the documented 60-day cohort defined in the PRD, at least 30% of eligible supported forks become shared tests.
-- The median shared test in that cohort receives five valid sessions within seven days.
-- In that cohort, at least half of creators whose tests reach five valid sessions record a decision within seven days of the fifth session.
-- At least five creators who receive five valid sessions complete a debrief; three must identify a changed confidence level or next design action consistent with their recorded decision.
-
-Complete each 10-person usability round within four weeks. The 60-day conversion cohort and its minimum sample sizes are canonical in the PRD; Checkpoint C may not substitute lower thresholds.
-
-### Stage 3 — Generalize and retain
-
-**Goal:** Establish that the workflow repeats across mechanics and projects.
-
-Deliverables:
-
-- A second microplay family selected from requests by at least five distinct creators.
-- A third microplay family only after Checkpoint D identifies requests from at least five distinct creators.
-- Project history and collections.
-- Read-only System Map only if independent Checkpoint E passes.
-- Comments and decision requests.
-- Permission-aware remix from completed shares.
-
-Exit criteria:
-
-- At least 3 of 10 active creator teams complete a second evidence-backed mechanic decision within a 60-day retention cohort.
-- Each of two microplay families independently meets the Stage 2 publish and decision thresholds in a 60-day cohort with the same minimum sample rules.
-- At least 2 of those 3 repeat teams open prior evidence and cite it in a revision or subsequent decision record.
-- At least 5 of the 10 active teams request the same engine and artifact type during the cohort before an engine export is scheduled.
-
-For this gate, an active creator team is a workspace that recorded an evidence-backed decision during the 30 days before enrollment. Enroll the first 10 qualifying teams that consent to the study, then observe the fixed cohort for 60 days.
-
-**Checkpoint E — System Map demand:** In a four-week study of at least 12 eligible creators using Forge specifications for real design tasks, at least five must independently encounter a dependency-diagnosis or communication problem that the structured fields do not resolve, and at least three must explicitly choose a read-only dependency view as the next artifact. The product lead reviews task recordings and signs the checkpoint. Checkpoint E may run any time after PR 7 and does not depend on template expansion.
-
-### Stage 4 — Scale the moat
-
-**Goal:** Turn accumulated implementation and decision data into a hard-to-reproduce workflow advantage.
-
-Candidates:
-
-- Engine-specific exports and project ingestion.
-- User-provided telemetry mapped to Forge hypotheses.
-- Comparable evidence patterns across anonymized, opted-in tests.
-- Moderated community contributions.
-- Public pattern pages and embeds.
-- Tester exchange or PlaytestCloud-style panel partnership.
-- Agent/API access to sourced patterns and mechanic specifications.
-
-Every Stage 4 feature requires a separate privacy, rights, and business-model review.
-
-## 6. Microplay sharing plan
-
-### Why it belongs in the core flow
-
-Without sharing, the microplay is only a creator-side toy. Sharing changes it into a validation instrument and connects four product advantages:
-
-1. **Low friction:** Reviewers open a link instead of installing a build.
-2. **Better evidence:** Variant assignment, telemetry, and responses share one test contract.
-3. **Asynchronous collaboration:** A lead, teammate, community member, or publisher can review on their own time.
-4. **Permission-aware growth:** A completed tester can discover the underlying public pattern or fork a permitted version.
-
-### P0 sharing scope
-
-Build only what is needed for trustworthy small-sample tests:
-
-- unlisted link;
-- no tester account;
-- authenticated creator ownership and authorization for publishing, link management, and results;
-- single device-class declaration;
-- blind or named variants;
-- balanced `AB`/`BA` ordering assigned once per participant and experiment version;
-- reload resume using a scoped first-party participant token;
-- concise instructions;
-- affirmative 18+ consent with the creator, captured data, purpose, and retention disclosed;
-- event capture;
-- structured response;
-- creator/test-session separation;
-- explicit valid, partial, duplicate, automated, preview, and repeat session states;
-- token-scoped `Delete my test data` access before, during, and for 90 days after participation; withdrawal removes telemetry and response data and recomputes results;
-- raw-data deletion 90 days after collection, including for active links, followed only by de-identified aggregate retention;
-- link pause, deletion, and mandatory expiry no later than 30 days after publishing;
-- cascade deletion of the link, sessions, responses, aggregates, and decision;
-- result access restricted to the authenticated owning creator.
-
-### P1 sharing scope
-
-- Password or workspace-only links.
-- Comments tied to a run or moment.
-- Embed mode.
-- Branded review pages.
-- Remix with explicit creator permission.
-- Shareable evidence summary with sensitive data redaction.
-
-### Guardrails
-
-- Do not rank public mechanics by tiny or incomparable samples.
-- Do not call preference a behavioral result.
-- Do not reveal variant names before a blind test completes.
-- Do not mix creator preview data with tester data.
-- Do not imply that a three-minute microplay validates retention, monetization, or full-game fun.
-- Do not make links public or searchable by default.
-
-## 7. Suggested application structure
-
-```text
-Explore
-  Games
-  Mechanics
-  Behaviors
-  Saved references
-
-Project
-  Brief
-  Comparisons
-  Forge specifications
-  Microplays
-  Evidence decisions
-
-Mechanic specification
-  Contract
-  References
-  Variants
-  System Map
-  Test plan
-  Export
-
-Microplay
-  Configure
-  Preview
-  Publish
-  Sessions
-  Evidence
-  Decision
-```
-
-The existing three-column graph interface can later become the `System Map` view. It should not remain the application home.
-
-## 8. Workstreams and dependencies
-
-### Content and ontology
-
-- Define the first vertical and pattern inclusion criteria.
-- Finalize the internal schema and user-facing vocabulary.
-- Establish source quality, media rights, and review standards.
-- Create the first implementation records and comparison dimensions.
-
-This workstream blocks trustworthy Explore, Compare, and AI grounding.
-
-### Product and interaction
-
-- Prototype search and comparison before full corpus tooling.
-- Design the forked specification and variant diff.
-- Design tester and creator flows independently.
-- Make evidence state and provenance visible in every view.
-
-### Microplay runtime
-
-- Extract reusable controls from the earlier dash arena.
-- Define template inputs, invariant fields, and event schemas.
-- Build deterministic seeding where it materially supports comparison.
-- Separate presentation events from evidence events.
-
-### Platform and data
-
-- Persist projects, specifications, variants, microplays, sessions, responses, and decisions.
-- Authenticate creators and enforce project and experiment ownership on every creator-only read and write.
-- Generate secure opaque share identifiers.
-- Add link status, expiry, abuse protection, participant withdrawal, creator deletion, and report recomputation.
-- Delete raw data and participant-contribution links 90 days after collection while allowing only de-identified counts, rates, and decisions to remain until creator deletion.
-- Limit isolated abuse metadata to a daily-rotated keyed network hash, coarse user-agent family, request time/count, and allow/block reason, with deletion within 24 hours.
-- Store schema and experiment versions with every session.
-
-### Research and operations
-
-- Recruit target designers and testers.
-- Observe task completion rather than relying only on stated preference.
-- Review whether each microplay isolates its claimed mechanic.
-- Track unsupported mechanic requests to choose new templates.
-
-## 9. Immediate backlog
-
-### Product definition
-
-- [ ] Select the initial action-game subgenre and ten anchor games.
-- [x] Create a ten-card corpus for Stage 0 validation.
-- [ ] Expand to 15–20 patterns only after the Stage 0 gate passes.
-- [ ] Rewrite internal taxonomy labels into user-facing language.
-- [x] Define source confidence and media rights fields.
-- [x] Define the mechanic comparison dimensions.
-- [x] Define the versioned Mechanic Forge JSON schema.
-
-### Prototype
-
-- [x] Replace the graph-first home concept with an Explore-first prototype.
-- [ ] Create behavior-query, results, mechanic-detail, and comparison screens.
-- [ ] Create a fork-to-specification interaction.
-- [ ] Reintroduce the dash arena as a microplay template rather than the main workspace.
-- [ ] Prototype the no-account tester journey.
-- [ ] Prototype the evidence report and recorded decision.
-
-### Validation
-
-- [ ] Recruit 12 target designers.
-- [ ] Run the Stage 0 task protocol.
-- [ ] Record baseline tools, task time, confidence, and resulting artifact.
-- [ ] Compare Explore-first and canvas-first completion.
-- [ ] Identify the dominant search language and initial vertical.
-- [ ] Update the PRD with findings and promote only validated features.
-
-## 10. Suggested changelog
-
-Record future recommendations and scope changes in `PRD.md` under its changelog, using this format:
-
-```markdown
-### YYYY-MM-DD — Decision title
-
-- **Suggestion:** What changed or was proposed.
-- **Reason:** Evidence or product risk that motivated it.
-- **Impact:** Features, priorities, or assumptions affected.
-- **Status:** Proposed, accepted, rejected, or superseded.
-```
-
-### 2026-09-12 — Initial plan
-
-- Added an Explore-first delivery sequence.
-- Prioritized a narrow curated corpus before database scale.
-- Made Compare and Fork prerequisites for authoring investment.
-- Added shareable microplays to P0 because sharing completes the evidence loop.
-- Limited P0 sharing to unlisted, no-account, blind A/B validation with basic telemetry and feedback.
-- Reframed the previous interactive arena as the first reusable microplay template.
-- Moved the generated System Map to P1 and freeform graph editing to P2.
-- Deferred generalized simulation, full-game generation, broad integrations, and public community features.
-
-### 2026-09-12 — Adversarial review amendments
-
-- Split the ten-card validation corpus from production corpus expansion.
-- Added a positive microplay-demand gate to Stage 1.
-- Moved Markdown, JSON, and test-plan export ahead of microplay implementation.
-- Defined the P0 tester flow as a balanced within-subject crossover with stable assignment and explicit validity states.
-- Added explicit non-PR evidence checkpoints so corpus, runtime, template, and System Map investment cannot bypass validation gates.
-- Added creator authentication and ownership before external sharing, plus tester consent, data minimization, withdrawal, retention, and deletion requirements.
-- Split additional templates and the System Map into independently gated PRs.
-- Added a sequential delivery series with test expectations for every behavior-changing slice.
-- Replaced subjective stage gates with owned, time-bounded cohorts and explicit denominators and thresholds.
-- Bounded P0 links and raw-data retention, made withdrawal available throughout the retained lifecycle, and constrained abuse metadata.
-- Made additional template selection demand-led and the read-only System Map an independently insertable optional PR.
-
-### 2026-09-12 — PR 1–4 implementation checkpoint
-
-- Completed the quality baseline, product specification, versioned domain schema, ten-card validation corpus, and Explore-first prototype.
-- Verified the Explore prototype with automated domain/state tests and desktop/mobile browser interaction checks.
-- Paused production corpus expansion at Checkpoint A; PR 5 remains blocked until the signed Stage 0 study passes its predeclared thresholds.
-- Kept Compare, Forge, microplays, and the System Map out of the prototype so the study measures the Explore wedge without downstream feature effects.
+This change authors a PRD delivery plan and issue specifications. GitHub publication status is recorded in the issue index. It does not implement the party game, provision, deploy, or report a fresh runtime quality pass. The previous plan is preserved byte-for-byte in the dated archive. Its historical relative-link base and path mappings are recorded in the archive README and manifest.

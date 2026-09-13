@@ -8,7 +8,11 @@ Every product change is reviewed against the same minimum gate before it is merg
 4. Independent adversarial review of the complete diff
 5. A second lint, build, and focused-test run after review fixes
 
-`npm test` runs both layers: Node's built-in test runner exercises the domain, query, schema, reducer, dash experiment, preview-runtime, and tester-session modules with native type stripping. Playwright then operates the complete golden flow in desktop and mobile Chrome: Explore, Returnal and dash reference pages, one-rule adaptation, creator preview, demo publishing, blind tester runs, response, evidence limitations, and decision capture.
+`npm test` runs both layers: Node's built-in test runner exercises the domain, query, schema, reducer, dash experiment, preview-runtime, tester-session, and party-contract modules with native type stripping. Playwright then operates the complete golden flow in desktop and mobile Chrome against the built Vinext Cloudflare Worker: Explore, Returnal and dash reference pages, one-rule adaptation, creator preview, demo publishing, blind tester runs, response, evidence limitations, and decision capture. Run the build gate first; the browser runner deliberately refuses to substitute a development server or reuse an existing server.
+
+PC-01 adds `npm run build:worker` (the same production build gate), `npm run db:generate`, `npm run db:migrate:local`, and `npm run test:party`. Network/storage packets must also pass `test:party` after building. It applies packaged migrations to real local D1, exercises the shared persistence helper through a local-only wrapper around the built Worker, races expected-revision writes, and kills/restarts the Worker before rereading the record. Three isolated browser contexts verify the HTTP boundary. This is local host evidence; deployed access and multiplayer product acceptance remain separate. See [host contract and evidence](./docs/party-forge-host.md).
+
+PC-03 extends `test:party` with real room commands from three isolated browser contexts: server-clock trials, authoritative results, cumulative ordered additions, command races, host/editor absence, abort/retry, restart and storage-failure recovery. Node tests also exercise the reducer, streamed request bounds and SQLite transaction rollback. The golden suite accepts an optional `PARTY_TEST_PORT` for simultaneous worktrees; its default remains 3107 and it still refuses an existing server.
 
 ## Scoped lint exceptions
 

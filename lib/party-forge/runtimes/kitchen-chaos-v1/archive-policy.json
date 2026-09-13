@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "kitchen-chaos-archive-policy/1",
+  "manifest": {
+    "protocolVersion": "party-forge/1",
+    "catalogVersion": "kitchen-chaos/1",
+    "resolverVersion": "kitchen-chaos-resolver-v1",
+    "origin": {
+      "kind": "preset",
+      "presetVersion": "kitchen-chaos-presets-v1"
+    },
+    "runtime": {
+      "key": "party-forge/kitchen-chaos-v1/engine.js",
+      "version": "kitchen-chaos-v1",
+      "hash": "sha256:94e56fdaa6a5cf1232a1e112e177e52ac4200f19f22f32ba58fe632e41942a31",
+      "mediaType": "text/javascript"
+    },
+    "assets": [],
+    "controls": "desktop-keyboard-mouse/1",
+    "scoringVersion": "orders-then-failures/1",
+    "adaptation": "off"
+  },
+  "validatorVersion": "kitchen-chaos-validator-v1",
+  "limitations": [
+    "Authored preset gameplay; no live model call or arbitrary generated gameplay.",
+    "Automated local bounded input witnesses cover tested scenarios, not observed external playtests or universal correctness.",
+    "Three desktop players use separate matched 60-second trials. This engine supplies no room transport, rendering or durable hosted archive."
+  ],
+  "effects": {
+    "knockback": {
+      "ruleId": "knockback",
+      "parameters": {
+        "shotRange": 20,
+        "shotDamage": 1,
+        "shotCooldownTicks": 18,
+        "pushDistance": 2,
+        "stunTicks": 60
+      },
+      "explanation": "Aimed shots repel the nearest visible zombie and push it away."
+    },
+    "pursuers": {
+      "ruleId": "pursuers",
+      "parameters": {
+        "speed": 0.8,
+        "health": 2,
+        "firstSpawnTick": 420,
+        "spawnIntervalTicks": 360,
+        "maxZombies": 10,
+        "contactCooldownTicks": 120,
+        "contactSlowTicks": 30
+      },
+      "explanation": "Zombies pursue the player and interrupt nearby cooking through contact."
+    },
+    "quick-orders": {
+      "ruleId": "quick-orders",
+      "parameters": {
+        "portions": 1,
+        "cookTicks": 150,
+        "burnAfterReadyTicks": 900
+      },
+      "explanation": "Prepare, cook, collect and deliver one portion per valid order."
+    },
+    "dinner-bell": {
+      "ruleId": "dinner-bell",
+      "parameters": {
+        "attractionTicks": 360,
+        "radius": 7,
+        "stackCap": 1
+      },
+      "explanation": "A delivery draws nearby zombies toward the delivery station for a bounded time."
+    },
+    "hot-potato": {
+      "ruleId": "hot-potato",
+      "parameters": {
+        "carryTicks": 600,
+        "stackCap": 1
+      },
+      "explanation": "A carried cooked dish spoils after its fixed carry deadline, failing that order."
+    },
+    "zombie-pantry": {
+      "ruleId": "zombie-pantry",
+      "parameters": {
+        "pickupCap": 6,
+        "worldDropCap": 3,
+        "dropLifetimeTicks": 900,
+        "pickupReach": 1.15,
+        "stackCap": 1
+      },
+      "explanation": "A repelled zombie drops a raw ingredient, subject to ground and pickup caps."
+    },
+    "batch-orders": {
+      "ruleId": "batch-orders",
+      "parameters": {
+        "portions": 2,
+        "cookTicks": 240,
+        "burnAfterReadyTicks": 900
+      },
+      "explanation": "Prepare two portions before cooking and deliver the batch as one valid order."
+    },
+    "noise-seekers": {
+      "ruleId": "noise-seekers",
+      "parameters": {
+        "speed": 0.8,
+        "health": 2,
+        "firstSpawnTick": 420,
+        "spawnIntervalTicks": 360,
+        "maxZombies": 10,
+        "contactCooldownTicks": 120,
+        "contactSlowTicks": 30
+      },
+      "explanation": "Zombies approach an active cooking station; otherwise they pursue the player."
+    },
+    "counter-ricochet": {
+      "ruleId": "counter-ricochet",
+      "parameters": {
+        "shotRange": 20,
+        "shotDamage": 1,
+        "shotCooldownTicks": 18,
+        "maxBounces": 1,
+        "pushDistance": 0.25,
+        "stunTicks": 15
+      },
+      "explanation": "Aimed shots can reflect once from the marked counter to hit a zombie."
+    }
+  },
+  "objectives": {
+    "quick-orders|standard": "In 60 seconds, prepare and cook 1 portion per order, then deliver the cooked dish. Rank by most valid delivered orders, then fewest spoiled or burned orders. Zombie contact spoils a carried dish.",
+    "quick-orders|hot-potato": "In 60 seconds, prepare and cook 1 portion per order, then deliver the cooked dish. Rank by most valid delivered orders, then fewest spoiled or burned orders. Deliver carried dishes within 10 seconds before they spoil. Zombie contact spoils a carried dish.",
+    "batch-orders|standard": "In 60 seconds, prepare and cook 2 portions per order, then deliver the cooked dish. Rank by most valid delivered orders, then fewest spoiled or burned orders. Zombie contact spoils a carried dish.",
+    "batch-orders|hot-potato": "In 60 seconds, prepare and cook 2 portions per order, then deliver the cooked dish. Rank by most valid delivered orders, then fewest spoiled or burned orders. Deliver carried dishes within 10 seconds before they spoil. Zombie contact spoils a carried dish."
+  },
+  "trialTicks": 3600,
+  "maxTraceBytes": 512000
+}

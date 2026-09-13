@@ -1,0 +1,83 @@
+Summary
+
+### Action Items
+
+- [ ]  Decide which concept to submit: the open-world verbalization flow or the competitive mini-game assembly concept
+- [ ]  Confirm the initial entry experience for the forge ("what do you see when you first enter") and whether it is "radically fun enough"
+
+### Context & Time Pressure
+
+- The team is under a tight deadline, with approximately 4.5 minutes/hours left for submission
+- The project is referred to as "Fauna House" or "the Forge" - a platform where the game-building experience is itself a game
+
+### Core Concept: Verbalize-to-Play Flow
+
+- A user enters the forge, describes a game they want to play verbally, and predefined game design concepts surface as options based on what they articulate
+- This is not fully unbounded - structured prompts guide both experienced and inexperienced users
+- Open question: should the default view be an "open world card" with no options, or surface options immediately?
+- 2D vs.3D preference was flagged as a potentially polarizing choice for gamers that the UI must address
+
+### New Idea: Competitive Mini-Game Assembly Mechanic
+
+- An alternative concept was proposed: the game-building experience is structured like a party game (compared to Wii party)
+- Players compete in a series of mini-games; winners earn game mechanics or components (e.g. "control gravity") as rewards
+- After completing several mini-games, each player assembles their own game from the components they've collected
+- Players then compete to see whose assembled game is better
+- This was compared to a game called "new bats" in terms of mechanics
+- Concern raised that this relies heavily on a large agency API, making it potentially very complex to implement
+
+### Open Questions & Next Steps
+
+- The team is still deciding between the two directions: the original verbalize-to-play flow vs. the new competitive assembly mechanic
+- If the new concept feels too unbounded, the group may revert to the earlier-discussed structured approach
+- The "cards and game decomposition" guidance layer was noted as applicable to both concepts regardless of direction chosen
+
+Notes
+
+Transcript
+
+Oh no no, I already took him on his codex. Oh sorry, I interrupted you. No no no, no choice, you must give us more credits now.
+
+Thank you, thank you, thanks for having me.
+
+We can say again that we use this. It's a good idea though. Actually just how to operationalize it. Not even 5 hours left. An hour left for... eh no, 4 and a half minutes.
+
+We have beacon already.
+
+I think that's the thing. Okay. So, it's normal. I just trying to think of what to submit by end of what now. So I guess if this is the whole concept then which part do you want to focus on for this Fauna House? The first exploratory part? The ability to take an existing game or just something you can verbalize as the next layer but we don't put it as part of it. Or it could be like two separate, was building separately and then merging.
+
+I think we will go to the shop and the tickets will be here Mini tickets will go and chiong. Cause then you can own a mini game within that game. Or you start the initial flow, whatever it is. Once enters the game, then... What's the experience like? Between an experience and a noob? You voice it out, then you're giving me a leave again. I've historically liked to play sims games.
+
+Show me the open world card, as in the one that you just say and then you just start. No options, right?
+
+The options surface as is. So it's not absolutely unbounded in the sense that when you enter 20BP, that's there. There are already predefined game analysis concepts that will surface based on what you articulate. and then your game begins But that part I'm just trying to figure out the UI.
+
+But you also said that there is not much value add to that in extra right? And also that already assumes that you start in like, in a first person kind of thing, but sometimes people might want to play like a 2D platformer.
+
+You can start watching 2D or 3D I think it's very polarizing actually for some gamers. Some people just don't like being 3D.
+
+Fun, really fun.
+
+Wait, is that where we gotta cancel? I built this, the open world one where you say and then the options come out and then you're going to do the one where you create a program and play the game.
+
+Oh we must do it, we're still confirming whether this is the line that we want to put up. Okay okay. Because I think ultimately the... cards and game decomposition will still come in to guide both experienced and inexperienced users. That part doesn't change. That is when you first enter the forge or whatever concept that we call it, what do you see? And is it radically fun enough that you start with a game?
+
+I'm gonna go back to my room.
+
+Actually now I'm taking the idea and thinking a bit further, thinking like why we have it like a comp... like this experience of building a game is a game. So that means that you have like five people you deploy in and then you are playing... sorry I'm thinking of Wii already. You're playing mini games along the way and then you win as you get first, second, third, fourth, fifth, then you get to choose what components you want and then at the end of like maybe three games you have to assemble your own game in the time that you have.
+
+And then you start a new game. and then neither you After you play a few games, you assemble the games together. With whatever you can have, you assemble the games together and then play. A way for them to compete which game is better, something like that. You play new bats right? Yeah, yeah, long time ago.
+
+So how does this compare to new bats? As in the sense that, from a mechanics standpoint? We are both none of us both get hurt.
+
+new points, I have a bank, blah blah blah I start and ready compete with you or do I play on my own or Okay, so they'll be like You know wee or some kind of wish? Like you play different mini games, you have a few friends on like 4 controllers and then maybe on Switch also that you can play, you play a few mini games together and then in those kind of games you are just basically like earning points or seeing who comes out the champion after all the mini games.
+
+But instead of having winning just points and being the champion, but you play the mini games and then and in every mini game there is like I don't know the ability to control gravity as the first place winner for this game. It's like SO3D I suppose so, yeah yeah I guess.
+
+I think I could. Oh yeah yeah.
+
+That plays more on the competitive element and assuming that you are able to assemble a game with all the different mechanics that you've collected through the mini games. and then you compete against like your other players what kind of game you play?
+
+4x agency API, very big Yeah, well that makes it very uncomfortable Anyway, we're just ideating.
+
+If you find that it's a bit too unbounded, then we can stick to what we discussed earlier regarding that. Because I do fixnd your idea of like, Being able to play games and experience games to learn the different mechanics also is also quite an interesting concept also. Or just ideating off of that to see whether we want to How much more? Or just different groups that we can consider? Sorry, I'm thinking. Yeah.

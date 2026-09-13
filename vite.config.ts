@@ -13,7 +13,10 @@ const { d1, r2 } = hostingConfig;
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === 'seatbelt';
 
 const localBindingConfig = {
+  name: 'mechanic-forge',
   main: 'vinext/server/fetch-handler',
+  // Match the locked workerd binary; do not silently select today's newer semantics.
+  compatibility_date: '2026-05-22',
   compatibility_flags: ['nodejs_compat'],
   d1_databases: d1
     ? [
@@ -21,6 +24,7 @@ const localBindingConfig = {
           binding: d1,
           database_name: 'site-creator-d1',
           database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
+          migrations_dir: 'drizzle',
         },
       ]
     : [],
@@ -45,6 +49,28 @@ export default defineConfig(async () => {
   const { cloudflare } = await import('@cloudflare/vite-plugin');
 
   return {
+    environments: {
+      client: {
+        build: {
+          // The locked Rolldown loses the dynamic namespace when navigation
+          // merges into the app entry. Preserve its boundary for next/link.
+          rolldownOptions: {
+            output: {
+              codeSplitting: {
+                groups: [
+                  {
+                    name: 'vinext-navigation',
+                    test: /[/\\]vinext[/\\]dist[/\\]shims[/\\]navigation\.js$/,
+                    priority: 100,
+                    minSize: 0,
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
     css: { postcss: { plugins: [tailwindcss()] } },
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }

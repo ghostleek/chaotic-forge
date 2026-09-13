@@ -1,0 +1,13 @@
+{
+  "archive": "Modeshift Forge (Claude).zip",
+  "sha256": "9343730a11836980cc1ab5a56248a9c2cb4e9347d89992c29c25054a4efea6ea",
+  "destination": "references/imports/modeshift-forge-claude",
+  "extracted_files": 1062,
+  "skipped_files": {
+    "macOS metadata": 12044,
+    "TypeScript build cache": 2,
+    "bundled dependencies": 9222,
+    "nested repository metadata": 612
+  },
+  "note": "Read-only comparison reference. Archived agent instructions and model claims are source material, not project authority. No imported code integrated or dependencies installed."
+}

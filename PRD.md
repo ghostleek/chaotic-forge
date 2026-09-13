@@ -1,528 +1,217 @@
-# Mechanic Forge Product Requirements Document
+# Forge — competitive game creation
 
-**Status:** Golden-flow implementation specification
+## Latest user decision — pixel instruction demo (13 September 2026)
 
-**Version:** 0.2
+This decision supersedes the fixed Kitchen demo and exactly-three-player defaults below for new pixel rooms. Two players can create and start; a third is optional, with a hard cap of three. Each connected player confirms one custom instruction card, optionally filled from a starter. The host explicitly asks Forge to mesh them into a single bounded pixel game. The model returns executable rule configuration for the retained Snake/Invaders/Bounce engine, including scoring weights and an interpretation for each card. It does not generate arbitrary JavaScript or satisfy all of PC-09.
 
-**Last updated:** 2026-09-13
-**Initial target:** Solo developers and small PC/console game teams, beginning with action-game combat and mobility mechanics
+Players run concurrently in separate arenas with matching rules, seed and server start time. Highest points wins, with fewer hits as the next comparison. Existing room capabilities, captured inputs, server replay, results and archive contracts are reused. Winner and loser may each propose a further instruction while the bounded recipe has space. Source text, model interpretation and user confirmation stay distinct. Legacy Kitchen and G1–G4 remain retained.
+
+User authorized implementation and GPT Sites deployment on the PC-05 stack; broad edge-case suites remain paused, with one real local golden flow requested. Full QUALITY.md gates and independent acceptance remain required before merging. See [current handoff](docs/design/pc-05-handoff.md).
+
+
+**Version:** 0.4 · **Updated:** 13 September 2026
+**Status:** Current demo simplified to one fixed authored recipe and deterministic additions; no mixed-hand dealing or swapping. Broader open-deck generation below is deferred target direction. See the latest demo decision immediately below.
+**Promise:** “My friends and I made a surprising game together—and we can play it again.”
+
+## Current demo simplification — 13 September 2026
+
+The user dropped mixed-hand dealing and swapping, then explicitly removed permutation scope. PC-04 now offers exactly Knockback, Pursuers and Quick orders: each participant claims one available card, producing the same authored recipe. The next editor adds Dinner bell, then Hot potato, then Zombie pantry; Pass is available only when exhausted. Contributor identity and winner/loser ordering remain authoritative, but do not create different gameplay recipes. No open deck, dealing, redraws, arbitrary custom instructions or alternate rulesets are required. The broader product ideas below are deferred, not current demo acceptance. Generation remains a separate target.
 
 ## 1. Product decision
 
-Mechanic Forge will be an evidence-oriented mechanic design workspace, not a generic node editor and not a passive mechanics encyclopedia.
+Forge is a browser party game in which a group chooses game-concept cards, generates a playable mashup, competes inside it, and changes it through the results. **Remixing the game is part of the game.** The result is a saved, playable creation with its history.
 
-The product promise is:
-
-> Find proven gameplay patterns, understand why they work, forge a version for your game, and run the smallest credible test before committing production time.
-
-The primary journey is:
+The target experience generates the game from the group's choices on the fly. Players do not begin by selecting an existing base game. The user explicitly permits preset chaotic combinations for the demo; that is a delivery technique, not a replacement for the generation requirement.
 
 ```text
-Design problem
-  -> relevant mechanics and real-game implementations
-  -> comparison of causal patterns and trade-offs
-  -> fork into a mechanic specification
-  -> create a control and mutation
-  -> generate or configure a microplay
-  -> share an unlisted playtest
-  -> review observed evidence
-  -> keep, revise, or reject the mechanic
+Join → everyone chooses cards → Forge creates a playable version → everyone plays
+     → results → group continues? → winner AND loser each add one mechanic
+     → Forge evolves the same game → everyone plays again → repeat
+     → group ends → save the whole game → replay / remix / forge fresh
 ```
 
-The Mobbin-like reference library is the acquisition and activation layer. The Forge specification is the core authoring layer. Shareable microplays and their evidence reports close the decision loop and are the long-term differentiator.
+Anyone can suggest any dimension: game modes, mechanics, concepts, perspectives, objectives, social rules or familiar game references. A player is never assigned a genre or a dimension. Cards may overlap in meaning; descriptive tags do not become seats or quotas. Players may discard unfamiliar uncommitted cards and receive replacements. See the [14-card base vocabulary and proposed extensions](./docs/card-catalog.md), and the [revised card-table design](./docs/design/pc-04-card-ux.md).
 
-The node graph remains available as a generated **System Map**. It is not the default starting point, and it must not claim to simulate behavior unless its rules are actually executable.
+The social inspiration is the surprising combinations of Cards Against Humanity and the accumulating contributions of Gartic. These are user-supplied references for the desired feeling. Performance in the resulting game determines the next editors; subjective awards can add humor but do not silently replace those rules.
 
-## 2. Problem
+## 2. Decisions and proposed defaults
 
-Game designers regularly move between scattered references, intuition, design documents, engine prototypes, spreadsheets, and playtests. Existing products solve individual parts of this workflow, but the handoffs remain expensive:
+| Topic | Confirmed user direction |
+| --- | --- |
+| Initial round | Everyone chooses from a hand of mixed concepts and plays. Anyone may contribute any dimension; no FPS, Zombies or Cooking assignment. “Pay” was a typo; no payment or resource economy is required. |
+| Card vocabulary | The definite base contains all 14 concepts listed in §4. Modes, mechanics and concepts can coexist in the same hand. |
+| Discard / replacement | A player may discard an unfamiliar uncommitted card and receive a new one. This changes their options, not the active game or contribution rights. |
+| Blank initial card | Exactly one conceptual blank card illustrates custom instructions in the initial hand. It is excluded from the playable demo. |
+| Later contributions | Both the previous round's winner and loser add one card contribution each, which may express any mode, mechanic or concept. It must add an executable effect while preserving previous contributions. Middle-ranked players keep playing but cannot commit an extra addition that round. |
+| Duration | Repeat for n rounds until the group decides to end. |
+| Finished artifact | Save the entire evolved game for future play or remix; starting from scratch remains available. |
+| Participation | Each player joins from their own browser. |
+| Creation | Generate the game on the fly from concept cards; preset combinations are acceptable for a demo. |
+| Example A | First-person shooter + zombies + Overcooked-style pressures. |
+| Example B | AR jump quest + hand recognition + Naruto-style signs + Mario-like enemies. |
+| Delivery | Prepare mostly independent stacked PRs for Kahhow and Lance. |
+| Exploration | Preserve adaptive difficulty for strong players as an idea. Review GPT-Live 1, GPT-Image-2.5 and Agents API for fit. |
 
-- Reference libraries show what exists but rarely explain the causal structure or help adapt it.
-- AI ideation tools produce plausible ideas without reliable provenance or evidence.
-- Visual system tools require designers to formalize a model before receiving value.
-- Prompt-to-game tools implement an idea before helping the designer isolate what should be tested.
-- Playtesting services validate a build only after a prototype exists.
+Proposed delivery choices below are not confirmed user decisions. The previous assignment of FPS/Zombies/Cooking to separate people is rejected, rather than an outstanding option.
 
-The result is that teams either prototype too much, argue from taste, or accept ungrounded AI output.
+| Area | Proposed delivery / decision still needed |
+| --- | --- |
+| Group size / device | Three desktop browsers for the first online walkthrough; target 3–6. Supported player counts and input devices must agree with the selected build. Bridge partnerships, for example, cannot be assumed to fit three people unchanged. |
+| Hand layout | Four playable cards plus the single illustrative blank card in the review mockup. Actual deal size, distribution, duplicate/reshuffle policy and visibility remain to be agreed. |
+| Card availability | One shared vocabulary with a disclosed runtime-support status. No per-player category quota. Any demo selection must be both supported and clearly labelled; unqualified catalog concepts are illustrative. |
+| Online play | Shared world versus separate matched trials remains a product/runtime choice. A universal 60-second FPS trial is not suitable for every mode. |
+| Preset showcase | FPS + zombies + timebound orders is one permitted example. It does not define the deck, assign roles or fulfill arbitrary on-the-fly generation. Select and qualify the actual demonstration combinations explicitly. |
+| Edit order / ties | Proposed alternating winner/loser order and rotating tie allocation. Show equal ranks honestly and two distinct editor rights; network arrival time does not break ties. |
+| Ending | Proposed unanimous end vote at completed results, before further edits. |
+| Account / storage | No game account required; anonymous room capabilities, durable rooms and saved-game links. Host audience access still requires proof. |
+| Adaptive difficulty | Off for the initial scored proof; no hidden individual adjustments. |
 
-## 3. Market context and product gap
+## 3. Revised user journey
 
-Mechanic Forge enters a market with strong adjacent products:
+1. **Meet at the table.** A host shares a room invitation. Friends join with a nickname. The roster says who is choosing or confirmed, never which genre they are allowed to contribute.
+2. **Explore your hand.** Receive mixed game modes, mechanics and concepts. Inspect a short example or **Swap for a new card** when an idea is unfamiliar. No forced tutorial, payment or edit-right consumption is attached to swapping. The initial illustration includes one clearly unavailable blank custom-instruction card.
+3. **Choose together.** Everyone commits one contribution from their supported hand. Any person can choose any kind of concept. Selection is local until the authority confirms it. In the target, the combination guides generation; in a preset demo, available coverage is disclosed rather than silently substituting a different game.
+4. **See what emerged.** Forge explains what each chosen concept becomes in this game, including overlapping or conflicting ideas. Show the actual objective, controls and scoring once the playable version exists, plus preset/generated origin. An unresolved interpretation or failed build remains a draft. Ready acknowledges an available executable version, not a card selection.
+5. **Play the same creation.** Every participant plays under the version's declared mode and common rules. The selected match model, player count, duration/completion condition and scoring must be supported by that build; the UI cannot infer them from a genre label.
+6. **Reveal the outcome and decide whether to continue.** Show comparable results and the two named next editors. The group may end on this completed version. Keep subjective reactions separate from the declared ranking policy.
+7. **Remix through the competition.** If continuing, both winner and loser choose one addition each in the announced order. Either may choose any dimension and swap unfamiliar uncommitted options. Others may inspect the evolving recipe; the open vocabulary does not give them an extra edit.
+8. **Forge and play again.** Preserve earlier contributions, resolve the new interactions and validate the next build. Separate pending additions from the last played version. Failure retains that playable version and the editors' pending choices/rights.
+9. **Keep the creation.** Save the whole final played game, contributions and history. Offer **Play again**, **Remix this game**, and **Forge fresh**, with distinct behavior.
 
-- [GameRefinery](https://www.gamerefinery.com/game-intelligence-tools/) provides mobile-game feature intelligence, deconstructions, market comparisons, and performance data.
-- [Game Design Index](https://blazium-games.github.io/game-design-index/) provides an open, structured index of games, mechanics, variables, genre recipes, and relationships.
-- [SteamMaho](https://steammaho.com/mechanics) and [Game Mechanics](https://gamemechanics.org/) provide broad searchable mechanic catalogs and examples.
-- [Machinations](https://machinations.io/homepage) provides visual economic-system modeling, execution, prediction, and balancing.
-- [Ludo.ai](https://ludo.ai/features/game-ideator) provides AI ideation, reference games, concept development, and game-design documents.
-- [Summer Engine](https://www.summerengine.com/ai-game-maker), [Rosebud](https://rosebud.ai/ai-game-creator), and game engines provide increasingly fast prompt-to-playable implementation.
-- [PlaytestCloud](https://www.playtestcloud.com/product) and [modl.ai](https://modl.ai/company) provide human or automated testing once a playable build exists.
+Players alternate between competitor and eligible remixer. The host coordinates room setup, not game outcomes. The earlier designer/player/reviewer roles remain useful for the legacy design lab, but are no longer the party game's primary navigation or personas.
 
-Mechanic Forge should not compete on catalog size, node-editor flexibility, or one-prompt game generation. The defensible gap is the connected workflow from behavior-oriented research to a traceable design decision.
+## 4. An open deck of modes, mechanics and concepts
 
-## 4. Target customer
+The definite base set contains **14 user-supplied concepts**:
 
-### Primary persona: hands-on game designer
+- First-person shooter; 2D; 3D; Space Invaders-style gameplay; jump quest.
+- Overcooked-style timebound delivery based on fixed orders/instructions.
+- Cards Against Humanity; poker; Snake; Mario; Super Smash Bros; Mario Kart.
+- Tower defence; bridge **the card game**.
 
-- Works alone or in a small team.
-- Owns a feature from concept through prototype.
-- Can discuss mechanics and player behavior but may not be able to build every experiment quickly.
-- Uses videos, wikis, design breakdowns, spreadsheets, engine prototypes, and general-purpose AI.
-- Needs to communicate why a mechanic should work and how the team will know.
+The [card catalog](./docs/card-catalog.md) gives each a friendly explanation, proposed working name, overlapping tags and example interactions. It also proposes typing, rhythm, pinball, maze chase, match-three, portals, gravity flips, hidden roles, delayed actions and a shrinking safe zone. Suggestions are not additional confirmed implementation commitments.
 
-### Secondary persona: design lead or creative director
+These are expressive inputs, not exclusive categories or a compulsory base-game picker. Poker may contribute hand combinations, hidden information or a decision structure; it does not necessarily turn the entire output into poker. A source reference such as Mario remains recorded while Forge states the original platforming behavior it actually implements. A card's illustration, generated title or valid JSON is not evidence that the rule runs.
 
-- Reviews proposed mechanics and compares variants.
-- Wants a concise causal explanation, risks, and evidence rather than another long design document.
-- Needs asynchronous review without installing a build or learning a modeling tool.
+### Draw, inspect, swap and commit
 
-### Initial vertical
+Every hand position can contain any type of concept. The initial review layout proposes four playable choices plus the one conceptual blank; counts, distribution, shared/private visibility, duplicates and reshuffling require a declared policy before implementation. Do not quietly encode a category quota in the dealing algorithm.
 
-Start with combat and mobility loops in action games and roguelites. This makes the corpus achievable, aligns with the existing dash experiment, and allows several mechanics to be represented as short browser-based microplays.
+**Swap for a new card** exchanges an uncommitted choice the player does not understand. It never spends their contribution or winner/loser right, replaces an active rule or implies a fee. Keep the old card recoverable until the authority confirms a replacement. Duplicate requests return the same replacement; stale hand revisions refresh visibly. If the eligible pool is exhausted, explain the limit and offer the agreed reshuffle/Pass path, never a fake new draw. A swap limit or time constraint has not been approved.
 
-Mobile free-to-play LiveOps and macro-economy design are explicitly not the initial wedge because GameRefinery and Machinations are already strong there.
+The single **Your own idea** card illustrates future custom instructions. In the review UI it is labelled **Concept only · unavailable in demo**, cannot be committed or count toward readiness, and triggers no live generation. Its appearance is not a requirement to implement free-text contributions in this demo.
 
-## 5. Jobs to be done
+### Combination and interpretation
 
-1. When I know the player behavior I want, help me find games and mechanics that achieved something similar.
-2. When several games use the same broad mechanic, show me how their implementations and trade-offs differ.
-3. When I choose a reference, help me adapt it without copying its surface treatment or losing its causal logic.
-4. When I propose a change, isolate it as a control and mutation with explicit invariants.
-5. When I need feedback, let someone experience the mechanic in minutes without installing a build.
-6. When the test ends, separate observed evidence from assumptions and recommend the next decision—not a fabricated conclusion.
+Related or contradictory cards are not automatically invalid. **2D + 3D** could mean a 3D scene with movement on a flat plane, or an explicit transition between modes; each contribution needs a visible effect. **Poker + Tower defence** could make hand combinations activate defenses. **Jump quest + Fixed-order rush** could turn timed platform routes into deliveries. These are proposed interpretations, not validated builds.
 
-## 6. Product principles
+If Forge cannot preserve every accepted contribution, it must explain the conflict and request an explicit revision through the authorized flow. It cannot drop one player's idea, relabel an unrelated preset or force players into different categories to hide the limitation. Cards about judging, partnerships, perspective or dimensionality require explicit input, participant and scoring compatibility.
 
-### Behavior before implementation
+### Showcase examples and capability boundary
 
-Start from the desired player behavior or design problem, not a node type or code request.
+The user permits preset combinations for a demo. **FPS + zombies + fixed-order delivery pressure** remains one example: shooting, approaching threats and preparation/delivery must interact as actual rules. Earlier Knockback/Counter ricochet, Pursuers/Noise seekers, Quick/Batch orders, Dinner bell, Hot potato and Zombie pantry are optional showcase content, not the product's initial slots or complete deck.
 
-### Reference before generation
+The AR jump-quest example with hand recognition, signs and platform enemies remains a separate feasibility direction. Camera consent, recognition, calibration, tracking loss and any spatial AR claim need actual validation; camera-themed art does not establish these capabilities.
 
-Generated suggestions should cite curated mechanic patterns and real implementations wherever possible.
+A finite demo may visibly label qualified combinations and illustration-only concepts. Inclusion in the 14-card catalog does not promise that all combinations execute today. A narrower runtime proof can be useful without redefining who may contribute what. The generation milestone must test heterogeneous concepts beyond one kitchen template.
 
-### One hypothesis per test
+## 5. Round and room rules
 
-A microplay changes one important rule while holding the rest of the test contract stable.
+The authority freezes the roster, executable artifact, recipe version, seed, duration and scoring version for each round. Every player acknowledges that artifact before the trial starts. A loading failure cannot quietly put one player on another version.
 
-### Evidence has provenance
+| State | Exit condition / invariant |
+| --- | --- |
+| Lobby / initial choices | Every required participant has one confirmed contribution of any concept type; hands, swaps and support status are explicit. There is no distinct-category requirement. |
+| Forging | One job for the selected contribution revision. Late output from an obsolete/canceled job cannot become the active game. |
+| Ready | Required participants loaded and acknowledged the same artifact and instructions. |
+| Playing | One accepted attempt per participant and round; no rule edits during play. |
+| Results | All required valid attempts received; deterministic scoring selects winner/loser slots. |
+| End vote | All active participants vote End to finish; a Continue choice opens the next edit phase. Uncast votes keep an all-End decision pending. |
+| Additions | Exactly the two eligible participants resolve one slot each. Others may view and react. |
+| Ended | Immutable final played version available to save. Historical ranks grant no future permissions. |
 
-Every conclusion is labeled as one of:
+An explicit Ready/start boundary gives all players the same declared rules and participation window. Duration, completion, input format and score comparison belong to the immutable build/mode, not the whole catalog. A 60-second deterministic action trial is one showcase profile, not a universal format for bridge, poker or social cards. Proposed transport grace remains 30 seconds, without extra playtime. The authority validates the appropriate input/action evidence and derives results; arbitrary client scores are insufficient. This improves consistency, not cheat-proof competition. Browser timestamps and request arrival order do not determine rank.
 
-- **Design hypothesis:** reasoned but untested.
-- **Model forecast:** derived from an explicit model and assumptions.
-- **Automated observation:** recorded from an executable simulation or bot.
-- **Human observation:** recorded from a playtest session.
+Scoring may differ between generated versions when the accepted concepts require it. Explain the objective and rubric before Ready; apply the same frozen rubric to everyone in a round. Never compare raw scores across incompatible versions. A subjective-judging or team-card concept requires an explicit ranking/eligibility policy; the initial social inspiration alone does not authorize one.
 
-Model-generated percentages must never be presented as observed outcomes.
+**Attempt continuity:** scored trials do not pause. Losing focus or pointer lock clears held controls while the trial clock continues. A brief network interruption may reconnect the same still-running client and submit its retained bounded input trace before the original deadline plus transport grace; grace is not extra play time. For the continuous-trial profile, a refresh/crash that loses the required trace makes that attempt incomplete. Turn-based action logs need an explicit resume policy with no duplicate turns or extra attempts. Do not restart it, invent inputs, or award a result; explicitly abort/retry the round under a new round ID with the whole roster, or end using the last completed game.
 
-### Progressive formalization
+Duplicate commands return the original receipt. Stale revisions are rejected with the current state. Room-scoped participant capabilities establish identity; an invitation link or supplied actor ID does not impersonate another player. Persist deadlines and state transitions so server restarts do not reset the room.
 
-The product begins with plain-language references and comparisons. Structured atoms and the System Map appear only when they help adaptation, testing, or export.
+**Disconnects and incomplete rounds:** reconnect with the same identity during grace. A timeout, abandonment or disconnect never automatically earns loser privileges. If a round cannot complete, explicitly abort it; keep the last completed game, record the interruption, and grant no edits for the aborted round. The remaining group can retry or end. Participants leave explicitly between rounds; after disclosed grace, the host may visibly remove an unavailable player before the next roster is frozen. Ending then applies to that active roster. If fewer than the supported minimum remain, offer waiting or archiving the last completed game, not a silently redefined match.
 
-### Private by default
+The server transfers host coordination to the earliest remaining participant in the fixed roster order after the absent host's grace period, using stored server timestamps. Host succession never transfers edit rights. Preserve an absent editor's pending slot during grace; afterward the remaining group may explicitly abort the pending evolution, discard its unplayed draft, and preserve the last completed build. Wait for a supported roster to retry that build, or archive it. Record the abort and do not give the missing editor's privilege to a middle player. If no game has completed yet, offer waiting or abandoning the draft; do not call it a saved finished game.
 
-Unreleased mechanics and microplays use unlisted links by default, with clear visibility, expiry, and deletion controls.
+**Ties:** retain honest equal ranks. Traverse the announced rotating roster order to fill one winner and one distinct loser editor slot from their respective tied groups. If everyone ties, choose two distinct slots using that order. Advance the rotation each completed round; do not use click speed.
 
-## 7. Core information model
+**Finite decks:** choose only compatible additions, with explicit duplicate/stack limits. When no legal addition remains for an editor, show Pass and resolve that slot without inventing a new rule. The group may keep playing unchanged rules or end. Resource limits must be disclosed; do not impose an undisclosed fixed number of rounds.
 
-### Game
+## 6. Generation is a phase, not the game clock
 
-A sourced reference title with genre, platform, release context, and implementation records.
-
-### Mechanic pattern
-
-A reusable design solution organized around a player behavior or design problem. It includes:
-
-- desired behavior and experience;
-- trigger and guard;
-- state transformation;
-- interaction topology;
-- feedback and discoverability;
-- cost, risk, counterplay, and fairness boundaries;
-- tunable variables and dependencies;
-- suitable metrics;
-- related and conflicting patterns.
-
-The existing intent, trigger, guard, transform, interaction, feedback, risk, invariant, and evidence contract remains useful as the internal schema. Terms such as `actum`, `tactum`, and `factum` should not be required user vocabulary.
-
-### Implementation
-
-How one real game instantiates a mechanic pattern, supported by source links, annotated stills or clips where rights permit, and an explanation of what differs from the general pattern.
-
-### Mechanic specification
-
-The user's forked version of a pattern, including project context, intended behavior, rules, tunables, dependencies, risks, invariants, and unresolved assumptions.
-
-### Variant
-
-A control or mutation of a mechanic specification. The difference between variants must be explicit and reviewable.
-
-### Microplay
-
-A browser-playable, instrumented experiment designed to test one mechanic hypothesis in less than three minutes. A microplay is not a vertical slice or a promise of production-ready code.
-
-### Evidence report
-
-The combined record of test configuration, assignments, telemetry, responses, limitations, and the resulting keep/revise/reject decision.
-
-## 8. Required product areas
-
-### 8.1 Explore
-
-Users can search with a mechanic name, desired player behavior, design problem, genre, or reference game.
-
-Results must support filters for:
-
-- behavior or experience;
-- system family;
-- genre and platform;
-- loop timescale;
-- single-player or multiplayer context;
-- implementation complexity;
-- required dependencies;
-- common risks.
-
-The default result should explain why it matched the query, not only show tags.
-
-### 8.2 Mechanic and game reference pages
-
-A mechanic page shows its causal contract, real implementations, trade-offs, tunables, related patterns, and sources. A game page shows how multiple patterns combine into its core and supporting loops.
-
-Users can save an implementation, add it to a comparison, or fork the general pattern into Forge.
-
-### 8.3 Compare
-
-Users can compare two to four implementations along consistent dimensions. Differences that change player behavior, counterplay, complexity, or evidence requirements should be emphasized automatically.
-
-### 8.4 Forge
-
-Forking creates an editable mechanic specification. AI may propose missing fields, risks, and metrics, but generated content must remain distinguishable from sourced material and user decisions.
-
-The first output is a readable design contract. A generated System Map is a secondary view. Freeform graph editing is not required for the first release.
-
-### 8.5 Variant builder
-
-Users can duplicate a specification as a mutation and see the exact changed rules. Variables declared invariant remain locked unless the user explicitly changes the test contract.
-
-### 8.6 Microplay builder
-
-For supported mechanic families, users can choose a tested microplay template, map specification variables to its controls, preview both variants, and confirm instrumentation.
-
-Initial templates should be intentionally constrained. Suggested first templates:
-
-1. Dash recharge and movement reward.
-2. Rally, lifesteal, or recoverable health.
-3. Stagger, parry, or timing-window risk/reward.
-
-Unsupported mechanics receive a generated test plan instead of a fake playable simulation.
-
-### 8.7 Shareable validation
-
-Shareability is part of the core validation flow.
-
-The minimum share experience must include:
-
-- unlisted browser link with no account required for testers;
-- authenticated creator ownership for publishing, managing links, and viewing results;
-- mobile/desktop capability declaration before publishing;
-- a within-subject crossover in which each tester plays both variants once;
-- balanced `control -> mutation` and `mutation -> control` ordering that is assigned once and remains stable across reloads;
-- optional blind mode that hides the hypothesis and variant names;
-- short task framing and consent notice;
-- automatic capture of completion, retries, time, core mechanic events, and variant assignment;
-- a structured post-play response with preference, confidence, comprehension, and one free-text explanation;
-- link pause, mandatory expiry no later than 30 days after publishing, and deletion;
-- creator preview sessions excluded from results;
-- a clear invitation for the reviewer to inspect or fork the public pattern only after completing the test.
-
-Public indexing, comments, embeds, remix chains, and custom branding are later enhancements. Sharing must first optimize for low-bias evidence and creator trust, not virality.
-
-#### P0 experiment protocol
-
-- The server creates an opaque participant ID on the tester's first visit and stores a scoped first-party token for that microplay.
-- The share route can read only the published test contract. Aggregate results, project context, and creator controls require the authenticated owning creator.
-- The participant is assigned to the currently smaller of two order buckets, with a random tie-break. The assignment is immutable for that experiment version.
-- A test session contains both assigned variant runs and one post-play response. Reloading resumes the incomplete session instead of creating a new assignment.
-- A **valid paired session** requires minimum exposure or the declared completion event for both variants, a completed response, a consistent experiment version, and no creator-preview, known automation, or duplicate flag.
-- Abandoned sessions remain visible as funnel evidence but are excluded from paired behavior and preference comparisons.
-- The first valid paired session per participant is used for the primary comparison. Later completions are labeled repeats and excluded unless the creator deliberately starts a retest cohort.
-- Clearing local state may create a new participant token. P0 duplicate detection uses the token plus conservative rate and event-pattern checks; it must not rely on invasive device fingerprinting.
-- Automated traffic and impossible event sequences are excluded and shown in an exclusion count. Ambiguous sessions remain visible but are not silently discarded.
-- Partial responses are reported as missing data. The product must not impute preference, comprehension, or completion.
-- Small samples are summarized descriptively. The P0 report does not claim statistical significance or generalize beyond the tested microplay and audience.
-
-#### P0 privacy and data lifecycle
-
-- Before play begins, the consent screen identifies the creator, explains the captured events and response fields, and requires an affirmative start action.
-- P0 tests are for participants aged 18 or older. Creators must not knowingly target minors until a separate child-safety and consent design is approved.
-- The research dataset stores only an opaque microplay-scoped participant ID, experiment and template versions, variant order, event names and elapsed times, completion state, coarse device compatibility, consent time, response selections, optional free text, and any exclusion reason.
-- The research dataset must not store tester names, email addresses, full IP addresses, exact location, advertising IDs, or invasive device fingerprints.
-- Abuse protection may store only a daily-rotated keyed network-address hash, coarse user-agent family, request timestamps and counts, and an allow/block reason. It is isolated from research data, cannot be reused across experiments, and is deleted within 24 hours.
-- Tester data is used only to run the test, preserve assignment, detect conservative duplicates or automation, and produce the creator's evidence report.
-- Every P0 share link expires no later than 30 days after publishing. Raw session and response data is deleted 90 days after collection even if the link remains active; expiry does not extend retention.
-- After raw deletion, only de-identified aggregate counts, rates, and the recorded decision may remain until creator deletion. Free text and the participant-to-contribution link are deleted, so later withdrawal is no longer possible; the consent notice must disclose this 90-day withdrawal window.
-- Pausing a link stops new sessions but preserves existing evidence. Deleting an experiment cascade-deletes its link, raw sessions, responses, aggregates, and recorded decision.
-- The share route exposes a token-scoped `Delete my test data` action before play, during an active or resumed session, and after completion for the 90-day raw-data window. Withdrawal removes that participant's telemetry and response and recomputes the report.
-- Optional free text warns testers not to include personal, confidential, or identifying information. Leaving it blank does not invalidate an otherwise complete session.
-- These controls must be verified before external share links are enabled.
-
-### 8.8 Evidence and decision
-
-The evidence report compares variants, displays sample size and uncertainty, surfaces comprehension failures, and separates telemetry from self-report.
-
-It must never declare a mechanic universally better. The creator records one decision:
-
-- keep the mutation;
-- keep the control;
-- revise and retest;
-- reject both;
-- inconclusive.
-
-Every decision retains the test configuration and limitations that produced it.
-
-### 8.9 Export
-
-The initial release exports:
-
-- mechanic specification as Markdown;
-- structured JSON using the Mechanic Forge schema;
-- telemetry event plan;
-- playtest brief and evidence summary.
-
-Engine-specific resources and plugins follow only after validation of the core workflow.
-
-### 8.10 Hackathon golden flow
-
-The first complete product slice uses one recognizable game and one mechanic:
+Target pipeline:
 
 ```text
-Popular games
-  -> Returnal
-  -> Projectile-phasing dash
-  -> mechanic breakdown
-  -> adapt one rule
-  -> creator A/B preview
-  -> blind tester flow
-  -> evidence report
-  -> keep, revise, reject, or inconclusive
+Chosen cards + accepted prior game + two eligible additions
+  → generation job → runnable candidate + rule manifest + assets
+  → validation → immutable playable artifact → ready → round
 ```
 
-This slice is a product prototype, not evidence that the Stage 0 or Stage 1 gates have passed. It may use fixed content and a single supported template, but every visible action must be honest about whether it is functional, simulated, or pending durable infrastructure.
+Use the same product contract for an authored preset resolver and a real generation service. Record `preset` versus `generated`, actual model/version when used, parent artifact, selected contributions, executable effects, assets, validation status and limitations. A generated title, thumbnail or explanation over an unchanged preset is not generated gameplay.
 
-#### Discovery model
+The recommended generation architecture is an Agents API build/repair job around a constrained game interface, with GPT-Image-2.5 for optional assets and GPT-Live 1 for optional voice conversation. This is a recommendation based on current documentation, not a benchmark or implemented feature. See the [capability review](./docs/openai-capability-fit.md).
 
-Explore borrows Mobbin's information-architecture pattern without copying its visual design: users can browse recognizable games first, then inspect the mechanics contained within each game. The default browse modes are **Popular games**, **Mechanics**, and **Behaviors**. Search continues to accept game names, mechanic names, and desired player behavior as equivalent entry points into the same detail records.
+Generated output must implement reset, input, step/snapshot, completion and score-validation contracts. Keep generation away from room authority and scoring credentials. Build and inspect code in an isolated environment; run accepted browser games through an isolated runtime boundary, with validated messages and bounded resources. A generated page must not gain the parent app's storage, credentials or arbitrary network access.
 
-The first viewport must prioritize useful browsing over internal research language. It uses the promise **Start with a game. Leave with a testable mechanic.** and describes the corpus as a curated beta library. Behavior, Game, and System are the default refinement controls; advanced taxonomy remains available through progressive disclosure.
+Validate that every earlier contribution remains effective within this match, both new additions are present, the build loads, assets exist, and bounded traces can be replayed for scoring. Require behavioral checks and witness traces for each contribution plus at least one completing run; these demonstrate tested scenarios, not universal correctness of arbitrary generated code. If validation fails, explain the affected choice, preserve the last playable build and pending rights, and offer retry/revise. A fallback preset requires a visible choice and preserves the contribution mapping; it cannot masquerade as successful generation.
 
-#### Reference-to-adaptation trust model
+Generation occurs once per game version, not once per participant. Players see real progress states, cancellation and failure recovery. No fixed latency or cost claim is made before measurement. A later successful job must not modify a round already started or a saved artifact.
 
-Every mechanic breakdown visibly separates:
+## 7. What “save the entire game” means
 
-1. **From the source:** statements directly supported by the linked first-party or publisher material.
-2. **Forge interpretation:** causal structure, trade-offs, risks, dependencies, and evidence suggestions inferred by the product.
-3. **Your decision:** the creator's adaptation or experiment rule.
+Save a durable immutable game record, with a usable link and portable export where supported:
 
-The initial Returnal reference supports projectile-phasing dash behavior. It does not establish the experimental recharge rules. The timer control must therefore be labelled **Experiment baseline — Forge-defined**, while elimination recharge is labelled **Your decision**. Neither may be presented as Returnal's implementation.
+- Final executable artifact or a retained, versioned runtime plus the full resolved manifest for preset mode.
+- Required assets and dependency/runtime versions; stable content hashes, not expiring sandbox URLs alone.
+- Original concept selections, ordered additions, contributors, parent lineage, and card-to-rule interpretations.
+- Completed round versions, seeds/configuration, results and explicit aborted-round markers. Keep raw scoring traces only for their defined validation retention period; a video of past play is not part of this promise.
+- Mode/provenance and the chosen scoring/adaptation policy. Exclude room/host/player capabilities and API secrets.
 
-#### Returnal and dash pages
+The save succeeds only when the artifact and its dependencies are durable and readable from a fresh browser. A localStorage entry, prompt, screenshot, or list of card names is insufficient. Preserve old runtime versions or give an explicit unsupported-version error; never silently drop mechanics to load an old game.
 
-The Returnal page groups its two current implementation records—Projectile-phasing dash and Adrenaline tiers—under one recognizable game context. It uses original interface diagrams rather than unlicensed gameplay captures and links back to the official source.
+| Action | Required behavior |
+| --- | --- |
+| Play again | Load the saved final executable version unchanged; reset attempts and scores. No generation required. A practice run or a new matched competition without edits is possible. |
+| Remix this game | Create a new room from the saved final game, preserve ancestry, run the fork setup below, and start fresh ranks/edit eligibility. Never mutate the original. |
+| Forge fresh | Start with new concept choices and new contribution history. |
 
-The dash page presents the sourced behavior followed by a plain-language causal breakdown: goal, activation, availability, state change, interaction, feedback, trade-off, invariants, tunables, and observable evidence. Its primary action is **Adapt this mechanic**; **View official source** remains secondary.
+**Proposed saved-remix setup:** create a new room from the saved build, with a contribution-based review of inherited ideas. Participants may propose keeping or explicitly replacing inherited contributions through the new room's agreed setup policy; replacements are not constrained to the same category. Finalize and record the whole fork recipe before its first round, preserving ancestry and the original archive. Once that new match begins, only winner/loser additions are permitted and earlier accepted contributions remain effective. An unchanged fork is **Play again**, not a changed game. Exact fork editing rights and minimum supported roster require contract agreement.
 
-#### One-rule experiment contract
+For the preset demo, store compact records in the existing host's durable database and retain the referenced versioned runtime/assets. Actual generated bundles may need object storage. Online rooms expire after a clearly displayed period of inactivity; proposed default is 24 hours. Saved games have a separate retention policy, not the room TTL. Before enabling saves, document that policy and a portable preservation route rather than promise permanence without support.
 
-The adapted goal is **Reward aggressive movement without increasing weapon damage.** Only dash recharge changes:
+## 8. Fairness, fun and evidence
 
-- Control A: recharge after three seconds.
-- Variant B: recharge on enemy elimination.
-- Locked conditions: dash distance, protected window, player speed, weapon damage, arena, enemies, seed, and run duration.
+The design aims for surprise, equal initial participation, and a chance for both extremes to influence the next game. It does not guarantee equal chances of winning: genre skill still matters, and winning or losing intentionally changes creative power.
 
-The interface states **One rule changes. Everything else stays matched.** Before preview, it surfaces the win-more and recovery-lockout risks created by elimination recharge.
+Playtest whether players intentionally lose for an edit, whether middle-ranked participants feel excluded, whether repeated leaders can build their own advantage, and whether accumulated mechanics remain understandable. Do not quietly remove loser rights or add handicaps to solve those questions. Adaptive difficulty is a separate recorded exploration in PC-11.
 
-#### Preview, sharing, and evidence
+Party results are results of that game version, not causal evidence that a mechanic improved design. Preserve Source / Forge interpretation / User decision provenance in references and generated artifacts. Continue to label simulated tests and preview runs honestly.
 
-The creator plays sequential runs rather than side-by-side arenas. The task is to cross projectile lanes and eliminate three targets. Preview runs are explicitly excluded from evidence, use the same seed, and explain the single changed rule before play.
+Proposed first study: five groups complete at least two rounds. Record whether each person recognizes their contribution, can explain who edits next, sees prior rules survive, and can replay the saved final version from another browser. Also record voluntary continuation, intentional-loss behavior and generation wait abandonment. These are future observations, not existing validation. Revisit the loop if middle players are consistently disengaged or contribution effects are unclear.
 
-The safe default publish contract is blind variants, two 45-second runs, desktop keyboard, unlisted access, seven-day expiry, no tester account, and creator previews excluded. Until creator ownership and durable experiment storage exist, this screen must say **Demo publish preview** and must not imply that an external test or evidence collection is live.
+## 9. Delivery and acceptance
 
-The tester journey is consent, Run 1, reset, Run 2, structured response, and completion. The report separates observed behavior from preference, states sample limitations, and lets the creator record **Keep**, **Revise**, **Reject**, or **Inconclusive** without the product choosing for them.
+The [delivery plan](./PLAN.md) splits work between Kahhow and Lance. PC-01–08 prove a complete online **preset demo**; PC-09 qualifies and integrates real on-the-fly generation. The target product is not complete until that requirement is met. PC-10 explores the hand-sign concept; PC-11 preserves adaptive difficulty. Voice and generated art can improve the experience without becoming mandatory for scoring or continuity.
 
-#### Astra and submission boundary
+Minimum demo acceptance: three independent browsers join → all contribute → all load and play V1 → winner/middle/loser are shown → middle-player edit is rejected → winner and loser each add one mechanic → all play V2 with earlier rules intact → unanimous end → durable save → fresh-browser replay of V2 → new remix with ancestry → fresh game without inherited history.
 
-The hackathon build uses Astra as a development collaborator for implementation, debugging, test design, accessibility review, and refinement. Maintain a short build log connecting material Astra-assisted decisions to commits or visible product changes so the 90-second submission can explain that contribution concretely.
+Also verify same-family contributions from multiple participants, unfamiliar-card replacement, duplicate/stale swap commands, the illustrative-only blank, ties, disconnect/reconnect, incomplete rounds, end votes, explicit conflicting interpretations, generation failure, deck exhaustion, missing artifacts and storage outages. Run all exact [QUALITY.md](./QUALITY.md) gates for implementation changes, preserve the legacy golden-flow tests, and add real Worker/database and multi-browser checks. An in-memory room fixture cannot establish online correctness.
 
-The current prototype does not need an in-product model request. Its mechanic decomposition and microplay are fixed, deterministic demonstrations, and the interface must say so. Add a runtime model dependency only if the organizers explicitly require one or a user-facing task cannot be delivered credibly without it. Any later runtime generation must preserve the Source / Forge interpretation / User decision boundary, validate structured output, expose failure honestly, and provide a deterministic fallback.
+Scope cuts: animation, optional art breadth, voice, live image generation, shared physics and extra runtime combinations can move later. Keep the 14-concept product vocabulary and unrestricted contribution types; display support limits honestly instead of restoring assigned categories. Removing separate-browser play, repeated rounds, both editor privileges or saved-game reuse breaks the accepted premise. Presets can prove the party loop, but must remain labeled as a generation fallback.
 
-#### Golden-flow acceptance criteria
+## 10. Reconciliation and repository boundary
 
-- A user can enter through Returnal or the behavior “move through danger” and reach the same dash breakdown.
-- Search submission and suggestion selection move focus to the updated result set and announce the match count.
-- Every reference card has a clear next action; no primary journey terminates at an external source.
-- A user can correctly identify sourced fact, Forge interpretation, and their own decision in an unaided review.
-- The adaptation screen shows exactly one changed rule and every locked condition.
-- The creator can preview A and B under the same stated conditions without builder assistance.
-- Publishing is labelled as a demo until ownership, storage, expiry, withdrawal, and result access are functional.
-- The final report never presents preference as behavioral evidence or a small sample as a general conclusion.
-- Deterministic product behavior never implies that Astra or another model was called at runtime.
+The [v0.2 PRD](./archive/2026-09-13-mechanic-lab/PRD-v0.2-mechanic-lab.md) and [v0.2 plan](./archive/2026-09-13-mechanic-lab/PLAN-v0.2-mechanic-lab.md) preserve the earlier mechanic-design lab. Its G1–G4 Returnal dash routes remain a regression-protected fallback. Its one-hypothesis/one-changed-rule experiment invariant applies there; two cumulative party additions are a different product behavior.
 
-## 9. End-to-end acceptance scenario
+The imported [ModeShift reference](./archive/2026-09-13-mechanic-lab/mechanic-forge-product-reconciliation.md) contributes a concrete playable artifact and meaningful perspective changes. Its authored 3D puzzle does not provide an arbitrary game generator, authoritative online room, or this mashup runtime. The older [concept exploration](./archive/2026-09-13-mechanic-lab/mechanic-forge-concept-directions.md) and [MFH candidate backlog](./archive/2026-09-13-mechanic-lab/mechanic-forge-split.md) are historical inputs, not the active delivery queue.
 
-Given the intent “make dashing reward aggressive play without increasing weapon damage,” a new user can:
-
-1. Browse Returnal or search for “move through danger.”
-2. Open the Projectile-phasing dash implementation and distinguish its sourced behavior from Forge interpretation.
-3. Choose **Adapt this mechanic** and start from a readable mechanic contract.
-4. Change dash recharge from a Forge-defined timer baseline to an elimination event.
-5. Verify that one rule changed while movement speed, damage, dash behavior, arena, opponents, seed, and duration remain locked.
-6. Review the resulting win-more and recovery-lockout risks.
-7. Preview both variants sequentially under the same conditions.
-8. Prepare or publish an honestly labelled unlisted blind A/B test.
-9. Review observed behavioral evidence separately from preference.
-10. Record a keep, revise, reject, or inconclusive decision and export the result.
-
-## 10. Success metrics
-
-### North-star metric
-
-**Evidence-backed mechanic decisions completed per active team per month.**
-
-A completed decision requires a forked specification, an explicit hypothesis, a test result or documented external evidence, and a recorded decision.
-
-### Funnel metrics
-
-- Time from first query to a useful saved or compared reference.
-- Search-to-reference-open rate.
-- Reference-to-compare rate.
-- Compare-to-fork rate.
-- Specification-to-test-plan or microplay rate.
-- Microplay publish and share rate.
-- Valid tester sessions per shared microplay.
-- Evidence-report-to-recorded-decision rate.
-- Retest rate after a “revise” decision.
-
-### Initial validation targets
-
-These are product hypotheses, not forecasts:
-
-- 8 of 12 recruited target designers find a relevant reference within three minutes.
-- At least 5 of 12 evaluators fork a reference rather than stopping after browsing.
-- At least one-third of eligible designers with a supported mechanic choose a browser microplay as their next validation artifact over a test-plan-only or engine-ready handoff, with at least six eligible designers required.
-- At least 30% of supported forks become a shared microplay within the Stage 2 measurement window.
-- The median shared microplay receives five valid sessions within seven days.
-- At least half of creators whose microplay receives five valid sessions record a decision within seven days of the fifth session.
-
-The Stage 2 conversion targets are evaluated on one documented 60-day cohort after the complete sharing and evidence loop ships. The cohort must contain at least 20 eligible supported forks and at least 10 creators whose tests reach five valid sessions; otherwise the result is “insufficient evidence,” not a pass. The product lead owns the gate decision and records the cohort definition, counts, exclusions, and outcome in the changelog.
-
-## 11. Non-goals for the first release
-
-- Universal coverage of every game genre or mechanic.
-- A canonical academic grammar for all game design.
-- Production-ready game or asset generation.
-- A general-purpose visual scripting environment.
-- Quantitative behavioral prediction without an executable model.
-- Replacement for human playtesting or a full game engine.
-- A public social network or marketplace of unreleased ideas.
-- Enterprise mobile-market intelligence.
-
-## 12. Risks and mitigations
-
-### Corpus operations and copyright
-
-High-quality implementations require continuous research and careful media rights. Begin with sourced written analysis, original diagrams, permitted captures, and links or timestamps to primary material. Do not build the product around indiscriminate scraping or rehosting.
-
-### Ontology rigidity
-
-One grammar will not fit every game. Preserve provenance, allow unknowns, and use system-specific extensions rather than forcing all designs into nine visible boxes.
-
-### False authority from AI
-
-Distinguish source, inference, user choice, forecast, and observation visually and in exported data.
-
-### Microplay validity
-
-A simplified experiment can strip away context that makes the mechanic meaningful. Every report must show what the microplay holds constant, what it omits, and which claims it cannot support.
-
-### Cold-start sharing
-
-Creators may not have testers. First support frictionless links to their own community; later consider opt-in tester exchange or a paid panel partnership.
-
-### Scope creep into an engine
-
-Only add a new playable template when it supports a repeated design question and shares the same evidence contract. Unsupported mechanics get test plans, not one-off mini-games.
-
-## 13. Open questions to validate
-
-1. Do target designers search more naturally by desired behavior, mechanic name, or reference game?
-2. Is the strongest initial vertical action combat, roguelite progression, or another narrow category?
-3. Does a structured comparison provide enough value over a general AI chat answer to trigger a fork?
-4. Which artifact is most useful after Forge: a test plan, a browser microplay, or an engine-ready specification?
-5. Will testers complete a blind two-variant microplay without creator facilitation?
-6. What level of source evidence is required for professional trust?
-7. Are studios comfortable sharing unlisted prototypes, and which privacy controls are mandatory?
-
-## 14. Changelog
-
-### 2026-09-13 — Hackathon hardening and Astra boundary
-
-- Marked G1–G4 complete and scoped one final hardening PR before cold testing.
-- Isolated Playwright's Next.js output so browser verification can run beside a local development session.
-- Aligned the project on Node.js 24 and added repository-level hackathon guardrails.
-- Clarified that Astra supports the build process while the current product experience is deterministic and makes no runtime model call.
-- Added a 90-second submission plan and required an evidence-backed Astra build log.
-
-### 2026-09-12 — Golden-flow PR G4 implementation
-
-- Added a fixed demo-publish capability gate that separates the working tester walkthrough from blocked production sharing infrastructure.
-- Added a no-account blind Run 1 / Run 2 journey with consent, matched 45-second runs, and a post-play response.
-- Added a descriptive local report that reveals the variants only after response and states its sample, scope, and limitations.
-- Added a local-only keep/revise/reject/inconclusive decision record that disappears on reload.
-
-### 2026-09-12 — Golden-flow PR G3 implementation
-
-- Added a deterministic 45-second creator preview for the fixed dash experiment.
-- Kept Control A and Variant B sequential, with the same seed, arena, inputs, protected window, and encounter rules.
-- Added keyboard and touch controls, explicit recharge feedback, reset-to-same-seed behavior, and preview event capture.
-- Marked all creator-preview events as local-only and excluded from evidence.
-
-### 2026-09-12 — Golden-flow PR G2 implementation
-
-- Made the dash design goal and the single Variant B recharge decision editable.
-- Added three bounded recharge choices while preserving one changed field and seven locked conditions.
-- Added session-local save feedback plus Markdown and JSON experiment exports.
-- Required both exports to retain the source boundary, Forge-defined baseline, user decision, risks, invariants, and evidence plan.
-
-### 2026-09-12 — Returnal dash golden flow
-
-- Added a Mobbin-inspired browse hierarchy from popular games to mechanics while retaining behavior-first search.
-- Selected Returnal's projectile-phasing dash as the single hackathon golden path.
-- Defined the source, Forge interpretation, and user-decision trust states.
-- Clarified that timer and elimination recharge rules are Forge experiment variants, not sourced claims about Returnal.
-- Specified the one-rule A/B contract, locked conditions, creator preview, demo publishing boundary, tester sequence, evidence separation, and decision states.
-- Added explicit acceptance criteria for every transition from discovery through decision.
-
-### 2026-09-12 — Adversarial review amendments
-
-- Split the small Stage 0 validation corpus from post-validation production corpus expansion.
-- Added an explicit demand gate before investing in the microplay runtime.
-- Defined a reproducible within-subject A/B protocol, stable assignment, validity and exclusion rules, repeat handling, and missing-data behavior.
-- Reconciled export and unsupported-mechanic sequencing so every specification can produce a test plan before microplay support exists.
-- Required creator authentication and ownership checks before publishing or reading results.
-- Added an explicit tester consent, data-minimization, withdrawal, retention, and deletion contract for P0 sharing.
-- Replaced subjective evidence gates with product-lead-owned, time-bounded cohorts, minimum samples, denominators, and pass thresholds.
-- Capped P0 link life at 30 days and raw-data life at 90 days from collection, made withdrawal available throughout that window, and limited abuse metadata to a 24-hour allowlist.
-- Made each additional microplay family demand-selected and made System Map work an independently gated optional PR.
-
-### 2026-09-12 — Initial documented direction
-
-- Created the first repository PRD because no prior PRD file existed.
-- Repositioned Mechanic Forge from a Flowise-like node editor to an evidence-oriented mechanic design workflow.
-- Added a Mobbin-like Explore and Compare layer as the product entry point.
-- Retained the atom contract as an internal schema and demoted the graph to an optional generated System Map.
-- Defined shareable microplays as short, instrumented experiments rather than miniature production prototypes.
-- Made unlisted blind A/B sharing, telemetry, structured feedback, and decision capture part of the core loop.
-- Narrowed the proposed initial corpus to action-game combat and mobility mechanics.
-- Required explicit separation between hypotheses, model forecasts, automated observations, and human observations.
-- Removed fabricated quantitative prediction and universal ontology claims from the intended product behavior.
-- Deferred full graph authoring, broad genre coverage, engine plugins, public community features, and generalized simulation.
+This revision updates product/planning documents and design imagery only. [PC-01 PR #41](https://github.com/ghostleek/chaotic-forge/pull/41) has merged a Worker/D1 foundation, but its current `party-forge/1` contract still encodes distinct FPS/Zombies/Cooking slots, FPS inputs and order scoring. Those are superseded implementation constraints, not the corrected product direction. See the [contract amendment map](./docs/party-forge-host.md) before downstream work. No open-deck runtime, card replacement, online party journey, arbitrary generation or camera capability is claimed implemented.
