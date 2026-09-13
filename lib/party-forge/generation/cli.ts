@@ -100,6 +100,14 @@ async function main() {
     const [stageId, parentPath, destination, grandparentPath] = args;
     const stage = BENCHMARK_STAGES.find((item) => item.id === stageId);
     if (!stage?.parentStageId) throw new Error('Expected a remix stage');
+    if (
+      (stage.id === 'remix-1' && grandparentPath !== undefined) ||
+      (stage.id === 'remix-2' && grandparentPath === undefined)
+    ) {
+      throw new Error(
+        'Usage: remix-prompt remix-1 <parent.json> <new-output.json> | remix-prompt remix-2 <parent.json> <new-output.json> <grandparent.json>',
+      );
+    }
     const parent = await readBounded(parentPath, MAX_CANDIDATE_BYTES);
     const grandparent = grandparentPath
       ? await readBounded(grandparentPath, MAX_CANDIDATE_BYTES)
