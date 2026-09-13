@@ -1,0 +1,369 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "7b258d7d-c975-4421-a771-d5222dab180e",
+  "prevId": "3474618a-0e09-455c-b4db-4233e4d6e25f",
+  "tables": {
+    "party_command_receipts": {
+      "name": "party_command_receipts",
+      "columns": {
+        "room_id": {
+          "name": "room_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "actor_id": {
+          "name": "actor_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "command_id": {
+          "name": "command_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "receipt": {
+          "name": "receipt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "party_command_receipts_room_id_party_rooms_id_fk": {
+          "name": "party_command_receipts_room_id_party_rooms_id_fk",
+          "tableFrom": "party_command_receipts",
+          "tableTo": "party_rooms",
+          "columnsFrom": [
+            "room_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "party_command_receipts_room_id_actor_id_command_id_pk": {
+          "columns": [
+            "room_id",
+            "actor_id",
+            "command_id"
+          ],
+          "name": "party_command_receipts_room_id_actor_id_command_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "party_command_receipts_json": {
+          "name": "party_command_receipts_json",
+          "value": "json_valid(\"party_command_receipts\".\"receipt\")"
+        }
+      }
+    },
+    "party_participants": {
+      "name": "party_participants",
+      "columns": {
+        "room_id": {
+          "name": "room_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "participant_id": {
+          "name": "participant_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "capability_hash": {
+          "name": "capability_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "command_id": {
+          "name": "command_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "last_seen_at": {
+          "name": "last_seen_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "party_participants_room_capability": {
+          "name": "party_participants_room_capability",
+          "columns": [
+            "room_id",
+            "capability_hash"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "party_participants_room_id_party_rooms_id_fk": {
+          "name": "party_participants_room_id_party_rooms_id_fk",
+          "tableFrom": "party_participants",
+          "tableTo": "party_rooms",
+          "columnsFrom": [
+            "room_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "party_participants_room_id_participant_id_pk": {
+          "columns": [
+            "room_id",
+            "participant_id"
+          ],
+          "name": "party_participants_room_id_participant_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "party_participants_last_seen_nonnegative": {
+          "name": "party_participants_last_seen_nonnegative",
+          "value": "\"party_participants\".\"last_seen_at\" >= 0"
+        }
+      }
+    },
+    "party_room_creations": {
+      "name": "party_room_creations",
+      "columns": {
+        "capability_hash": {
+          "name": "capability_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "command_id": {
+          "name": "command_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "room_id": {
+          "name": "room_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "participant_id": {
+          "name": "participant_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "party_room_creations_room": {
+          "name": "party_room_creations_room",
+          "columns": [
+            "room_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "party_room_creations_room_id_party_rooms_id_fk": {
+          "name": "party_room_creations_room_id_party_rooms_id_fk",
+          "tableFrom": "party_room_creations",
+          "tableTo": "party_rooms",
+          "columnsFrom": [
+            "room_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "party_room_creations_capability_hash_command_id_pk": {
+          "columns": [
+            "capability_hash",
+            "command_id"
+          ],
+          "name": "party_room_creations_capability_hash_command_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "party_room_history": {
+      "name": "party_room_history",
+      "columns": {
+        "room_id": {
+          "name": "room_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ordinal": {
+          "name": "ordinal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "entry": {
+          "name": "entry",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "party_room_history_room_id_party_rooms_id_fk": {
+          "name": "party_room_history_room_id_party_rooms_id_fk",
+          "tableFrom": "party_room_history",
+          "tableTo": "party_rooms",
+          "columnsFrom": [
+            "room_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "party_room_history_room_id_revision_ordinal_pk": {
+          "columns": [
+            "room_id",
+            "revision",
+            "ordinal"
+          ],
+          "name": "party_room_history_room_id_revision_ordinal_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "party_room_history_revision_positive": {
+          "name": "party_room_history_revision_positive",
+          "value": "\"party_room_history\".\"revision\" > 0"
+        },
+        "party_room_history_ordinal_nonnegative": {
+          "name": "party_room_history_ordinal_nonnegative",
+          "value": "\"party_room_history\".\"ordinal\" >= 0"
+        },
+        "party_room_history_entry_json": {
+          "name": "party_room_history_entry_json",
+          "value": "json_valid(\"party_room_history\".\"entry\")"
+        }
+      }
+    },
+    "party_rooms": {
+      "name": "party_rooms",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "snapshot": {
+          "name": "snapshot",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "internal_state": {
+          "name": "internal_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "write_token": {
+          "name": "write_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "party_rooms_revision_nonnegative": {
+          "name": "party_rooms_revision_nonnegative",
+          "value": "\"party_rooms\".\"revision\" >= 0"
+        },
+        "party_rooms_snapshot_json": {
+          "name": "party_rooms_snapshot_json",
+          "value": "json_valid(\"party_rooms\".\"snapshot\")"
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

@@ -8,6 +8,13 @@
       "when": 1789274304046,
       "tag": "0000_bored_agent_brand",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1789277517380,
+      "tag": "0001_jittery_ink",
+      "breakpoints": true
     }
   ]
 }
