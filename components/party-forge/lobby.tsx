@@ -11,6 +11,8 @@ import {
   type RoomStatusParticipant,
 } from './room-status.tsx';
 import { CardPicker } from './card-picker.tsx';
+import { GameViewport } from './game-viewport.tsx';
+import { useTrialController } from './use-trial-controller.ts';
 import { RecipeSummary } from './recipe-summary.tsx';
 import styles from './party-room.module.css';
 
@@ -28,41 +30,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
   const [nickname, setNickname] = useState('');
   const [onboarding, setOnboarding] = useState(true);
   const [swatted, setSwatted] = useState(false);
-  const [loadingBuild, setLoadingBuild] = useState(false);
-  const [buildError, setBuildError] = useState<string | null>(null);
-  const runtime = useRef<unknown>(null);
-  async function acknowledgeBuild() {
-    if (!room || room.build.status !== 'playable' || !room.round) return;
-    const build = room.build.manifest;
-    setLoadingBuild(true);
-    setBuildError(null);
-    try {
-      const { createPartyRuntime } =
-        await import('../../lib/party-forge/runtimes/kitchen-chaos-v1/adapter.ts');
-      const loaded = await createPartyRuntime(build, room.round.seed);
-      const current = client.snapshot().room;
-      if (
-        current?.phase !== 'ready' ||
-        current.build.status !== 'playable' ||
-        current.build.manifest.contentHash !== build.contentHash
-      )
-        throw new Error('The build changed. Review it again.');
-      runtime.current = loaded;
-      await client.command({
-        type: 'acknowledge-build',
-        buildId: build.buildId,
-        buildHash: build.contentHash,
-      });
-    } catch (failure) {
-      setBuildError(
-        failure instanceof Error
-          ? failure.message
-          : 'Could not load the executable.',
-      );
-    } finally {
-      setLoadingBuild(false);
-    }
-  }
+  const { controller, view } = useTrialController(client);
   const help = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (access && !roomId) window.location.replace(`/party/${access.roomId}`);
@@ -112,7 +80,11 @@ export function Lobby({ roomId }: { roomId?: string }) {
           How to play
         </button>
       </header>
-      <div className={styles.hero} data-swatted={swatted}>
+      <div
+        className={styles.hero}
+        data-swatted={swatted}
+        hidden={room?.phase === 'playing' || room?.phase === 'ready'}
+      >
         <Image
           src="/party-forge/world.svg"
           width={760}
@@ -126,7 +98,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
           </button>
         ) : null}
       </div>
-      {onboarding ? (
+      {onboarding && !['ready', 'playing'].includes(room?.phase ?? '') ? (
         <aside className={styles.onboarding} aria-label="How to play">
           <h1>Strange ideas. One shared game.</h1>
           <p>
@@ -207,7 +179,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
           {['lobby', 'additions'].includes(room.phase) ? (
             <RoomStatus
               participants={players}
-            expectedContributions={room.phase === 'lobby' ? 3 : 2}
+              expectedContributions={room.phase === 'lobby' ? 3 : 2}
               localParticipantId={me}
               roundNumber={room.round?.number ?? 1}
               phase={room.phase === 'additions' ? 'additions' : 'initial'}
@@ -266,6 +238,19 @@ export function Lobby({ roomId }: { roomId?: string }) {
               )}
             </section>
           ) : null}
+          {room.phase === 'lobby' &&
+          room.build.status === 'playable' &&
+          room.hostId === me ? (
+            <button
+              disabled={disabled || room.participants.length !== 3}
+              onClick={() => void client.command({ type: 'start-round' })}
+            >
+              Prepare a new round after interruption
+            </button>
+          ) : null}
+          {['ready', 'playing'].includes(room.phase) ? (
+            <GameViewport controller={controller} view={view} />
+          ) : null}
           {room.phase === 'ready' && room.build.status === 'playable' ? (
             <section>
               <h2>Your game is ready</h2>
@@ -273,27 +258,51 @@ export function Lobby({ roomId }: { roomId?: string }) {
                 {room.acknowledgments.length}/3 players ready for this build.
               </p>
               <button
-                disabled={disabled || loadingBuild}
-                onClick={() => void acknowledgeBuild()}
+                disabled={disabled || view.status !== 'ready'}
+                onClick={() => void controller.ready()}
               >
-                {loadingBuild
-                  ? 'Validating executable…'
-                  : 'Load and confirm build'}
+                Ready to play
               </button>
-              {buildError ? <p role="alert">{buildError}</p> : null}
+              {view.status === 'error' ? (
+                <button
+                  disabled={disabled}
+                  onClick={() => controller.reloadBuild()}
+                >
+                  Retry executable loading
+                </button>
+              ) : null}
+              {room.hostId === me ? (
+                <button
+                  className={styles.primary}
+                  disabled={
+                    disabled ||
+                    view.status !== 'ready' ||
+                    room.acknowledgments.length !== 3 ||
+                    room.participants.some((p) => p.presence !== 'present')
+                  }
+                  onClick={() => void client.command({ type: 'start-round' })}
+                >
+                  Start 60-second round
+                </button>
+              ) : (
+                <p>The host starts when all three players are ready.</p>
+              )}
               <p>
-                The playable viewport connects here in PC-05. Starting a timed
-                trial is unavailable until that player is integrated.
+                Readiness expires after 30 seconds. Confirm again if the host
+                cannot start.
               </p>
             </section>
           ) : null}
           {room.phase === 'playing' ? (
             <section>
-              <h2>Round {room.round?.number} is running</h2>
-              <p>
-                Results come from the retained runtime and submitted input. This
-                room interface does not submit simulated play.
-              </p>
+              {view.status === 'complete' ? (
+                <button
+                  disabled={disabled}
+                  onClick={() => void controller.submit()}
+                >
+                  Submit captured attempt
+                </button>
+              ) : null}
               {room.hostId === me ? (
                 <button
                   disabled={disabled}

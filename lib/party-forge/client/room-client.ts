@@ -4,6 +4,7 @@ import {
   roomSnapshotSchema,
   commandReceiptSchema,
   type ParticipantAccess,
+  type CommandReceipt,
   type RoomCommand,
   type RoomSnapshot,
 } from '../contracts.ts';
@@ -22,6 +23,11 @@ export type ClientState = {
   uncertain: boolean;
   connected: boolean;
   terminal: boolean;
+  lastReceipt: {
+    type: RoomCommand['type'];
+    roundId: string | null;
+    receipt: CommandReceipt;
+  } | null;
   error: string | null;
 };
 const replySchema = z.object({
@@ -43,6 +49,7 @@ const EMPTY: ClientState = {
   uncertain: false,
   connected: false,
   terminal: false,
+  lastReceipt: null,
   error: null,
 };
 
@@ -59,6 +66,11 @@ export class RoomClient {
   private controllers = new Set<AbortController>();
   private roomId?: string;
   private transport: typeof fetch;
+  private clock: { server: number; local: number } | null = null;
+  serverNow = () =>
+    this.clock
+      ? this.clock.server + performance.now() - this.clock.local
+      : null;
   constructor(
     roomId?: string,
     transport: typeof fetch = (...args) => fetch(...args),
@@ -126,6 +138,7 @@ export class RoomClient {
   private async http(url: string, capability: string, body?: unknown) {
     const controller = new AbortController();
     this.controllers.add(controller);
+    const sentAt = performance.now();
     const timeout = setTimeout(() => controller.abort(), 15_000);
     try {
       const response = await this.transport(url, {
@@ -138,7 +151,16 @@ export class RoomClient {
         cache: 'no-store',
         signal: controller.signal,
       });
-      return { response, data: replySchema.parse(await response.json()) };
+      const data = replySchema.parse(await response.json());
+      // GET refreshes this participant's server heartbeat. The midpoint bounds request latency.
+      const seen =
+        !body &&
+        data.snapshot?.participants.find(
+          (p) => p.id === this.state.access?.participantId,
+        )?.lastSeenAt;
+      if (response.ok && typeof seen === 'number')
+        this.clock = { server: seen, local: (sentAt + performance.now()) / 2 };
+      return { response, data };
     } finally {
       clearTimeout(timeout);
       this.controllers.delete(controller);
@@ -172,7 +194,14 @@ export class RoomClient {
     } finally {
       this.polling = false;
       if (this.active && !this.state.terminal)
-        this.timer = setTimeout(() => void this.poll(), 4000);
+        this.timer = setTimeout(
+          () => void this.poll(),
+          this.state.room?.phase === 'ready'
+            ? 300
+            : this.state.room?.phase === 'playing'
+              ? 1000
+              : 4000,
+        );
     }
   }
   forgetAccess() {
@@ -244,8 +273,13 @@ export class RoomClient {
           this.key,
           JSON.stringify({ access: this.state.access, request: null }),
         );
+        const command = this.request.body as RoomCommand;
+        const type = command.type;
+        const roundId =
+          command.type === 'submit-trial' ? command.trial.roundId : null;
         this.request = null;
         this.update({
+          lastReceipt: { type, roundId, receipt },
           uncertain: false,
           connected: true,
           error:
