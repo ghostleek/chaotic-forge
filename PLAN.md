@@ -1,5 +1,7 @@
 # Competitive Forge delivery plan
 
+**Accepted additional PR — 13 September 2026:** [PC-12 Dino × Mario onboarding](./docs/issues/PC-12.md), owned by Kahhow with Lance for human acceptance, uses exact base `1dbccea77d4d2707328c704f1d20be8aabc3b2ac`. Its standalone authored demo and reusable instruction document do not change room/creator APIs. Follow the packet’s scoped files, quality gates and serialized-merge policy.
+
 **Updated:** 2026-09-13
 **Status:** Product planning; GitHub publication in progress. PC-01 is [issue #30](https://github.com/ghostleek/chaotic-forge/issues/30), assigned to Lance (@Leoendithas). PC-02–11 remain drafts pending publication after the main-branch sync. Implementation has not started.
 **Specification:** [PRD.md](./PRD.md)
