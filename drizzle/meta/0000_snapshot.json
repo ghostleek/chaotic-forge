@@ -1,0 +1,66 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "3474618a-0e09-455c-b4db-4233e4d6e25f",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "party_rooms": {
+      "name": "party_rooms",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "snapshot": {
+          "name": "snapshot",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "party_rooms_revision_nonnegative": {
+          "name": "party_rooms_revision_nonnegative",
+          "value": "\"party_rooms\".\"revision\" >= 0"
+        },
+        "party_rooms_snapshot_json": {
+          "name": "party_rooms_snapshot_json",
+          "value": "json_valid(\"party_rooms\".\"snapshot\")"
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
