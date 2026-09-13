@@ -18,7 +18,7 @@ import {
 } from '../../lib/party-forge/generation/benchmark.ts';
 import { sha256 } from '../../lib/party-forge/generation/candidate.ts';
 
-test('cost monitor rejects unknown counters, accounts subsets once and stops at thresholds', () => {
+void test('cost monitor rejects unknown counters, accounts subsets once and stops at thresholds', () => {
   assert.equal(estimateObservedCost(null), null);
   assert.equal(
     estimateObservedCost({ input_tokens: -1, output_tokens: 1 }),
@@ -47,7 +47,7 @@ test('cost monitor rejects unknown counters, accounts subsets once and stops at 
   );
 });
 
-test('API restricts destination, refuses redirects, bounds bytes and redacts remote errors', async () => {
+void test('API restricts destination, refuses redirects, bounds bytes and redacts remote errors', async () => {
   const receipts = [];
   const requests = [];
   const api = createAgentApi(
@@ -136,7 +136,7 @@ async function scenario(t, behavior) {
   return { result, calls };
 }
 
-test('known create rejection does not retry, dispatch, cancel or claim inference', async (t) => {
+void test('known create rejection does not retry, dispatch, cancel or claim inference', async (t) => {
   const { result, calls } = await scenario(t, () => {
     throw new AgentApiError(403, 'scope_denied', 'req_fixture');
   });
@@ -145,7 +145,7 @@ test('known create rejection does not retry, dispatch, cancel or claim inference
   assert.equal(result.inferenceAccessVerified, false);
 });
 
-test('unknown creation recovers only its unique marker and cleans up without paid input', async (t) => {
+void test('unknown creation recovers only its unique marker and cleans up without paid input', async (t) => {
   let marker;
   const { result, calls } = await scenario(t, ({ path, options }) => {
     if (options.method === 'POST') {
@@ -169,7 +169,7 @@ test('unknown creation recovers only its unique marker and cleans up without pai
   assert.equal(calls.filter((c) => c.method === 'POST').length, 1);
 });
 
-test('deadline crossed during provisioning cannot dispatch the first paid input', async (t) => {
+void test('deadline crossed during provisioning cannot dispatch the first paid input', async (t) => {
   const { result, calls } = await scenario(t, ({ path, options, advance }) => {
     if (path === '/agents/sessions')
       return { id: 'sess_owned', environment: { id: 'env_owned' } };
@@ -188,7 +188,7 @@ test('deadline crossed during provisioning cannot dispatch the first paid input'
   );
 });
 
-test('completed mock job retains only the matching turn artifact without executing or accepting it', async (t) => {
+void test('completed mock job retains only the matching turn artifact without executing or accepting it', async (t) => {
   const frames = Array.from({ length: 3600 }, (_, tick) => ({
     tick,
     buttons: 0,
@@ -266,7 +266,7 @@ for (const mode of [
   'missing-usage',
   'transient-cancel-with-late-usage',
 ]) {
-  test(
+  void test(
     mode + ' cancels and confirms terminal state before cleanup',
     async (t) => {
       let cancelled = false;

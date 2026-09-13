@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="calico-title calico-desc">
+  <title id="calico-title">Calico the patchwork cat</title>
+  <desc id="calico-desc">A cream cat with one orange ear patch, one charcoal eye patch and mismatched orange and dark shoulders. Original flat vector artwork authored by Codex.</desc>
+  <g stroke="#292735" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#F7E9D3" d="M43 88C31 94 25 107 25 121h78c0-14-6-27-18-33Z"/>
+    <path fill="#D99362" stroke="none" d="M43 92q10 9 3 29H27q0-19 16-29Z"/>
+    <path fill="#454653" stroke="none" d="M87 94q15 14 14 27H86q-11-18 1-27Z"/>
+    <path fill="#F7E9D3" d="m25 48-1-31q0-7 6-2l18 18q16-6 32 0l18-18q6-5 6 2l-1 31q9 11 6 26c-4 19-22 28-45 28S23 93 19 74q-3-15 6-26Z"/>
+    <path fill="#D99362" stroke="none" d="m27 47-1-29q0-2 2-1l20 19 9-2c3 11-4 25-16 28-8 3-15 0-20-4q1-6 6-11Z"/>
+    <path fill="#454653" stroke="none" d="m72 34 9 2 19-19q2-1 2 1l-1 30q7 10 6 21c-11 17-34 7-34-9 0-12-9-18-1-26Z"/>
+    <path fill="#E1AF9A" stroke="none" d="m32 25 2 21 11-8Zm64 0-13 13 11 8Z"/>
+    <ellipse cx="46" cy="65" rx="4" ry="5" fill="#292735" stroke="none"/>
+    <ellipse cx="82" cy="65" rx="5.5" ry="6.5" fill="#F7E9D3" stroke="none"/>
+    <ellipse cx="82" cy="65" rx="2.5" ry="4" fill="#292735" stroke="none"/>
+    <path fill="#B87889" stroke-width="2" d="m60 78 4 4 4-4Z"/>
+    <path fill="none" stroke-width="2.5" d="M64 82v3m0 0q-5 5-9 0m9 0q5 5 9 0M41 114v7m46-7v7"/>
+  </g>
+</svg>

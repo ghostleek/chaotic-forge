@@ -1,0 +1,48 @@
+{
+  "source": "PC-02/PC-03 at e529e74c7cbff5e63db7184734f553ae559bb27d",
+  "kind": "authored-demo-combination-inventory",
+  "initialRecipeCount": 8,
+  "playerAssignmentCount": 48,
+  "recipes": [
+    {
+      "fps": "knockback",
+      "zombies": "pursuers",
+      "cooking": "quick-orders"
+    },
+    {
+      "fps": "knockback",
+      "zombies": "pursuers",
+      "cooking": "batch-orders"
+    },
+    {
+      "fps": "knockback",
+      "zombies": "noise-seekers",
+      "cooking": "quick-orders"
+    },
+    {
+      "fps": "knockback",
+      "zombies": "noise-seekers",
+      "cooking": "batch-orders"
+    },
+    {
+      "fps": "counter-ricochet",
+      "zombies": "pursuers",
+      "cooking": "quick-orders"
+    },
+    {
+      "fps": "counter-ricochet",
+      "zombies": "pursuers",
+      "cooking": "batch-orders"
+    },
+    {
+      "fps": "counter-ricochet",
+      "zombies": "noise-seekers",
+      "cooking": "quick-orders"
+    },
+    {
+      "fps": "counter-ricochet",
+      "zombies": "noise-seekers",
+      "cooking": "batch-orders"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="lilac-title lilac-desc">
+  <title id="lilac-title">Lilac the playful cat</title>
+  <desc id="lilac-desc">A lavender cat with a tilted ear, one winking eye and a tiny pink tongue. Original flat vector artwork authored by Codex.</desc>
+  <g stroke="#292735" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#BBA0DC" d="M43 88C31 94 25 107 25 121h78c0-14-6-27-18-33Z"/>
+    <path fill="#E7D9F5" stroke="none" d="M47 94q17 9 34 0l6 27H41Z"/>
+    <path fill="#BBA0DC" d="m25 48-1-31q0-7 6-2l18 18q16-6 32 0l19-17q5-4 6 3l1 21-7-2 4 10q9 11 6 26c-4 19-22 28-45 28S23 93 19 74q-3-15 6-26Z"/>
+    <path fill="#DFBADB" stroke="none" d="m32 25 2 21 11-8Zm66-1L84 38l12 5Z"/>
+    <path fill="#977DBD" stroke="none" d="m56 32 5 18 7-12 8 7-3-14q-9-2-17 1Z"/>
+    <ellipse cx="46" cy="66" rx="4" ry="5" fill="#292735" stroke="none"/>
+    <path fill="none" d="m76 66 6-3 6 3"/>
+    <path fill="#DFBADB" stroke="none" d="M35 76h11v5H35Zm47 0h11v5H82Z"/>
+    <path fill="#292735" stroke-width="2" d="m60 77 4 4 4-4Z"/>
+    <path fill="#DE8EAD" stroke-width="2.5" d="M64 86h9v4a4.5 4.5 0 0 1-9 0Z"/>
+    <path fill="none" stroke-width="2.5" d="M64 81v3m0 0q-5 5-9 0m9 0q5 5 10 0M41 114v7m46-7v7"/>
+  </g>
+</svg>

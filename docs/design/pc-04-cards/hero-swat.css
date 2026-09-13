@@ -1,0 +1,64 @@
+.table-stage {
+  overflow: clip;
+}
+.world {
+  position: relative;
+}
+.world > svg {
+  transform-origin: 50% 70%;
+}
+.hero-swat-cat {
+  position: absolute;
+  z-index: 3;
+  left: max(0px, calc(50% - 235px));
+  bottom: 9%;
+  width: clamp(80px, 12vw, 125px);
+  pointer-events: none;
+}
+.hero-swat-cat img {
+  display: block;
+  width: 100%;
+}
+.hero-swat-paw {
+  position: absolute;
+  right: -18%;
+  top: 49%;
+  width: 48%;
+  height: 20%;
+  border: 2px solid #302937;
+  border-radius: 50% 60% 60% 50%;
+  background: #bcb0da;
+  transform-origin: left center;
+}
+.hero-swat-recovery {
+  position: absolute;
+  inset: 10% 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+.hero-swat-recovery p {
+  margin: 0;
+  font-size: 14px;
+}
+.hero-swat-recovery button {
+  border: 1px solid #242821;
+  border-radius: 4px;
+  background: #e0fa74;
+  color: #242821;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.hero-swat-recovery button:focus-visible {
+  outline: 3px solid #745997;
+  outline-offset: 3px;
+}
+.hero-swat-cat[hidden],
+.hero-swat-recovery[hidden] {
+  display: none;
+}

@@ -1,0 +1,41 @@
+.player-wait {
+  margin: 22px 0 0;
+}
+.player-wait .table-room-status {
+  color-scheme: light;
+  font-family: var(--ui-font, Arial, sans-serif);
+}
+.pw-preview-note,
+.pw-swat-hint {
+  color: #696d63;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.pw-preview-note {
+  margin: 0 0 10px;
+}
+.pw-swat-hint {
+  margin: 12px 0 0;
+}
+.round-note,
+.hand-bound {
+  color: #696d63;
+  font-size: 11px;
+}
+.hand-bound {
+  padding: 9px 12px;
+  border: 1px solid #d1d3c8;
+  border-radius: 20px;
+}
+.forge-card[locked]:not([committed]):not(.fc-blank) {
+  background: #efeee8;
+  box-shadow: none;
+}
+.forge-card[locked]:hover {
+  transform: none;
+}
+@media (max-width: 650px) {
+  .hand-bound {
+    font-size: 10px;
+  }
+}

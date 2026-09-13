@@ -28,7 +28,7 @@ import {
   fixtureRoster,
 } from './fixtures/party-forge.ts';
 
-test('all eight declared initial combinations have an unambiguous schema', () => {
+void test('all eight declared initial combinations have an unambiguous schema', () => {
   for (const fps of ['knockback', 'counter-ricochet'])
     for (const zombies of ['pursuers', 'noise-seekers'])
       for (const cooking of ['quick-orders', 'batch-orders']) {
@@ -41,7 +41,7 @@ test('all eight declared initial combinations have an unambiguous schema', () =>
       }
 });
 
-test('manifest boundaries reject malformed, unsupported and falsely attributed data', async (t) => {
+void test('manifest boundaries reject malformed, unsupported and falsely attributed data', async (t) => {
   const cases = {
     version: (b) => {
       b.protocolVersion = 'party-forge/2';
@@ -106,7 +106,7 @@ test('manifest boundaries reject malformed, unsupported and falsely attributed d
     });
 });
 
-test('evolution preserves prior contributions and bounded additions; failure retains previous build', () => {
+void test('evolution preserves prior contributions and bounded additions; failure retains previous build', () => {
   const evolved = makeBuild(undefined, ['dinner-bell', 'hot-potato']);
   assert.deepEqual(parseEvolution(makeBuild(), evolved), evolved);
   assert.deepEqual(
@@ -138,7 +138,7 @@ test('evolution preserves prior contributions and bounded additions; failure ret
   assert.throws(() => parseEvolution(makeBuild(), erased));
 });
 
-test('commands require version/revision and never accept asserted authority or client scores', () => {
+void test('commands require version/revision and never accept asserted authority or client scores', () => {
   const command = {
     protocolVersion: PROTOCOL_VERSION,
     commandId: 'command-1',
@@ -174,7 +174,7 @@ test('commands require version/revision and never accept asserted authority or c
   );
 });
 
-test('trial envelope binds every input tick to the frozen version and seed', () => {
+void test('trial envelope binds every input tick to the frozen version and seed', () => {
   assert.equal(
     parseTrialForRound(makeTrial(), makeRound()).frames.length,
     3600,
@@ -220,7 +220,7 @@ test('trial envelope binds every input tick to the frozen version and seed', () 
   );
 });
 
-test('ranks are honest under ties; rotation and odd/even edit order are independent of arrival', () => {
+void test('ranks are honest under ties; rotation and odd/even edit order are independent of arrival', () => {
   const scores = fixtureRoster.map((participantId) => ({
     participantId,
     completedOrders: 2,
@@ -255,7 +255,7 @@ test('ranks are honest under ties; rotation and odd/even edit order are independ
   );
 });
 
-test('end voting waits for every active participant unless one continues', () => {
+void test('end voting waits for every active participant unless one continues', () => {
   const votes = fixtureRoster.map((participantId) => ({
     participantId,
     vote: 'end',
@@ -271,7 +271,7 @@ test('end voting waits for every active participant unless one continues', () =>
   assert.equal(endVoteOutcome([], []), 'pending');
 });
 
-test('room snapshots expose no capabilities and cannot start mixed builds or reassign editors', () => {
+void test('room snapshots expose no capabilities and cannot start mixed builds or reassign editors', () => {
   const room = makeRoom();
   assert.equal(roomSnapshotSchema.safeParse(room).success, true);
   assert.equal(
@@ -327,7 +327,7 @@ test('room snapshots expose no capabilities and cannot start mixed builds or rea
   assert.equal(roomSnapshotSchema.safeParse(additions).success, false);
 });
 
-test('exhausted saved games retain additions during explicit fork setup; all-kept is play again', () => {
+void test('exhausted saved games retain additions during explicit fork setup; all-kept is play again', () => {
   const source = makeBuild(undefined, [
     'dinner-bell',
     'hot-potato',
@@ -364,7 +364,7 @@ test('exhausted saved games retain additions during explicit fork setup; all-kep
   assert.throws(() => parseForkSetup(source, setup));
 });
 
-test('pending editor choices and rights survive forging and a failed evolution', () => {
+void test('pending editor choices and rights survive forging and a failed evolution', () => {
   const prior = makeBuild();
   const room = {
     ...makeRoom(),
@@ -406,7 +406,7 @@ test('pending editor choices and rights survive forging and a failed evolution',
   assert.equal(roomSnapshotSchema.safeParse(room).success, false);
 });
 
-test('archives reject surplus unplayed candidates and record evolution abort without inventing a trial', () => {
+void test('archives reject surplus unplayed candidates and record evolution abort without inventing a trial', () => {
   const archive = makeArchive();
   const candidate = makeBuild(undefined, ['dinner-bell']);
   assert.equal(
@@ -444,7 +444,7 @@ test('archives reject surplus unplayed candidates and record evolution abort wit
   assert.equal(archiveSchema.safeParse(archive).success, false);
 });
 
-test('archive saves the last completed artifact, retains abort markers, and excludes secrets', () => {
+void test('archive saves the last completed artifact, retains abort markers, and excludes secrets', () => {
   const archive = makeArchive();
   assert.equal(archiveSchema.safeParse(archive).success, true);
   archive.history.push({

@@ -122,7 +122,7 @@ export async function startHost({
     stopped = true;
     const killGroup = (signal) => {
       try {
-        process.kill(-child.pid, signal);
+        if (child.pid !== undefined) process.kill(-child.pid, signal);
       } catch (error) {
         if (error.code !== 'ESRCH') throw error;
       }

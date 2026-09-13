@@ -1,0 +1,96 @@
+/* Reusable whole-interface modes. Set data-presentation on the document root.
+   This layer is loaded after component CSS; semantics and DOM order stay fixed. */
+:root[data-presentation="2d"] {
+  --ui-font: Arial, Helvetica, sans-serif;
+  --display-font: Arial, Helvetica, sans-serif;
+  --paper: #f6f5ef; --ink: #20231f; --line: #c7c9bd;
+  --fc-paper: #fffefa; --fc-ink: #20231f; --fc-accent: #e8f36b;
+}
+:root[data-presentation="3d"] {
+  --ui-font: 'Avenir Next', 'Trebuchet MS', sans-serif;
+  --display-font: 'Avenir Next', 'Trebuchet MS', sans-serif;
+  --paper: #efede5; --ink: #292e26; --line: #c6c9b9;
+  --fc-paper: #fffefa; --fc-ink: #272e24; --fc-accent: #e8f36b;
+}
+html[data-presentation], html[data-presentation] button,
+html[data-presentation] .forge-card,
+html[data-presentation] .mini-demo button,
+html[data-presentation] .mini-demo-label,
+html[data-presentation] .mini-demo-copy,
+html[data-presentation] .mini-demo-count { font-family: var(--ui-font); }
+html[data-presentation] h1, html[data-presentation] h2,
+html[data-presentation] h3, html[data-presentation] .wordmark { font-family: var(--display-font); }
+html[data-presentation] svg text { font-family: var(--ui-font); }
+
+/* Flat edition: crisp ink, planar cards, graphic sprites, zero surface depth. */
+html[data-presentation="2d"] .forge-card,
+html[data-presentation="2d"] .player-wait,
+html[data-presentation="2d"] .contributions,
+html[data-presentation="2d"] dialog,
+html[data-presentation="2d"] .mini-demo,
+html[data-presentation="2d"] .primary,
+html[data-presentation="2d"] .outline-button,
+html[data-presentation="2d"] .segmented,
+html[data-presentation="2d"] .segmented button,
+html[data-presentation="2d"] .study-badge,
+html[data-presentation="2d"] .hand-bound,
+html[data-presentation="2d"] .pw-portrait,
+html[data-presentation="2d"] .pw-state { box-shadow: none; border-radius: 3px; transform: none; transition: none; }
+html[data-presentation="2d"] .forge-card[selected] { outline: 2px solid var(--ink); outline-offset: 0; }
+html[data-presentation="2d"] .forge-card:hover { border-color: var(--ink); }
+html[data-presentation="2d"] .pw-portrait { background: transparent; }
+html[data-presentation="2d"] .eyebrow,
+html[data-presentation="2d"] .fc-top,
+html[data-presentation="2d"] .round-note { font-family: 'Courier New', monospace; }
+html[data-presentation="2d"] :is(h1,h2,h3,p,a,strong,small,button,span) { text-shadow: none; }
+
+/* Dimensional edition: raised lettering, rounded cast surfaces and cat figures.
+   Text stays live and readable; geometry is CSS/SVG rather than screenshots. */
+html[data-presentation="3d"] body {
+  background: radial-gradient(ellipse at 40% 5%, #fffef8 0, #f2f0e8 44%, #e7e8df 100%);
+  min-height: 100vh;
+}
+html[data-presentation="3d"] :is(h1, h2, .fc-title, .wordmark) {
+  font-weight: 700; letter-spacing: -.04em;
+  text-shadow: 0 1px 0 #b7b9a9, 0 2px 0 #c7c8bc, 0 4px 3px #353f2218;
+}
+html[data-presentation="3d"] :is(p, .eyebrow, .pw-roster strong, .fc-top, .round-note, .hand-bound, .study-badge, .provenance) { text-shadow: 0 1px 0 #ffffffb0; }
+html[data-presentation="3d"] .masthead { border-bottom-color: #c3c6b9; box-shadow: 0 1px 0 #ffffffc0; }
+html[data-presentation="3d"] .table-stage { border-radius: 20px; }
+html[data-presentation="3d"] .world { filter: drop-shadow(0 14px 10px #434c2820); }
+html[data-presentation="3d"] .contributions { margin: 18px 0 18px 10px; padding: 23px 20px; background: linear-gradient(150deg,#fffff9,#e9eadf); border: 1px solid #bdc3ac; border-radius: 18px; box-shadow: 0 5px 0 #b6bba6, 0 14px 24px #39452a12, inset 1px 1px 0 #fff; }
+html[data-presentation="3d"] .contributions h2 { font-size: 26px; }
+html[data-presentation="3d"] .empty-mix { background: #e8ebdf; border: 1px dashed #a4af91; box-shadow: inset 0 2px 5px #59634216; }
+html[data-presentation="3d"] .player-wait { border-radius: 21px; background: linear-gradient(130deg,#fffdf5,#eeeee4); border-color: #bdc3af; box-shadow: 0 5px 0 #bdc3ac, 0 13px 24px #29371c10, inset 1px 1px 0 white; }
+html[data-presentation="3d"] .player-wait[data-waiting=true] { background: linear-gradient(130deg,#f8fced,#e5edda); }
+html[data-presentation="3d"] .pw-portrait { border-radius: 50%; background: linear-gradient(150deg,#fdfcf5,#d5d7ca); box-shadow: inset 0 1px 0 white, 0 4px 0 #b8bba8, 0 10px 12px #30392315; }
+html[data-presentation="3d"] .pw-portrait img { transform: translateY(-5px) scale(1.12); filter: drop-shadow(0 3px 2px #353e2520); }
+html[data-presentation="3d"] .pw-mark { box-shadow: 0 2px 0 #bdc3af; z-index: 1; }
+html[data-presentation="3d"] .pw-state { box-shadow: 0 2px 0 #bdc3af80, inset 0 1px 0 #ffffff80; }
+html[data-presentation="3d"] .hand { perspective: 1100px; padding: 6px 0 9px; gap: 19px; }
+html[data-presentation="3d"] .forge-card { border-radius: 15px; background: linear-gradient(145deg,#fffefa,#f0f0e5); border-color: #bec3ae; box-shadow: 0 2px 0 #e3e5d9, 0 7px 0 #b9bea8, 0 14px 19px #28321918, inset 1px 1px 0 white; transform: translateY(-2px); transform-origin: center bottom; }
+html[data-presentation="3d"] .forge-card:hover { transform: translateY(-5px); box-shadow: 0 2px 0 #e3e5d9,0 7px 0 #b9bea8,0 20px 22px #28321920; }
+html[data-presentation="3d"] .forge-card[selected] { background: linear-gradient(145deg,#f1fa91,#dae956); border-color: #667832; transform: translateY(-9px); box-shadow: 0 2px 0 #ccdc56,0 7px 0 #85973e,0 19px 24px #45581a28; outline: 2px solid #718431; outline-offset: 0; }
+html[data-presentation="3d"] .forge-card[committed] { background: linear-gradient(145deg,#ecf3e1,#d9e4ca); border-color: #7d9168; }
+html[data-presentation="3d"] .forge-card[locked]:not([committed]):not(.fc-blank) { background: linear-gradient(145deg,#f1f2e9,#e1e4d6); }
+html[data-presentation="3d"] .forge-card[locked] { transform: translateY(-2px); }
+html[data-presentation="3d"] .fc-blank { background: linear-gradient(145deg,#3b4434,#21291f); color: #fffdf3; border-color: #47533e; box-shadow: 0 2px 0 #3d4934,0 7px 0 #151d12,0 14px 19px #28321920,inset 1px 1px 0 #798568; }
+html[data-presentation="3d"] .fc-blank .fc-title { color: #fffdf3; text-shadow: 0 1px 0 #788267,0 2px 0 #68725a,0 3px 0 #5f6a50,0 5px 3px #0004; }
+html[data-presentation="3d"] .fc-blank :is(p,.fc-top) { text-shadow: 0 1px 0 #000; }
+html[data-presentation="3d"] .primary { background: linear-gradient(145deg,#46513b,#293321); border-color: #26321c; box-shadow: 0 4px 0 #161f11,inset 0 1px 0 #748266; text-shadow: 0 1px 1px #000; border-radius: 10px; }
+html[data-presentation="3d"] :is(.outline-button,.study-badge,.hand-bound,.segmented) { background: linear-gradient(145deg,#fffef8,#e4e7d8); border-color: #b2bba1; box-shadow: 0 3px 0 #bdc5ad,inset 0 1px 0 #fff; border-radius: 12px; }
+html[data-presentation="3d"] .segmented button { border-radius: 8px; }
+html[data-presentation="3d"] .segmented button[aria-pressed=true] { background: linear-gradient(#5b6848,#36452a); box-shadow: 0 2px 0 #23301a,inset 0 1px 0 #81916b; }
+html[data-presentation="3d"] :is(.primary,.outline-button,.segmented button):active:not(:disabled) { transform: translateY(2px); }
+html[data-presentation="3d"] dialog { background: linear-gradient(145deg,#fffdf5,#eceee0); border-color: #a5b093; box-shadow: 0 8px 0 #a7b297,0 30px 100px #17250f50,inset 1px 1px 0 #fff; }
+html[data-presentation="3d"] .mini-demo { background: #e9eddf; border-color: #b8c3a6; box-shadow: inset 0 3px 6px #4e613b18,0 1px 0 #fff; border-radius: 14px; }
+html[data-presentation="3d"] .mini-demo button { border-radius: 8px; box-shadow: 0 3px 0 #a9b795; }
+html[data-presentation="3d"] .mini-demo svg { filter: drop-shadow(0 2px 1px #64724b20); }
+html[data-presentation="3d"] .play-mode .action-bar { background: #efeee4f5; box-shadow: 0 -1px 0 #ffffffc0; }
+html[data-presentation="3d"] .page-footer { box-shadow: 0 -1px 0 #ffffffa0; }
+@media (max-width: 740px) { html[data-presentation="3d"] .contributions { margin: 15px 0; padding: 20px; } }
+@media (max-width: 460px) { html[data-presentation="3d"] :is(h1,h2,.fc-title) { text-shadow: 0 1px 0 #b7b9a9,0 2px 0 #c7c8bc,0 3px 2px #353f2220; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-presentation] *, html[data-presentation] *::before, html[data-presentation] *::after { transition: none !important; animation: none !important; }
+  html[data-presentation="3d"] .forge-card, html[data-presentation="3d"] .forge-card:hover, html[data-presentation="3d"] .forge-card[selected], html[data-presentation="3d"] .forge-card[locked] { transform: none; }
+}
