@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/integration',
-  testMatch: /party-(host|room)\.spec\.ts/,
+  testMatch: /party-(host|room|archive)\.spec\.ts/,
   outputDir: './test-results/party',
   fullyParallel: false,
   workers: 1,

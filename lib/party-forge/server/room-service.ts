@@ -6,14 +6,18 @@ import {
   roomCommandSchema,
   roomSnapshotSchema,
   type ParticipantAccess,
+  type GameArchive,
+  type CommandReceipt,
 } from '../contracts.ts';
 import {
   createRoomRecord as initialRoom,
+  createArchiveRoomRecord,
   joinRoom,
   reduceRoom,
   refreshPresence,
   RoomTransitionError,
   type RoomRecord,
+  type GameHistory,
 } from '../room-reducer.ts';
 import {
   commitRoom,
@@ -34,6 +38,10 @@ import {
   RoomHttpError,
   validRoomId,
 } from './participants.ts';
+
+import { archiveLink, prepareArchiveSave, requirePlayableArchive } from './archive-service.ts';
+import { roomArchiveId } from './archive-store.ts';
+import { UnavailableRuntimeError } from '../runtime-registry.ts';
 
 const MAX_CAS_ATTEMPTS = 8;
 const responseHeaders = {
@@ -132,12 +140,6 @@ function enrollmentResponse(
 export async function createRoomResponse(request: Request): Promise<Response> {
   const capability = participantCapability(request);
   const payload = createRoomRequestSchema.parse(await readRoomJson(request));
-  if (payload.setup.kind !== 'fresh') {
-    throw new RoomHttpError(
-      409,
-      'Saved-game setup is not available yet. Start a fresh room.',
-    );
-  }
   const db = await getDb();
   const hash = await capabilityHash(capability);
   for (let attempt = 0; attempt < MAX_CAS_ATTEMPTS; attempt++) {
@@ -150,12 +152,10 @@ export async function createRoomResponse(request: Request): Promise<Response> {
       );
     }
     const participantId = crypto.randomUUID();
-    const record = initialRoom(
-      crypto.randomUUID(),
-      participantId,
-      payload.nickname,
-      Date.now(),
-    );
+    const record = payload.setup.kind === 'fresh'
+      ? initialRoom(crypto.randomUUID(), participantId, payload.nickname, Date.now())
+      : createArchiveRoomRecord(crypto.randomUUID(), participantId, payload.nickname, Date.now(),
+        await requirePlayableArchive(db, payload.setup.archiveId), payload.setup.kind);
     if (
       await createRoomRecord(db, record, {
         participantId,
@@ -256,6 +256,7 @@ export async function readRoomResponse(
     history: page.history,
     historyCursor: page.cursor,
     historyCount: record.historyCount,
+    archiveId: await roomArchiveId(db, roomId),
   });
 }
 
@@ -284,6 +285,8 @@ export async function commandRoomResponse(
       return json(
         {
           receipt: original,
+          ...(member && command.type === 'save-game' && original.status === 'accepted'
+            ? await savedArchivePointer(db, roomId) : {}),
           ...(member ? { snapshot: current.snapshot } : {}),
         },
         original.status === 'accepted' ? 200 : 409,
@@ -300,12 +303,12 @@ export async function commandRoomResponse(
         'This participant is no longer in the room.',
       );
     }
-    const transition = await reduceRoom(
-      current,
-      enrollment.participantId,
-      command,
-      Math.max(Date.now(), now, current.snapshot.updatedAt),
-    );
+    const transition: {record: RoomRecord; history: GameHistory[]; receipt: CommandReceipt; archive?: GameArchive; archiveId?: string} = command.type === 'save-game'
+      ? {...await prepareArchiveSave(db, current, command), history: []}
+      : await reduceRoom(
+          current, enrollment.participantId, command,
+          Math.max(Date.now(), now, current.snapshot.updatedAt),
+        );
     if (
       await commitRoom(db, current.snapshot.revision, transition.record, {
         receipt: {
@@ -313,6 +316,7 @@ export async function commandRoomResponse(
           receipt: transition.receipt,
         },
         history: transition.history,
+        archive: 'archive' in transition ? transition.archive : undefined,
         expectedPresence: current.snapshot.participants.map((p) => ({
           participantId: p.id,
           lastSeenAt: p.lastSeenAt,
@@ -320,7 +324,10 @@ export async function commandRoomResponse(
       })
     ) {
       return json(
-        { receipt: transition.receipt, snapshot: transition.record.snapshot },
+        { receipt: transition.receipt, snapshot: transition.record.snapshot,
+          ...('archiveId' in transition && transition.archiveId
+            ? {archiveId: transition.archiveId, archiveUrl: archiveLink(transition.archiveId)} : {}),
+        },
         transition.receipt.status === 'accepted' ? 200 : 409,
       );
     }
@@ -329,6 +336,11 @@ export async function commandRoomResponse(
     503,
     'The room is busy. Retry with the same command ID.',
   );
+}
+
+async function savedArchivePointer(db: D1Database, roomId: string) {
+  const archiveId = await roomArchiveId(db, roomId);
+  return archiveId ? {archiveId, archiveUrl: archiveLink(archiveId)} : {};
 }
 
 /** No storage exception becomes a fabricated local room or a claimed successful command. */
@@ -340,6 +352,8 @@ export async function roomHttpBoundary(
   } catch (error) {
     if (error instanceof RoomHttpError)
       return json({ error: error.message }, error.status);
+    if (error instanceof UnavailableRuntimeError)
+      return json({error: error.message, availability: {status: 'unavailable'}}, 409);
     if (error instanceof z.ZodError)
       return json(
         { error: 'The request does not match the party-forge/1 protocol.' },

@@ -1,11 +1,15 @@
 import { z } from 'zod';
 import {
+  buildManifestSchema,
   commandReceiptSchema,
   gameHistorySchema,
   roomSnapshotSchema,
   type CommandReceipt,
+  type GameArchive,
   type RoomSnapshot,
 } from '../contracts.ts';
+
+import { roomArchiveStatements } from './archive-store.ts';
 
 export type GameHistory = z.infer<typeof gameHistorySchema>;
 type StoredRoom = { snapshot: RoomSnapshot };
@@ -22,6 +26,7 @@ export interface StoredEnrollment extends Enrollment {
 }
 
 interface CommitOptions {
+  archive?: GameArchive;
   receipt?: { actorId: string; receipt: CommandReceipt };
   history?: GameHistory[];
   participant?: Enrollment;
@@ -266,6 +271,20 @@ export async function commitRoom<T extends StoredRoom>(
           writeToken,
         ),
     );
+  }
+  for (const entry of history) {
+    if (entry.status !== 'completed') continue;
+    const manifest = buildManifestSchema.parse((record as T & {lastPlayedBuild?: unknown}).lastPlayedBuild);
+    if (manifest.buildId !== entry.result.round.buildId || manifest.contentHash !== entry.result.round.buildHash) {
+      throw new Error('Completed history must retain its exact played manifest');
+    }
+    statements.push(db.prepare(`INSERT OR IGNORE INTO party_played_builds (room_id, build_id, manifest)
+      SELECT ?, ?, ? WHERE EXISTS (SELECT 1 FROM party_rooms WHERE id = ? AND write_token = ?)`)
+      .bind(snapshot.roomId, manifest.buildId, JSON.stringify(manifest), snapshot.roomId, writeToken));
+  }
+  if (options.archive) {
+    if (snapshot.phase !== 'ended' || !receipt || receipt.status !== 'accepted') throw new Error('Archive writes require an ended room and accepted save receipt');
+    statements.push(...await roomArchiveStatements(db, snapshot.roomId, writeToken, options.archive));
   }
   if (options.participant) {
     statements.push(

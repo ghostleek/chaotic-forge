@@ -223,6 +223,28 @@ export const forkSetupSchema = z
       unique(setup.decisions.map((d) => d.selection.inheritedContributionId)),
     'Each new participant claims one inherited slot',
   );
+export type ForkSetup = z.infer<typeof forkSetupSchema>;
+
+/** New-room choices are separate from the retained source contribution history. */
+export const roomForkSchema = z.strictObject({
+  sourceArchiveId: id,
+  sourceBuild: buildManifestSchema,
+  mode: z.enum(['play-again', 'remix']),
+  decisions: z.array(forkDecisionSchema).max(3),
+}).superRefine((fork, ctx) => {
+  const initial = fork.sourceBuild.contributions.filter(c => c.kind === 'initial');
+  if (!unique(fork.decisions.map(d => d.participantId)) ||
+      !unique(fork.decisions.map(d => d.selection.inheritedContributionId)) ||
+      (fork.mode === 'play-again' && fork.decisions.some(d => d.selection.kind === 'replace')) ||
+      fork.decisions.some(d => {
+        const inherited = initial.find(c => c.id === d.selection.inheritedContributionId);
+        return !inherited || (d.selection.kind === 'replace' &&
+          (d.selection.choice.slot !== inherited.choice.slot ||
+            d.selection.choice.cardId === inherited.choice.cardId));
+      })) {
+    ctx.addIssue({ code: 'custom', message: 'Fork decisions must claim distinct inherited initial slots with valid replacements' });
+  }
+});
 
 /** Resolve setup semantics only; PC-06 authorizes the new room and retains the source. */
 export function parseForkSetup(source: BuildManifest, value: unknown) {
@@ -648,6 +670,7 @@ export const roomSnapshotSchema = z
       )
       .max(3),
     editSlots: z.array(editSlotSchema).max(2),
+    fork: roomForkSchema.nullable().default(null),
     updatedAt: integer,
   })
   .superRefine((room, ctx) => {
@@ -655,6 +678,8 @@ export const roomSnapshotSchema = z
     const bad =
       !unique(members) ||
       !members.includes(room.hostId) ||
+      (room.fork !== null && !room.lastCompleted && room.build.status !== 'playable' &&
+        room.fork.decisions.some(d => !members.includes(d.participantId))) ||
       [room.acknowledgments, room.votes, room.editSlots].some(
         (items) =>
           !unique(items.map((i) => i.participantId)) ||

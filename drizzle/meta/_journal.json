@@ -15,6 +15,13 @@
       "when": 1789277517380,
       "tag": "0001_jittery_ink",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789278858320,
+      "tag": "0002_whole_sharon_carter",
+      "breakpoints": true
     }
   ]
 }
