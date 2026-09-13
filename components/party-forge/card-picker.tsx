@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { InitialCard, RoomSnapshot } from '../../lib/party-forge/contracts.ts';
 import { LegacyCardPicker } from './legacy-card-picker.tsx';
 import { PixelSprite } from './pixel-sprite.tsx';
+import { unsupportedInstructionReason } from '../../lib/party-forge/instruction-policy.ts';
 import styles from './party-room.module.css';
 const STARTERS = [
   ['Snake', 'Snake', 'snake'],
@@ -14,11 +15,13 @@ const STARTERS = [
 ] as const;
 export function InstructionEditor({initial='',disabled,onConfirm,label='Your instruction',confirmed=false}:{initial?:string;disabled:boolean;onConfirm:(text:string)=>void;label?:string;confirmed?:boolean}) {
   const [text,setText]=useState(initial);
-  return <form className={styles.editor} onSubmit={e=>{e.preventDefault();if(text.trim())onConfirm(text.trim());}}>
+  const unsupported=unsupportedInstructionReason([text]);
+  return <form className={styles.editor} onSubmit={e=>{e.preventDefault();if(!disabled&&!unsupported&&text.trim())onConfirm(text.trim());}}>
     <label className={styles.eyebrow} htmlFor="instruction-text">{label}</label>
-    <textarea id="instruction-text" maxLength={240} required rows={4} placeholder="What should happen in our game?" value={text} onChange={e=>setText(e.target.value)} disabled={disabled}/>
+    <textarea id="instruction-text" maxLength={240} required rows={4} placeholder="What should happen in our game?" value={text} onChange={e=>setText(e.target.value)} disabled={disabled} aria-invalid={!!unsupported} aria-describedby={unsupported?'instruction-feedback':undefined}/>
     <p>Quick demo: one player chooses Snake, the other Space Invaders. This pair uses saved AI-generated rules. Custom instructions use live generation.</p>
-    <div className={styles.editorFooter}><span>{text.length}/240</span><button className={styles.primary} disabled={disabled||!text.trim()}>{disabled?'Saving…':confirmed?'Update instruction':'Confirm instruction'}</button></div>
+    {unsupported ? <p id="instruction-feedback" role="alert">{unsupported}</p> : null}
+    <div className={styles.editorFooter}><span>{text.length}/240</span><button className={styles.primary} disabled={disabled||!text.trim()||!!unsupported}>{disabled?'Saving…':confirmed?'Update instruction':'Confirm instruction'}</button></div>
     <details><summary>Need an idea? Pick a starter.</summary><div className={styles.starters}>{STARTERS.map(([title,instruction,sprite])=><button type="button" key={title} onClick={()=>setText(instruction)} disabled={disabled}><PixelSprite kind={sprite} size={24}/><span>{title}</span></button>)}</div><p>Starters fill your card. Change any words before confirming.</p></details>
   </form>;
 }

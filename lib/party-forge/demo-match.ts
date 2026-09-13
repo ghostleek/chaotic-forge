@@ -1,10 +1,10 @@
 import type { BuildManifest } from './contracts.ts';
+import { normalizeInstruction } from './instruction-policy.ts';
 
-/** Exact reference pair only: extra instructions must never be silently dropped. */
-export function snakeInvadersDemoOrder(contributions: Readonly<BuildManifest['contributions']>): [number, number] | null {
-  if (contributions.length !== 2 || contributions.some(c => c.kind !== 'initial' || c.choice.slot !== 'instruction')) return null;
-  const titles = contributions.map(c => c.kind === 'initial' && c.choice.slot === 'instruction' ? c.choice.text.trim().toLowerCase().replace(/\s+/g, ' ') : '');
-  const snake = titles.indexOf('snake');
-  const invaders = titles.indexOf('space invaders');
-  return snake >= 0 && invaders >= 0 ? [snake, invaders] : null;
+/** Map every card to a saved reference; extra words must never be silently dropped. */
+export function snakeInvadersDemoOrder(contributions: Readonly<BuildManifest['contributions']>): (0 | 1)[] | null {
+  if (contributions.length < 2 || contributions.length > 3 || contributions.some(c => c.kind !== 'initial' || c.choice.slot !== 'instruction')) return null;
+  const titles = contributions.map(c => c.kind === 'initial' && c.choice.slot === 'instruction' ? normalizeInstruction(c.choice.text) : '');
+  const order = titles.map(title => /^snakes?$/.test(title) ? 0 : /^space invaders?$/.test(title) ? 1 : -1);
+  return order.includes(0) && order.includes(1) && !order.includes(-1) ? order as (0 | 1)[] : null;
 }

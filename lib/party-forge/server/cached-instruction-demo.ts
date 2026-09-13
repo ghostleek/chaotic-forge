@@ -11,7 +11,7 @@ export async function cachedInstructionDemo(contributions: BuildManifest['contri
   if (retained.runtime.hash !== PIXEL_RUNTIME_RESOURCE.hash) throw new Error('Cached demo runtime no longer matches its retained executable');
   const recipe = {
     ...retained.pixelRules,
-    interpretations: retained.pixelRules.interpretations.map(entry => ({...entry, instructionIndex: order[entry.instructionIndex]})),
+    interpretations: order.map((sourceIndex, instructionIndex) => ({...retained.pixelRules.interpretations[sourceIndex], instructionIndex})),
   };
   return createInstructionBuild(contributions, null, recipe, {
     ...retained.origin,
