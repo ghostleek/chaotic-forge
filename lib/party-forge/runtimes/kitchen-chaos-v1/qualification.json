@@ -1,0 +1,616 @@
+{
+  "provenance": "authored-automated-local-qualification",
+  "externalPlayEvidence": false,
+  "runtimeHash": "sha256:94e56fdaa6a5cf1232a1e112e177e52ac4200f19f22f32ba58fe632e41942a31",
+  "seed": 20260913,
+  "recipes": {
+    "knockback|pursuers|quick-orders": {
+      "completingTraceHash": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+      "witnesses": {
+        "fps": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "zombies": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "cooking": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e"
+      }
+    },
+    "knockback|pursuers|quick-orders|dinner-bell": {
+      "completingTraceHash": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+      "witnesses": {
+        "fps": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "zombies": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "cooking": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "dinner-bell": "sha256:873ac4c6e2c529b8b29bdd8ee107488e89dd2be6b25294faa8443a121e73a02e"
+      }
+    },
+    "knockback|pursuers|quick-orders|dinner-bell|hot-potato": {
+      "completingTraceHash": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+      "witnesses": {
+        "fps": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "zombies": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "cooking": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "dinner-bell": "sha256:873ac4c6e2c529b8b29bdd8ee107488e89dd2be6b25294faa8443a121e73a02e",
+        "hot-potato": "sha256:68033f8afffb80b5e9a68f2ea92087ef8fe6457aff0a2c31c1212aaa57b8e5f3"
+      }
+    },
+    "knockback|pursuers|quick-orders|dinner-bell|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+      "witnesses": {
+        "fps": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "zombies": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "cooking": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "dinner-bell": "sha256:873ac4c6e2c529b8b29bdd8ee107488e89dd2be6b25294faa8443a121e73a02e",
+        "hot-potato": "sha256:68033f8afffb80b5e9a68f2ea92087ef8fe6457aff0a2c31c1212aaa57b8e5f3",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|pursuers|quick-orders|dinner-bell|zombie-pantry": {
+      "completingTraceHash": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+      "witnesses": {
+        "fps": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "zombies": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "cooking": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "dinner-bell": "sha256:873ac4c6e2c529b8b29bdd8ee107488e89dd2be6b25294faa8443a121e73a02e",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|pursuers|quick-orders|hot-potato": {
+      "completingTraceHash": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+      "witnesses": {
+        "fps": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "zombies": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "cooking": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "hot-potato": "sha256:68033f8afffb80b5e9a68f2ea92087ef8fe6457aff0a2c31c1212aaa57b8e5f3"
+      }
+    },
+    "knockback|pursuers|quick-orders|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+      "witnesses": {
+        "fps": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "zombies": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "cooking": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "hot-potato": "sha256:68033f8afffb80b5e9a68f2ea92087ef8fe6457aff0a2c31c1212aaa57b8e5f3",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|pursuers|quick-orders|zombie-pantry": {
+      "completingTraceHash": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+      "witnesses": {
+        "fps": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "zombies": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "cooking": "sha256:2c3004ebfff8b8492b53974c100c0a0fecf90fd2cc9c186b02e1c3d04ae6198e",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|pursuers|batch-orders": {
+      "completingTraceHash": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+      "witnesses": {
+        "fps": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombies": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "cooking": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8"
+      }
+    },
+    "knockback|pursuers|batch-orders|dinner-bell": {
+      "completingTraceHash": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+      "witnesses": {
+        "fps": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "zombies": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "cooking": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "dinner-bell": "sha256:892c3a7c2f1d6a80212e25cbe116130432c6e0b3d0ed876a08cb74a0d8754e73"
+      }
+    },
+    "knockback|pursuers|batch-orders|dinner-bell|hot-potato": {
+      "completingTraceHash": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+      "witnesses": {
+        "fps": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "zombies": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "cooking": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "dinner-bell": "sha256:892c3a7c2f1d6a80212e25cbe116130432c6e0b3d0ed876a08cb74a0d8754e73",
+        "hot-potato": "sha256:833321a26be36a86a42afbdb4727f85e9a03d4af910aaafbbdadd8390322dfa1"
+      }
+    },
+    "knockback|pursuers|batch-orders|dinner-bell|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+      "witnesses": {
+        "fps": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "zombies": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "cooking": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "dinner-bell": "sha256:892c3a7c2f1d6a80212e25cbe116130432c6e0b3d0ed876a08cb74a0d8754e73",
+        "hot-potato": "sha256:833321a26be36a86a42afbdb4727f85e9a03d4af910aaafbbdadd8390322dfa1",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|pursuers|batch-orders|dinner-bell|zombie-pantry": {
+      "completingTraceHash": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+      "witnesses": {
+        "fps": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "zombies": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "cooking": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "dinner-bell": "sha256:892c3a7c2f1d6a80212e25cbe116130432c6e0b3d0ed876a08cb74a0d8754e73",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|pursuers|batch-orders|hot-potato": {
+      "completingTraceHash": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+      "witnesses": {
+        "fps": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombies": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "cooking": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "hot-potato": "sha256:833321a26be36a86a42afbdb4727f85e9a03d4af910aaafbbdadd8390322dfa1"
+      }
+    },
+    "knockback|pursuers|batch-orders|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+      "witnesses": {
+        "fps": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombies": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "cooking": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "hot-potato": "sha256:833321a26be36a86a42afbdb4727f85e9a03d4af910aaafbbdadd8390322dfa1",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|pursuers|batch-orders|zombie-pantry": {
+      "completingTraceHash": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+      "witnesses": {
+        "fps": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombies": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "cooking": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|noise-seekers|quick-orders": {
+      "completingTraceHash": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+      "witnesses": {
+        "fps": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "zombies": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "cooking": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014"
+      }
+    },
+    "knockback|noise-seekers|quick-orders|dinner-bell": {
+      "completingTraceHash": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+      "witnesses": {
+        "fps": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "zombies": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "cooking": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "dinner-bell": "sha256:d861ccdf488d36f8e2fee7dd493ad1ba502ba5d0a9b67b3e6a906e5594741f97"
+      }
+    },
+    "knockback|noise-seekers|quick-orders|dinner-bell|hot-potato": {
+      "completingTraceHash": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+      "witnesses": {
+        "fps": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "zombies": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "cooking": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "dinner-bell": "sha256:d861ccdf488d36f8e2fee7dd493ad1ba502ba5d0a9b67b3e6a906e5594741f97",
+        "hot-potato": "sha256:6dca394be3c980fdf27369e45bf9761dd22419863d23caa94ee8f23ad58a25f6"
+      }
+    },
+    "knockback|noise-seekers|quick-orders|dinner-bell|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+      "witnesses": {
+        "fps": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "zombies": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "cooking": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "dinner-bell": "sha256:d861ccdf488d36f8e2fee7dd493ad1ba502ba5d0a9b67b3e6a906e5594741f97",
+        "hot-potato": "sha256:6dca394be3c980fdf27369e45bf9761dd22419863d23caa94ee8f23ad58a25f6",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|noise-seekers|quick-orders|dinner-bell|zombie-pantry": {
+      "completingTraceHash": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+      "witnesses": {
+        "fps": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "zombies": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "cooking": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "dinner-bell": "sha256:d861ccdf488d36f8e2fee7dd493ad1ba502ba5d0a9b67b3e6a906e5594741f97",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|noise-seekers|quick-orders|hot-potato": {
+      "completingTraceHash": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+      "witnesses": {
+        "fps": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "zombies": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "cooking": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "hot-potato": "sha256:6dca394be3c980fdf27369e45bf9761dd22419863d23caa94ee8f23ad58a25f6"
+      }
+    },
+    "knockback|noise-seekers|quick-orders|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+      "witnesses": {
+        "fps": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "zombies": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "cooking": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "hot-potato": "sha256:6dca394be3c980fdf27369e45bf9761dd22419863d23caa94ee8f23ad58a25f6",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|noise-seekers|quick-orders|zombie-pantry": {
+      "completingTraceHash": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+      "witnesses": {
+        "fps": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "zombies": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "cooking": "sha256:d6b65166e835b5e542315f0ddf9817b99bfabf39615551e38ffff65ef6b28014",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|noise-seekers|batch-orders": {
+      "completingTraceHash": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+      "witnesses": {
+        "fps": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombies": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "cooking": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8"
+      }
+    },
+    "knockback|noise-seekers|batch-orders|dinner-bell": {
+      "completingTraceHash": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+      "witnesses": {
+        "fps": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "zombies": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "cooking": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "dinner-bell": "sha256:892c3a7c2f1d6a80212e25cbe116130432c6e0b3d0ed876a08cb74a0d8754e73"
+      }
+    },
+    "knockback|noise-seekers|batch-orders|dinner-bell|hot-potato": {
+      "completingTraceHash": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+      "witnesses": {
+        "fps": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "zombies": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "cooking": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "dinner-bell": "sha256:892c3a7c2f1d6a80212e25cbe116130432c6e0b3d0ed876a08cb74a0d8754e73",
+        "hot-potato": "sha256:833321a26be36a86a42afbdb4727f85e9a03d4af910aaafbbdadd8390322dfa1"
+      }
+    },
+    "knockback|noise-seekers|batch-orders|dinner-bell|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+      "witnesses": {
+        "fps": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "zombies": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "cooking": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "dinner-bell": "sha256:892c3a7c2f1d6a80212e25cbe116130432c6e0b3d0ed876a08cb74a0d8754e73",
+        "hot-potato": "sha256:833321a26be36a86a42afbdb4727f85e9a03d4af910aaafbbdadd8390322dfa1",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|noise-seekers|batch-orders|dinner-bell|zombie-pantry": {
+      "completingTraceHash": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+      "witnesses": {
+        "fps": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "zombies": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "cooking": "sha256:60be1a71ce5f05d7052fed8112cfc4ed68ab9da22532f9a18b4518dc77742f3d",
+        "dinner-bell": "sha256:892c3a7c2f1d6a80212e25cbe116130432c6e0b3d0ed876a08cb74a0d8754e73",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|noise-seekers|batch-orders|hot-potato": {
+      "completingTraceHash": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+      "witnesses": {
+        "fps": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombies": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "cooking": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "hot-potato": "sha256:833321a26be36a86a42afbdb4727f85e9a03d4af910aaafbbdadd8390322dfa1"
+      }
+    },
+    "knockback|noise-seekers|batch-orders|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+      "witnesses": {
+        "fps": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombies": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "cooking": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "hot-potato": "sha256:833321a26be36a86a42afbdb4727f85e9a03d4af910aaafbbdadd8390322dfa1",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "knockback|noise-seekers|batch-orders|zombie-pantry": {
+      "completingTraceHash": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+      "witnesses": {
+        "fps": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombies": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "cooking": "sha256:99e23d805b34f2e25af7cc6e6b2ed1a6ff1b8d3fd5526b9669ac42e8b66396e8",
+        "zombie-pantry": "sha256:63c04a91524c2d109b593194b9cad30c1e1725b79aebbdab5641bb975d8e6a44"
+      }
+    },
+    "counter-ricochet|pursuers|quick-orders": {
+      "completingTraceHash": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "cooking": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0"
+      }
+    },
+    "counter-ricochet|pursuers|quick-orders|dinner-bell": {
+      "completingTraceHash": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "cooking": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "dinner-bell": "sha256:d4209e80627c8657b23f9e4a1c2b684d957e78ba823b471868471995a2d3e30b"
+      }
+    },
+    "counter-ricochet|pursuers|quick-orders|dinner-bell|hot-potato": {
+      "completingTraceHash": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "cooking": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "dinner-bell": "sha256:d4209e80627c8657b23f9e4a1c2b684d957e78ba823b471868471995a2d3e30b",
+        "hot-potato": "sha256:5324af8eb4876ce593799f2b9728d939fda38a232e1751db775d916fe3187000"
+      }
+    },
+    "counter-ricochet|pursuers|quick-orders|dinner-bell|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "cooking": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "dinner-bell": "sha256:d4209e80627c8657b23f9e4a1c2b684d957e78ba823b471868471995a2d3e30b",
+        "hot-potato": "sha256:5324af8eb4876ce593799f2b9728d939fda38a232e1751db775d916fe3187000",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|pursuers|quick-orders|dinner-bell|zombie-pantry": {
+      "completingTraceHash": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "cooking": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "dinner-bell": "sha256:d4209e80627c8657b23f9e4a1c2b684d957e78ba823b471868471995a2d3e30b",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|pursuers|quick-orders|hot-potato": {
+      "completingTraceHash": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "cooking": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "hot-potato": "sha256:5324af8eb4876ce593799f2b9728d939fda38a232e1751db775d916fe3187000"
+      }
+    },
+    "counter-ricochet|pursuers|quick-orders|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "cooking": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "hot-potato": "sha256:5324af8eb4876ce593799f2b9728d939fda38a232e1751db775d916fe3187000",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|pursuers|quick-orders|zombie-pantry": {
+      "completingTraceHash": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "cooking": "sha256:e6ee710bad85c43cea7a808363f8f2f75e6fac5fdd0c617140c245f9b1b8aea0",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|pursuers|batch-orders": {
+      "completingTraceHash": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "cooking": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7"
+      }
+    },
+    "counter-ricochet|pursuers|batch-orders|dinner-bell": {
+      "completingTraceHash": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "cooking": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "dinner-bell": "sha256:e3b073db9e6bc5148bf251eb9409b4622b81d16c005a9fceffb2b42971580d60"
+      }
+    },
+    "counter-ricochet|pursuers|batch-orders|dinner-bell|hot-potato": {
+      "completingTraceHash": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "cooking": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "dinner-bell": "sha256:e3b073db9e6bc5148bf251eb9409b4622b81d16c005a9fceffb2b42971580d60",
+        "hot-potato": "sha256:43d558fc1a0c7527b018453b31ab965ab9ee6b8d18ce2c51fa59a76184227efd"
+      }
+    },
+    "counter-ricochet|pursuers|batch-orders|dinner-bell|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "cooking": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "dinner-bell": "sha256:e3b073db9e6bc5148bf251eb9409b4622b81d16c005a9fceffb2b42971580d60",
+        "hot-potato": "sha256:43d558fc1a0c7527b018453b31ab965ab9ee6b8d18ce2c51fa59a76184227efd",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|pursuers|batch-orders|dinner-bell|zombie-pantry": {
+      "completingTraceHash": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "cooking": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "dinner-bell": "sha256:e3b073db9e6bc5148bf251eb9409b4622b81d16c005a9fceffb2b42971580d60",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|pursuers|batch-orders|hot-potato": {
+      "completingTraceHash": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "cooking": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "hot-potato": "sha256:43d558fc1a0c7527b018453b31ab965ab9ee6b8d18ce2c51fa59a76184227efd"
+      }
+    },
+    "counter-ricochet|pursuers|batch-orders|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "cooking": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "hot-potato": "sha256:43d558fc1a0c7527b018453b31ab965ab9ee6b8d18ce2c51fa59a76184227efd",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|pursuers|batch-orders|zombie-pantry": {
+      "completingTraceHash": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "cooking": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|noise-seekers|quick-orders": {
+      "completingTraceHash": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "cooking": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520"
+      }
+    },
+    "counter-ricochet|noise-seekers|quick-orders|dinner-bell": {
+      "completingTraceHash": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "cooking": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "dinner-bell": "sha256:5b0eee84ce7be407a2e2c8c23e09d7df35a7858f360b19a2cf1d767c8148349f"
+      }
+    },
+    "counter-ricochet|noise-seekers|quick-orders|dinner-bell|hot-potato": {
+      "completingTraceHash": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "cooking": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "dinner-bell": "sha256:5b0eee84ce7be407a2e2c8c23e09d7df35a7858f360b19a2cf1d767c8148349f",
+        "hot-potato": "sha256:6123d61fb4f89af3f4c77dd30380db666d5fa0ea7038c987f159a16f0cd133f6"
+      }
+    },
+    "counter-ricochet|noise-seekers|quick-orders|dinner-bell|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "cooking": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "dinner-bell": "sha256:5b0eee84ce7be407a2e2c8c23e09d7df35a7858f360b19a2cf1d767c8148349f",
+        "hot-potato": "sha256:6123d61fb4f89af3f4c77dd30380db666d5fa0ea7038c987f159a16f0cd133f6",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|noise-seekers|quick-orders|dinner-bell|zombie-pantry": {
+      "completingTraceHash": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "cooking": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "dinner-bell": "sha256:5b0eee84ce7be407a2e2c8c23e09d7df35a7858f360b19a2cf1d767c8148349f",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|noise-seekers|quick-orders|hot-potato": {
+      "completingTraceHash": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "cooking": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "hot-potato": "sha256:6123d61fb4f89af3f4c77dd30380db666d5fa0ea7038c987f159a16f0cd133f6"
+      }
+    },
+    "counter-ricochet|noise-seekers|quick-orders|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "cooking": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "hot-potato": "sha256:6123d61fb4f89af3f4c77dd30380db666d5fa0ea7038c987f159a16f0cd133f6",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|noise-seekers|quick-orders|zombie-pantry": {
+      "completingTraceHash": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "cooking": "sha256:b70b03809a3615a5e9cb1bce50d84317128d3d255e8ad67c5f8164c5288e6520",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|noise-seekers|batch-orders": {
+      "completingTraceHash": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "cooking": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7"
+      }
+    },
+    "counter-ricochet|noise-seekers|batch-orders|dinner-bell": {
+      "completingTraceHash": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "cooking": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "dinner-bell": "sha256:e3b073db9e6bc5148bf251eb9409b4622b81d16c005a9fceffb2b42971580d60"
+      }
+    },
+    "counter-ricochet|noise-seekers|batch-orders|dinner-bell|hot-potato": {
+      "completingTraceHash": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "cooking": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "dinner-bell": "sha256:e3b073db9e6bc5148bf251eb9409b4622b81d16c005a9fceffb2b42971580d60",
+        "hot-potato": "sha256:43d558fc1a0c7527b018453b31ab965ab9ee6b8d18ce2c51fa59a76184227efd"
+      }
+    },
+    "counter-ricochet|noise-seekers|batch-orders|dinner-bell|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "cooking": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "dinner-bell": "sha256:e3b073db9e6bc5148bf251eb9409b4622b81d16c005a9fceffb2b42971580d60",
+        "hot-potato": "sha256:43d558fc1a0c7527b018453b31ab965ab9ee6b8d18ce2c51fa59a76184227efd",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|noise-seekers|batch-orders|dinner-bell|zombie-pantry": {
+      "completingTraceHash": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "cooking": "sha256:5291ceef3747ece71dbc1b35a4501e6c583d2478fe5421e4f67119b64090acca",
+        "dinner-bell": "sha256:e3b073db9e6bc5148bf251eb9409b4622b81d16c005a9fceffb2b42971580d60",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|noise-seekers|batch-orders|hot-potato": {
+      "completingTraceHash": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "cooking": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "hot-potato": "sha256:43d558fc1a0c7527b018453b31ab965ab9ee6b8d18ce2c51fa59a76184227efd"
+      }
+    },
+    "counter-ricochet|noise-seekers|batch-orders|hot-potato|zombie-pantry": {
+      "completingTraceHash": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "cooking": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "hot-potato": "sha256:43d558fc1a0c7527b018453b31ab965ab9ee6b8d18ce2c51fa59a76184227efd",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    },
+    "counter-ricochet|noise-seekers|batch-orders|zombie-pantry": {
+      "completingTraceHash": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+      "witnesses": {
+        "fps": "sha256:d20bbb431591c2f1cec8a0e82b8ea66f0ac5cacb141d11e51e1993af5d844a88",
+        "zombies": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "cooking": "sha256:036f17c1f8259995760a94274649f5b5abd3345944e7970b1632b5af0b3019c7",
+        "zombie-pantry": "sha256:5a95423519f48be01832af2e877951e20d8245dc2963a2c3d669e08110528b28"
+      }
+    }
+  }
+}
