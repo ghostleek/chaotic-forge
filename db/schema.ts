@@ -99,3 +99,51 @@ export const partyRoomHistory = sqliteTable(
     check('party_room_history_entry_json', sql`json_valid(${table.entry})`),
   ],
 );
+
+// Only completed builds are retained here, atomically with their scored history.
+export const partyPlayedBuilds = sqliteTable('party_played_builds', {
+  roomId: text('room_id').notNull().references(() => partyRooms.id, { onDelete: 'cascade' }),
+  buildId: text('build_id').notNull(),
+  manifest: text('manifest').notNull(),
+}, table => [
+  primaryKey({ columns: [table.roomId, table.buildId] }),
+  check('party_played_builds_json', sql`json_valid(${table.manifest})`),
+]);
+
+// Saved games deliberately have no cascading relationship to transient rooms.
+// Imports remain invisible until every bounded child record has been written.
+export const partyArchives = sqliteTable('party_archives', {
+  id: text('id').primaryKey(),
+  sourceRoomId: text('source_room_id'),
+  contentHash: text('content_hash').notNull(),
+  metadata: text('metadata').notNull(),
+  provenance: text('provenance').notNull(),
+  historyCount: integer('history_count').notNull(),
+  buildCount: integer('build_count').notNull(),
+  ready: integer('ready').notNull().default(0),
+}, table => [
+  uniqueIndex('party_archives_source_room').on(table.sourceRoomId),
+  check('party_archives_metadata_json', sql`json_valid(${table.metadata})`),
+  check('party_archives_history_bound', sql`${table.historyCount} BETWEEN 1 AND 10000`),
+  check('party_archives_build_bound', sql`${table.buildCount} BETWEEN 1 AND 4`),
+  check('party_archives_ready', sql`${table.ready} IN (0, 1)`),
+  check('party_archives_provenance', sql`${table.provenance} IN ('room-authority', 'portable-import-unverified')`),
+]);
+export const partyArchiveBuilds = sqliteTable('party_archive_builds', {
+  archiveId: text('archive_id').notNull().references(() => partyArchives.id),
+  ordinal: integer('ordinal').notNull(),
+  manifest: text('manifest').notNull(),
+}, table => [
+  primaryKey({ columns: [table.archiveId, table.ordinal] }),
+  check('party_archive_builds_ordinal', sql`${table.ordinal} BETWEEN 0 AND 3`),
+  check('party_archive_builds_json', sql`json_valid(${table.manifest})`),
+]);
+export const partyArchiveHistory = sqliteTable('party_archive_history', {
+  archiveId: text('archive_id').notNull().references(() => partyArchives.id),
+  ordinal: integer('ordinal').notNull(),
+  entry: text('entry').notNull(),
+}, table => [
+  primaryKey({ columns: [table.archiveId, table.ordinal] }),
+  check('party_archive_history_ordinal', sql`${table.ordinal} BETWEEN 0 AND 9999`),
+  check('party_archive_history_json', sql`json_valid(${table.entry})`),
+]);

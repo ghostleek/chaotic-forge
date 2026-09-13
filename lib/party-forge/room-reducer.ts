@@ -1,7 +1,9 @@
 import {
   DEMO_POLICY,
   PROTOCOL_VERSION,
+  archiveSchema,
   completedResultSchema,
+  forkSetupSchema,
   gameHistorySchema,
   legalAdditions,
   rankResults,
@@ -9,11 +11,14 @@ import {
   roomSnapshotSchema,
   type BuildManifest,
   type CommandReceipt,
+  type ForkSetup,
+  type GameArchive,
   type RoomCommand,
   type RoomSnapshot,
 } from './contracts.ts';
 import { CARDS, type Contribution } from './cards.ts';
 import { resolveBuild } from './resolve-build.ts';
+import { resolveArchiveFork, resolveArchiveEvolution } from './archive.ts';
 import { scoreTrial } from './score.ts';
 import type { z } from 'zod';
 
@@ -31,6 +36,9 @@ export interface RoomRecord {
   historyCount: number;
   recovery: boolean;
   editDecisions: { participantId: string; commandId: string; contributionId: string }[];
+  parentArchiveId: string | null;
+  sourceBuild: BuildManifest | null;
+  forkSetup: ForkSetup | null;
 }
 
 export class RoomTransitionError extends Error {
@@ -73,7 +81,30 @@ export function createRoomRecord(roomId: string, participantId: string, nickname
     }),
     submissions: [], lastPlayedBuild: null, retryBuild: null,
     roundCounter: 0, historyCount: 0, recovery: false, editDecisions: [],
+    parentArchiveId: null, sourceBuild: null, forkSetup: null,
   };
+}
+
+/** The service validates retained resources before creating a new archive room. */
+export function createArchiveRoomRecord(
+  roomId: string, participantId: string, nickname: string, now: number,
+  value: GameArchive, mode: 'play-again' | 'remix',
+): RoomRecord {
+  const archive = archiveSchema.parse(value);
+  const record = createRoomRecord(roomId, participantId, nickname, now);
+  requireCondition(!archive.finalBuild.contributions.some(c => c.participantId === participantId) &&
+    !archive.history.some(h => h.status !== 'evolution-aborted' &&
+      (h.status === 'completed' ? h.result.round : h.round).roster.includes(participantId)),
+    'unauthorized', 'A saved game starts with a fresh participant identity');
+  record.parentArchiveId = archive.archiveId;
+  record.sourceBuild = structuredClone(archive.finalBuild);
+  record.snapshot.fork = {
+    sourceArchiveId: archive.archiveId, sourceBuild: structuredClone(archive.finalBuild), mode, decisions: [],
+  };
+  record.snapshot.contributions = structuredClone(archive.finalBuild.contributions);
+  if (mode === 'play-again') record.snapshot.build = { status: 'playable', manifest: structuredClone(archive.finalBuild) };
+  roomSnapshotSchema.parse(record.snapshot);
+  return record;
 }
 
 /** Invitation transport creates a fresh identity; it cannot claim an existing ID. */
@@ -85,9 +116,15 @@ export function joinRoom(record: RoomRecord, participantId: string, nickname: st
   requireCondition(['lobby', 'results', 'end-vote', 'additions'].includes(room.phase),
     'invalid-phase', 'Join at a round boundary');
   requireCondition(!room.participants.some(p => p.id === participantId), 'unauthorized', 'An invitation cannot reclaim a participant');
+  requireCondition(!next.sourceBuild?.contributions.some(c => c.participantId === participantId),
+    'unauthorized', 'Historical contribution identities cannot become new-room authority');
   room.participants.push({ id: participantId, nickname: nickname.trim(), presence: 'present', lastSeenAt: now });
   room.votes = []; // A newly active participant must participate in any End decision.
   if (room.phase === 'end-vote') room.phase = 'results';
+  if (room.phase === 'lobby' && room.fork?.mode === 'play-again' &&
+      room.build.status === 'playable' && room.participants.length === DEMO_POLICY.players) {
+    prepareRound(next, room.build.manifest, now);
+  }
   return finish(next, now);
 }
 
@@ -213,6 +250,37 @@ async function forge(record: RoomRecord, now: number, resolve: typeof resolveBui
   }
 }
 
+async function forgeFork(record: RoomRecord, now: number, resolve: typeof resolveArchiveFork) {
+  const room = record.snapshot;
+  const fork = room.fork;
+  requireCondition(fork && record.sourceBuild && record.parentArchiveId, 'invalid-phase', 'A retained source game is required');
+  requireCondition(room.participants.length === DEMO_POLICY.players &&
+    room.participants.every(p => fork.decisions.some(d => d.participantId === p.id)),
+    'unavailable', 'Each of the three new participants must choose an inherited slot');
+  const setup = forkSetupSchema.parse({
+    protocolVersion: PROTOCOL_VERSION, sourceArchiveId: record.parentArchiveId,
+    sourceBuildId: record.sourceBuild.buildId, sourceBuildHash: record.sourceBuild.contentHash,
+    decisions: fork.decisions,
+  });
+  const jobId = crypto.randomUUID();
+  const contributionRevision = room.revision + 1;
+  const previous = record.sourceBuild;
+  room.phase = 'forging';
+  room.build = { status: 'forging', jobId, contributionRevision, previous };
+  try {
+    const resolved = await resolve(previous, setup);
+    record.forkSetup = structuredClone(resolved.setup);
+    fork.mode = resolved.kind;
+    prepareRound(record, resolved.manifest, now);
+  } catch {
+    room.build = {
+      status: 'failed', jobId, contributionRevision, previous,
+      affectedContributionIds: fork.decisions.filter(d => d.selection.kind === 'replace').map(d => d.selection.inheritedContributionId),
+      reason: 'The saved game could not be loaded or its fork validated. Retained choices remain available for retry or revision.',
+    };
+  }
+}
+
 function restoreCompleted(record: RoomRecord) {
   const room = record.snapshot;
   requireCondition(record.lastPlayedBuild && room.lastCompleted, 'invalid-phase', 'No completed game is available');
@@ -252,7 +320,7 @@ export async function reduceRoom(
   actorId: string,
   value: RoomCommand,
   now: number,
-  services: { resolve?: typeof resolveBuild } = {},
+  services: { resolve?: typeof resolveBuild; resolveFork?: typeof resolveArchiveFork } = {},
 ): Promise<{ record: RoomRecord; history: GameHistory[]; receipt: CommandReceipt }> {
   const command = roomCommandSchema.parse(value);
   const next = structuredClone(record);
@@ -268,7 +336,30 @@ export async function reduceRoom(
     actor.presence = 'present';
 
     switch (command.type) {
+      case 'choose-fork': {
+        requireCondition(room.fork && next.sourceBuild && room.fork.mode === 'remix' &&
+          (room.phase === 'lobby' || (room.phase === 'forging' && !room.lastCompleted && room.build.status !== 'forging')),
+          'invalid-phase', 'Choose inherited slots during the new remix setup');
+        requireCondition(room.build.status !== 'playable', 'invalid-phase', 'The accepted recipe is frozen');
+        const inherited = next.sourceBuild.contributions.find(c => c.id === command.selection.inheritedContributionId);
+        requireCondition(inherited?.kind === 'initial', 'invalid-choice', 'Claim an inherited initial concept slot');
+        requireCondition(!room.fork.decisions.some(d => d.participantId !== actorId &&
+          d.selection.inheritedContributionId === inherited.id), 'invalid-choice', 'Another participant has claimed this inherited slot');
+        const choice = command.selection.kind === 'replace' ? command.selection.choice : inherited.choice;
+        requireCondition(choice.slot === inherited.choice.slot &&
+          (command.selection.kind === 'keep' || choice.cardId !== inherited.choice.cardId),
+          'invalid-choice', 'Choose Keep or the other supported variant in that slot');
+        room.fork.decisions = room.fork.decisions.filter(d => d.participantId !== actorId);
+        room.fork.decisions.push({ participantId: actorId, selection: command.selection,
+          provenance: provenance(actorId, command.commandId, choice.cardId) });
+        room.phase = 'lobby';
+        room.build = { status: 'empty' };
+        next.forkSetup = null;
+        if (room.fork.decisions.length === DEMO_POLICY.players) await forgeFork(next, now, services.resolveFork ?? resolveArchiveFork);
+        break;
+      }
       case 'choose-initial': {
+        requireCondition(!room.fork, 'invalid-phase', 'Saved games use the explicit inherited-slot setup');
         requireCondition(room.phase === 'lobby' || (room.phase === 'forging' && !room.lastCompleted && room.build.status !== 'forging'),
           'invalid-phase', 'Initial choices are editable before the first build is accepted');
         requireCondition(room.build.status !== 'playable', 'invalid-phase', 'The accepted recipe is frozen');
@@ -285,7 +376,7 @@ export async function reduceRoom(
         else room.contributions[existing] = contribution;
         room.phase = 'lobby';
         room.build = { status: 'empty' };
-        if (room.contributions.length === DEMO_POLICY.players) await forge(next, now, services.resolve ?? resolveBuild);
+        if (room.contributions.length === DEMO_POLICY.players) await forge(next, now, services.resolve ?? (next.sourceBuild && next.lastPlayedBuild ? resolveArchiveEvolution : resolveBuild));
         break;
       }
       case 'acknowledge-build': {
@@ -393,7 +484,7 @@ export async function reduceRoom(
           next.editDecisions.push({ participantId: actorId, commandId: command.commandId, contributionId: crypto.randomUUID() });
         }
         if (room.editSlots.every(s => s.resolution.status !== 'pending') && room.participants.length === DEMO_POLICY.players) {
-          await forge(next, now, services.resolve ?? resolveBuild);
+          await forge(next, now, services.resolve ?? (next.sourceBuild && next.lastPlayedBuild ? resolveArchiveEvolution : resolveBuild));
         }
         break;
       }
@@ -402,7 +493,8 @@ export async function reduceRoom(
         requireCondition((room.phase === 'forging' && room.build.status !== 'forging') ||
           (room.phase === 'additions' && room.editSlots.every(s => s.resolution.status !== 'pending')),
           'invalid-phase', 'Retry the retained failed or pending choices');
-        await forge(next, now, services.resolve ?? resolveBuild);
+        if (room.fork && !room.lastCompleted) await forgeFork(next, now, services.resolveFork ?? resolveArchiveFork);
+        else await forge(next, now, services.resolve ?? (next.sourceBuild && next.lastPlayedBuild ? resolveArchiveEvolution : resolveBuild));
         break;
       }
       case 'cancel-forge': {
@@ -446,7 +538,9 @@ export async function reduceRoom(
       }
       case 'leave':
       case 'remove-unavailable': {
-        requireCondition(['lobby', 'results', 'end-vote', 'additions'].includes(room.phase), 'invalid-phase', 'Membership changes only at a round boundary');
+        const pendingFork = room.fork && !room.lastCompleted && room.phase === 'forging' && room.build.status !== 'forging';
+        requireCondition(['lobby', 'results', 'end-vote', 'additions'].includes(room.phase) || pendingFork,
+          'invalid-phase', 'Membership changes only at a round boundary');
         const targetId = 'participantId' in command ? command.participantId : actorId;
         if (command.type === 'remove-unavailable') hostOnly(room, actorId);
         const target = room.participants.find(p => p.id === targetId);
@@ -465,18 +559,23 @@ export async function reduceRoom(
           restoreCompleted(next);
         }
         room.participants = room.participants.filter(p => p.id !== targetId);
+        if (pendingFork) {
+          room.phase = 'lobby';
+          room.build = { status: 'empty' };
+          next.forkSetup = null;
+        }
         room.acknowledgments = [];
         room.votes = [];
         if (room.phase === 'end-vote') room.phase = 'results';
         if (room.hostId === targetId) room.hostId = room.participants[0].id;
         if (room.phase === 'lobby' && room.build.status === 'empty') {
-          room.contributions = room.contributions.filter(c => c.participantId !== targetId).map((c, ordinal) => ({ ...c, ordinal }));
+          if (room.fork) room.fork.decisions = room.fork.decisions.filter(d => d.participantId !== targetId);
+          else room.contributions = room.contributions.filter(c => c.participantId !== targetId).map((c, ordinal) => ({ ...c, ordinal }));
         }
         break;
       }
-      case 'choose-fork':
       case 'save-game':
-        throw new RoomTransitionError('unavailable', 'Durable archives and saved-game setup are delivered by PC-06');
+        throw new RoomTransitionError('unavailable', 'A save requires the durable archive service');
     }
     finish(next, now);
     return { record: next, history, receipt: { protocolVersion: PROTOCOL_VERSION, commandId: command.commandId, status: 'accepted', revision: room.revision } };
