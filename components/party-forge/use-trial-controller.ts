@@ -162,7 +162,7 @@ class TrialController {
         }
         this.update({
           status:
-            this.capture?.frames.length === 3600 ? 'complete' : 'incomplete',
+            (this.capture?.frames.length === 3600 || this.runtime?.snapshot().state.gameOver === true) ? 'complete' : 'incomplete',
           message: `Submission rejected: ${receipt.receipt.reason}. The captured attempt has not been restarted.`,
         });
       }
@@ -265,7 +265,7 @@ class TrialController {
     try {
       const due = this.capture.due(now);
       let feedback = this.state.feedback;
-      while (this.capture.frames.length < due) {
+      while (this.capture.frames.length < due && this.runtime.snapshot().state.gameOver !== true) {
         this.runtime.input(this.capture.next());
         const step = this.runtime.step();
         if (step.state.kind === 'pixel') feedback = String(step.state.feedback);
@@ -276,7 +276,7 @@ class TrialController {
         }
       }
       const snapshot = this.runtime.snapshot();
-      const complete = snapshot.completed;
+      const complete = snapshot.completed || snapshot.state.gameOver === true;
       const gameOver = snapshot.state.gameOver === true;
       if (gameOver) this.clearInput();
       this.update({
@@ -287,12 +287,12 @@ class TrialController {
         countdown: 0,
         message: complete
           ? 'Round complete. Confirming scores…'
-          : gameOver ? 'Your score is locked. Results when the round timer ends.' : '',
+          : gameOver ? 'Your score is locked. Waiting for the other players.' : '',
       });
       if (
         complete &&
         !this.submitted &&
-        (this.client.serverNow() ?? 0) >= this.round.submissionDeadline + 250 &&
+        (gameOver || (this.client.serverNow() ?? 0) >= this.round.submissionDeadline + 250) &&
         this.client.snapshot().connected
       )
         void this.submit();
@@ -338,7 +338,7 @@ class TrialController {
       !this.active ||
       !this.capture ||
       !this.round ||
-      this.capture.frames.length !== 3600 ||
+      (this.capture.frames.length !== 3600 && this.runtime?.snapshot().state.gameOver !== true) ||
       state.pending ||
       state.uncertain ||
       !state.connected
@@ -360,7 +360,7 @@ class TrialController {
     });
     await this.client.command({
       type: 'submit-trial',
-      trial: this.capture.trial(this.round, this.attemptId),
+      trial: this.capture.trial(this.round, this.attemptId, this.capture.frames.length < 3600),
     });
     if (this.active && this.state.status === 'sending')
       this.update({

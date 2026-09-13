@@ -42,14 +42,14 @@ function PixelViewport({ controller, view }: Props) {
     <div className={styles.viewport}>
       <canvas ref={canvas} width={256} height={192} tabIndex={0} aria-label="Pixel arena. Arrow keys to steer." aria-describedby="trial-controls" onPointerDown={() => canvas.current?.focus({ preventScroll: true })} />
       {view.status === 'countdown' && view.countdown > 0 ? <div className={styles.countdown}>{view.countdown}</div> : null}
-      {gameOver ? <div className={styles.overlay}>GAME OVER · 0 LIVES<br/>Waiting for the round to finish</div> : null}
+      {gameOver ? <div className={styles.overlay}>GAME OVER · 0 LIVES<br/>Waiting for other players</div> : null}
       {view.status === 'ready' ? <div className={styles.overlay}>READY, PLAYER?</div> : null}
       {['loading', 'incomplete', 'error'].includes(view.status) ? <div className={styles.overlay}>{view.message}</div> : null}
     </div>
     <div className={styles.controlRow}>
       <div id="trial-controls" className={styles.controls}>
         <p><strong>ARROWS / WASD</strong> to steer. Shooting and movement follow your generated rules.</p>
-        <p>{hasLives ? '3 lives. Lose one per hit. Your run stops at zero lives or 60 seconds.' : '60 seconds.'} Most points wins; fewer hits breaks a tie.</p>
+        <p>{hasLives ? '3 lives. Lose one per hit. Your run stops at zero lives or 60 seconds.' : '60 seconds.'} Results appear when everyone finishes. Most points wins; fewer hits breaks a tie.</p>
         <p className={styles.feedback}>{view.feedback || 'EAT. GROW. ZAP. REPEAT.'}</p>
       </div>
       <div className={styles.dpad} aria-label="Touch direction pad">

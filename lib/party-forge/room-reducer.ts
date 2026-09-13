@@ -430,8 +430,8 @@ export async function reduceRoom(
       case 'submit-trial': {
         requireCondition(room.phase === 'playing' && room.round, 'invalid-phase', 'No active scored trial');
         requireCondition(room.round.roster.includes(actorId), 'unauthorized', 'The active roster is frozen');
-        requireCondition(now >= room.round.submissionDeadline && now <= room.round.transportDeadline,
-          'deadline', 'Submit only after the full trial and within its original transport grace');
+        requireCondition(now >= (command.trial.endedEarly ? room.round.startsAt + Math.ceil(command.trial.frames.length * 1000 / room.round.ticksPerSecond) : room.round.submissionDeadline) && now <= room.round.transportDeadline,
+          'deadline', 'Submit only after the captured play time and within the transport grace');
         requireCondition(!next.submissions.some(s => s.participantId === actorId || s.attemptId === command.trial.attemptId),
           'incomplete-attempt', 'Only one accepted attempt per participant and round');
         let score: Awaited<ReturnType<typeof scoreTrial>>;

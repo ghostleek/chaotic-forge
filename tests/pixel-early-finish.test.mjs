@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { createRoomRecord,joinRoom,reduceRoom } from '../lib/party-forge/room-reducer.ts';
+import { cachedInstructionDemo } from '../lib/party-forge/server/cached-instruction-demo.ts';
+import { createRetainedRuntime } from '../lib/party-forge/runtime-registry.ts';
+import { trialInputSchema } from '../lib/party-forge/contracts.ts';
+import { scoreTrial } from '../lib/party-forge/score.ts';
+void test('both verified eliminations complete the room before 60 seconds; partial or premature claims fail',async()=>{
+ let now=100000,sequence=0;
+ let record=joinRoom(createRoomRecord('early-room','one','One',now),'two','Two',now);
+ const dispatch=async(actor,type,fields={})=>reduceRoom(record,actor,{protocolVersion:'party-forge/1',commandId:`early-${++sequence}`,expectedRevision:record.snapshot.revision,type,...fields},now,{resolve:async request=>({status:'playable',manifest:await cachedInstructionDemo(request.contributions)})});
+ const apply=async(actor,type,fields={})=>{const result=await dispatch(actor,type,fields);assert.equal(result.receipt.status,'accepted',JSON.stringify(result.receipt));record=result.record;};
+ for(const [actor,text] of [['one','Snake'],['two','Space invader']])await apply(actor,'choose-initial',{choice:{slot:'instruction',cardId:'instruction',text}});
+ await apply('one','retry-forge');
+ const build=record.snapshot.build.manifest;
+ for(const actor of ['one','two'])await apply(actor,'acknowledge-build',{buildId:build.buildId,buildHash:build.contentHash});
+ await apply('one','start-round');
+ const round=record.snapshot.round,run=await createRetainedRuntime(build,round.seed),frames=[];
+ while(run.snapshot().state.gameOver!==true){const frame={tick:frames.length,buttons:0,yaw:0,pitch:0};frames.push(frame);run.input(frame);run.step();}
+ assert.ok(frames.length<3600);
+ const trial={protocolVersion:'party-forge/1',roundId:round.roundId,buildId:build.buildId,buildHash:build.contentHash,seed:round.seed,attemptId:'early-one',frames,endedEarly:true};
+ assert.equal(trialInputSchema.safeParse({...trial,endedEarly:undefined}).success,false);
+ await assert.rejects(scoreTrial(build,round,{...trial,frames:frames.slice(0,-1)}),/three replay-verified/);
+ now=round.startsAt;
+ assert.equal((await dispatch('one','submit-trial',{trial})).receipt.status,'rejected');
+ now=round.startsAt+Math.ceil(frames.length*1000/60)+1;
+ await apply('one','submit-trial',{trial});assert.equal(record.snapshot.phase,'playing');
+ await apply('two','submit-trial',{trial:{...trial,attemptId:'early-two'}});
+ assert.equal(record.snapshot.phase,'results');assert.ok(now<round.submissionDeadline);
+ assert.equal(record.snapshot.lastCompleted.results.length,2);
+ assert.ok(record.snapshot.lastCompleted.results.every(result=>result.hits===3));
+ console.log(`Round finalized after ${Math.ceil(frames.length/60)} seconds, without padding input`);
+});

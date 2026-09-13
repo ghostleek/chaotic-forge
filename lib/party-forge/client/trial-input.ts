@@ -76,8 +76,8 @@ export class TrialInputCapture {
     this.frames.push(frame);
     return frame;
   }
-  trial(round: FrozenRound, attemptId: string): TrialInput {
-    if (this.frames.length !== DEMO_POLICY.trialTicks)
+  trial(round: FrozenRound, attemptId: string, endedEarly = false): TrialInput {
+    if (this.frames.length !== DEMO_POLICY.trialTicks && !(endedEarly && this.frames.length > 0))
       throw new Error('An incomplete trace cannot be submitted.');
     return {
       protocolVersion: PROTOCOL_VERSION,
@@ -86,6 +86,7 @@ export class TrialInputCapture {
       buildHash: round.buildHash,
       attemptId,
       seed: round.seed,
+      ...(endedEarly ? {endedEarly: true as const} : {}),
       frames: this.frames.map((frame) => ({ ...frame })),
     };
   }

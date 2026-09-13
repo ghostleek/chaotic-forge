@@ -409,10 +409,11 @@ export const trialInputSchema = z
     buildHash: hash,
     attemptId: id,
     seed: integer.max(0xffffffff),
-    frames: z.array(inputFrameSchema).length(DEMO_POLICY.trialTicks),
+    frames: z.array(inputFrameSchema).min(1).max(DEMO_POLICY.trialTicks),
+    endedEarly: z.literal(true).optional(),
   })
   .refine(
-    (t) => t.frames.every((frame, i) => frame.tick === i),
+    (t) => (t.frames.length === DEMO_POLICY.trialTicks || t.endedEarly === true) && t.frames.every((frame, i) => frame.tick === i),
     'Every tick must appear exactly once in order',
   );
 export type TrialInput = z.infer<typeof trialInputSchema>;
