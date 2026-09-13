@@ -149,26 +149,20 @@ attempt ID and canonical trace hash. PC-03 must establish participant identity,
 check deadlines and enforce a single accepted attempt, then use PC-01 ranking
 and tie/editor rules. This function does not award room permissions.
 
-## Parallel development checkpoint
+## Accepted integration base
 
 PC-02 is [issue #31](https://github.com/ghostleek/chaotic-forge/issues/31).
-Development is isolated on `codex/pc-02-kitchen-runtime`, based on the committed
-planning baseline `c6a8fe4d29c7ae76ee6e57f7a826308b151fdd9b`, while
-[PC-01 #30](https://github.com/ghostleek/chaotic-forge/issues/30) is implemented
-concurrently. No accepted PC-01 parent SHA or PR is claimed at this checkpoint.
-PC-01 now has [draft PR #41](https://github.com/ghostleek/chaotic-forge/pull/41),
-with inspected checkpoint `26fae35e53299b3e1de757ebb292e59fabe4c94a`; its human
-acceptance and deployed-host proof remain pending. This is dependency tracking,
-not acceptance of that draft as PC-02's integration base.
-The temporary worktree reads PC-01's draft `contracts.ts` via a local symlink;
-that symlink is not part of the PC-02 change. Shared contracts/configuration and
-the original checkout are left to PC-01. Before integration, replace that local
-dependency by rebasing onto the explicitly accepted parent, record its SHA/PR,
-and rerun the exact quality gates plus the accepted Worker checks. Do not merge
-this checkpoint independently of that foundation.
-The PC-02 source is now committed locally; the persistent worktree is in this
-task's workspace, outside PC-01's checkout. The contract used for current checks
-has SHA-256 `daf0fe513bbc06e96d7f9090dcbbeac4ef6ac39abdd8ce68562ed3ee6b04fb04`.
+Development is isolated on `codex/pc-02-kitchen-runtime` in a persistent
+worktree outside PC-01's checkout. [PC-01 #30](https://github.com/ghostleek/chaotic-forge/issues/30)
+is closed and [PR #41](https://github.com/ghostleek/chaotic-forge/pull/41) is
+merged. PC-02 is rebased onto its main-branch merge commit
+`2a842d704a0f9a9757a793d6ad7f77282f42f752`.
+The shared `contracts.ts` is now the tracked parent file; the temporary draft
+symlink has been removed. Its SHA-256 remains
+`daf0fe513bbc06e96d7f9090dcbbeac4ef6ac39abdd8ce68562ed3ee6b04fb04`.
+The rebase preserved both implementation commits without patch changes. The
+incremental diff contains only PC-02-owned runtime, resolver and test files;
+shared contracts/configuration and the original checkout belong to PC-01.
 
 Node 24 is required. The packet tests are
 `node --test --experimental-strip-types tests/party-runtime.test.mjs tests/party-build.test.mjs`.
@@ -181,16 +175,19 @@ compatibility and deterministic local execution, not hosted room durability.
 
 - `npm run lint` passes with the repository rules; no shared lint configuration
   or legacy assertions changed. Worker tooling loads lazily inside its test.
-- `npm run build` passes using this branch's planning-baseline Next build.
-- `npm test` passed all 63 Node tests and all 20 desktop/mobile Chrome golden
-  tests. An earlier intermittent desktop Explore failure did not recur in the
-  complete rerun; no assertion was skipped or weakened.
-- Independent adversarial review found no remaining P1/P2 findings after
-  qualification-hash and immutable-parent fixes, including the PC-01 adapter.
-- Post-review lint/build and all 41 focused PC-02 tests pass. Those tests cover
-  all 128 ordered recipe histories, exact executable bytes, complete bounded
-  witnesses and actual Node/Chrome/workerd parity.
+- `npm run build` passes using the merged PC-01 Vinext Cloudflare Worker build,
+  including its entrypoint, assets, Site identity, DB binding and migration checks.
+- `npm test` passed all 93 Node tests and all 20 desktop/mobile Chrome golden
+  tests against the built Worker. No assertion was skipped or weakened.
+- `npm run db:migrate:local` and `npm run test:party` pass. The latter verifies
+  separate browser contexts, concurrent revision writes, and persistence across
+  a Worker restart using real local D1.
+- Independent adversarial review of the rebased incremental diff found no
+  remaining P1/P2 findings, including the PC-01 adapter, qualification-hash and
+  immutable-parent protections. Its separate non-network run passed 40 tests.
+- Post-review lint, Worker build and all 41 focused PC-02 tests pass.
 
-These are local checks against the identified PC-01 contract, not acceptance of
-PC-01 or a combined deployed build. Rebase and rerun the accepted foundation's
-Worker build and relevant quality gates before marking the dependent PR ready.
+These checks cover the combined local branch on the merged foundation. They do
+not establish deployed Site access or online multiplayer product acceptance.
+The focused PC-02 suite covers all 128 ordered recipe histories, exact executable
+bytes, complete bounded witnesses and actual Node/Chrome/workerd parity.
