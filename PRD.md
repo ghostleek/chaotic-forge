@@ -1,5 +1,7 @@
 # Forge — competitive game creation
 
+**Accepted standalone supplement — 13 September 2026:** [PC-12 Dino × Mario](./docs/issues/PC-12.md) introduces a one-input authored runner with stomp bounce as the default simulated onboarding example. It preserves the party recipe, reference corpus and live-generation target. Play is local and does not call AI.
+
 **Version:** 0.4 · **Updated:** 13 September 2026
 **Status:** Current demo simplified to one fixed authored recipe and deterministic additions; no mixed-hand dealing or swapping. Broader open-deck generation below is deferred target direction. See the latest demo decision immediately below.
 **Promise:** “My friends and I made a surprising game together—and we can play it again.”
