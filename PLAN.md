@@ -119,3 +119,11 @@ PC-09 cannot be marked fulfilled by PC-01–08. A pending capability, unsupporte
 ## Planning validation
 
 This change authors a PRD delivery plan and issue specifications. GitHub publication status is recorded in the issue index. It does not implement the party game, provision, deploy, or report a fresh runtime quality pass. The previous plan is preserved byte-for-byte in the dated archive. Its historical relative-link base and path mappings are recorded in the archive README and manifest.
+
+## Latest decision — authenticated API access and saved permutations (13 September 2026)
+
+Paid generation requires BYOK unless ChatGPT-authenticated email is exactly kahhow@string.sg, leekahhow@gmail.com or lancetyw@gmail.com (case-normalized). Those admins may use the site key. This supersedes broader sponsored trials. Public saved-demo play makes no API call. Never accept client-provided identity as authorization.
+
+Current party creation uses GPT-6 Astra Responses structured rules; separate Agents code creation stays disabled until a supervised runner is qualified. Exact Snake/Invaders two- and three-player permutations reuse saved output; custom modifiers do not silently match. Starter buttons prefill with visible help and require confirmation. Preserve provenance and deterministic replay.
+
+Implementation/release packet: PC-09 supplement on current production base d766b394958dd6518d664b04e5f41cd00a2bca9f, preserving existing PC-03/05/06 runtime and migrations. Human owners Kahhow (UX) and Lance (backend/shared files); implementer Codex; independent review required. Allowed files: creator/auth routes, generation funding/resolver, starter UI, appended schema migration, focused tests, this guidance and mini PRD. No new GitHub issue/PR verified. Existing source dependencies remain; Agents runner is optional/disabled fallback. Run QUALITY.md gates and real Worker tests before release. Timebox: this deployment session; cut is public saved play plus protected Responses generation, with Agents disabled. Roll back Site version without dropping stored data.

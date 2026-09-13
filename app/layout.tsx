@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Mechanic Forge — Find patterns worth testing',
@@ -14,7 +15,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <nav
+          aria-label="Creator access"
+          style={{ padding: '10px 20px', display: 'flex', gap: 20 }}
+        >
+          <Link href="/explore">Mechanic lab</Link>
+          <Link href="/forge/create">Sign in / API access</Link>
+          <Link href="/play/snake-space-invaders">
+            Free Snake × Invaders demo
+          </Link>
+        </nav>
+        {children}
+      </body>
     </html>
   );
 }
