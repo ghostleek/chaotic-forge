@@ -72,7 +72,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
   return (
     <main className={styles.root}>
       <header>
-        <Link href="/party" className={styles.wordmark}>
+        <Link href="/" className={styles.wordmark}>
           CHAOTIC
           <br />
           FORGE /
