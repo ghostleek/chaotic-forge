@@ -4,7 +4,6 @@ import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import ts from 'typescript';
 import { chromium } from '@playwright/test';
-import { Miniflare } from 'miniflare';
 import { additionOptions, recipeFromContributions } from '../lib/party-forge/cards.ts';
 import { resolveBuild } from '../lib/party-forge/resolve-build.ts';
 import { loadBuild, manifestHash, qualifyBuild, retainedQualification } from '../lib/party-forge/validate-build.ts';
@@ -249,6 +248,9 @@ void test('PC01 synchronous score validation stays bound to its verified manifes
 
 void test('retained executable replays identical full snapshots in Node, Chrome and workerd', { timeout: 120_000 }, async () => {
   const retained = await readFile(new URL('../lib/party-forge/runtimes/kitchen-chaos-v1/retained/engine.js', import.meta.url), 'utf8');
+  // Load Worker tooling only for this check. Resolving its package URL keeps
+  // Miniflare's development declarations out of the application's type graph.
+  const { Miniflare } = await import(import.meta.resolve('miniflare'));
   const worker = new Miniflare({ compatibilityDate: '2026-05-15', modulesRoot: '/',
     modules: [
       { type: 'ESModule', path: '/worker.js', contents: 'import { replayRuntime } from "./engine.js"; export default { async fetch(request) { const {recipe,seed,frames} = await request.json(); return Response.json(replayRuntime(recipe,seed,frames)); } };' },

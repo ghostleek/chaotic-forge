@@ -101,6 +101,17 @@ packets. This module alone establishes neither online play nor durable saves.
 
 ## Resolver, qualification and scoring integration
 
+`await createPartyRuntime(manifest, seed)` in `adapter.ts` implements PC-01's
+`PartyRuntime` envelope. It verifies the manifest once, then accepts exactly one
+`input(frame)` followed by one `step()`. Missing, duplicate or out-of-order input
+cannot advance the clock. `snapshot()` returns a frozen, detached envelope with
+the typed Kitchen Chaos payload in `state`; `isComplete()` reports the fixed
+trial boundary. Synchronous `reset(manifest, seed)` accepts only the same verified
+manifest and clears pending input. Use a new async factory to load another
+build. `validateScore(manifest, trial)` replays the bound build independently of
+the active presentation state; use `scoreTrial` below when validating against a
+frozen room round.
+
 `resolveBuild({ contributions, previous? })` consumes PC-01 contribution history.
 It produces a preset manifest or an explicit incompatible result retaining the
 previous manifest. Initial resolution requires three supported slots; evolution
@@ -145,12 +156,19 @@ Development is isolated on `codex/pc-02-kitchen-runtime`, based on the committed
 planning baseline `c6a8fe4d29c7ae76ee6e57f7a826308b151fdd9b`, while
 [PC-01 #30](https://github.com/ghostleek/chaotic-forge/issues/30) is implemented
 concurrently. No accepted PC-01 parent SHA or PR is claimed at this checkpoint.
+PC-01 now has [draft PR #41](https://github.com/ghostleek/chaotic-forge/pull/41),
+with inspected checkpoint `26fae35e53299b3e1de757ebb292e59fabe4c94a`; its human
+acceptance and deployed-host proof remain pending. This is dependency tracking,
+not acceptance of that draft as PC-02's integration base.
 The temporary worktree reads PC-01's draft `contracts.ts` via a local symlink;
 that symlink is not part of the PC-02 change. Shared contracts/configuration and
 the original checkout are left to PC-01. Before integration, replace that local
 dependency by rebasing onto the explicitly accepted parent, record its SHA/PR,
 and rerun the exact quality gates plus the accepted Worker checks. Do not merge
 this checkpoint independently of that foundation.
+The PC-02 source is now committed locally; the persistent worktree is in this
+task's workspace, outside PC-01's checkout. The contract used for current checks
+has SHA-256 `daf0fe513bbc06e96d7f9090dcbbeac4ef6ac39abdd8ce68562ed3ee6b04fb04`.
 
 Node 24 is required. The packet tests are
 `node --test --experimental-strip-types tests/party-runtime.test.mjs tests/party-build.test.mjs`.
@@ -158,3 +176,21 @@ The build suite compares full retained-engine snapshots across Node, Chrome and
 local Cloudflare workerd for all eight maximal-addition recipes. Browser/Worker
 checks require local listeners and Chrome process access. This proves module
 compatibility and deterministic local execution, not hosted room durability.
+
+## Local verification checkpoint — 13 September 2026
+
+- `npm run lint` passes with the repository rules; no shared lint configuration
+  or legacy assertions changed. Worker tooling loads lazily inside its test.
+- `npm run build` passes using this branch's planning-baseline Next build.
+- `npm test` passed all 63 Node tests and all 20 desktop/mobile Chrome golden
+  tests. An earlier intermittent desktop Explore failure did not recur in the
+  complete rerun; no assertion was skipped or weakened.
+- Independent adversarial review found no remaining P1/P2 findings after
+  qualification-hash and immutable-parent fixes, including the PC-01 adapter.
+- Post-review lint/build and all 41 focused PC-02 tests pass. Those tests cover
+  all 128 ordered recipe histories, exact executable bytes, complete bounded
+  witnesses and actual Node/Chrome/workerd parity.
+
+These are local checks against the identified PC-01 contract, not acceptance of
+PC-01 or a combined deployed build. Rebase and rerun the accepted foundation's
+Worker build and relevant quality gates before marking the dependent PR ready.
