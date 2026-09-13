@@ -5,14 +5,14 @@ export function qualificationPreflight(
   const keyPresent = Boolean(environment.OPENAI_API_KEY?.trim());
   const blockers = [
     ...(!keyPresent ? ['OPENAI_API_KEY is not configured'] : []),
-    'Actual Agents API access has not been verified',
-    'Live time/spend policy and enforcement must be accepted before paid jobs',
-    'A bounded isolated execution service for generated score validation is not qualified',
+    'This offline check cannot verify Agents API access; consult the recorded live run',
+    'This offline check cannot verify accepted time/spend policy or its enforcement',
+    'Production CPU/memory isolation and independent score validation remain unqualified',
   ];
   return {
     packet: 'PC-09A',
-    baseline: '2a842d704a0f9a9757a793d6ad7f77282f42f752',
-    parentPullRequest: 'https://github.com/ghostleek/chaotic-forge/pull/41',
+    baseline: '7666e96ac22d0a9588ca159c15cd87457671a7e8',
+    parentPullRequest: 'https://github.com/ghostleek/chaotic-forge/pull/42',
     apiKeyPresent: keyPresent,
     modelRequestsMade: 0,
     readyForLiveGeneration: false,
