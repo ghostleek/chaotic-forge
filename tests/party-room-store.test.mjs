@@ -104,7 +104,7 @@ const aborted = (id = 'evolution-a') => ({
   abortedAt: 1_000_001,
 });
 
-test('the appended SQLite migration preserves existing platform room rows', async (t) => {
+void test('the appended SQLite migration preserves existing platform room rows', async (t) => {
   const snapshot = makeRoom('legacy-platform-room');
   snapshot.revision = 7;
   const db = sqliteD1(t, (sqlite) => {
@@ -147,7 +147,7 @@ function joinGuest(record) {
   return next;
 }
 
-test('SQLite bootstrap retry is privately scoped and cannot enroll on a lost room insert', async (t) => {
+void test('SQLite bootstrap retry is privately scoped and cannot enroll on a lost room insert', async (t) => {
   const db = sqliteD1(t);
   const first = room();
   assert.equal(await createRoomRecord(db, first, host), true);
@@ -185,7 +185,7 @@ test('SQLite bootstrap retry is privately scoped and cannot enroll on a lost roo
   assert.equal(row.snapshot.includes(host.capabilityHash), false);
 });
 
-test('lost SQLite CAS appends no history, receipt, or participant and rejected retries remain identical', async (t) => {
+void test('lost SQLite CAS appends no history, receipt, or participant and rejected retries remain identical', async (t) => {
   const db = sqliteD1(t);
   const first = room();
   await createRoomRecord(db, first, host);
@@ -242,7 +242,7 @@ test('lost SQLite CAS appends no history, receipt, or participant and rejected r
   assert.equal((await loadRoomRecord(db, 'room-a')).snapshot.revision, 1);
 });
 
-test('a later SQLite statement failure rolls back the room CAS, receipt, and history together', async (t) => {
+void test('a later SQLite statement failure rolls back the room CAS, receipt, and history together', async (t) => {
   const db = sqliteD1(t);
   const first = room();
   await createRoomRecord(db, first, host);
@@ -270,7 +270,7 @@ test('a later SQLite statement failure rolls back the room CAS, receipt, and his
   });
 });
 
-test('a concurrent heartbeat prevents stale host removal and preserves monotonic presence', async (t) => {
+void test('a concurrent heartbeat prevents stale host removal and preserves monotonic presence', async (t) => {
   const db = sqliteD1(t);
   const first = room();
   await createRoomRecord(db, first, host);
@@ -323,7 +323,7 @@ test('a concurrent heartbeat prevents stale host removal and preserves monotonic
   });
 });
 
-test('history pages never split and lose entries committed in the same revision', async (t) => {
+void test('history pages never split and lose entries committed in the same revision', async (t) => {
   const db = sqliteD1(t);
   let record = room();
   await createRoomRecord(db, record, host);

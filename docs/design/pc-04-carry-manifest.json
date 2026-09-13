@@ -1,0 +1,383 @@
+{
+  "base": "e529e74c7cbff5e63db7184734f553ae559bb27d",
+  "sourceCheckoutBase": "2a842d704a0f9a9757a793d6ad7f77282f42f752",
+  "branch": "codex/pc-04-room-cards",
+  "scope": "Local uncommitted reconciliation snapshot; not a PR or integration acceptance",
+  "pending": "Avatar task remains active; re-capture its final integration/swat output before committing or opening a PR.",
+  "excluded": [
+    "AGENTS.md and unrelated issue/planning edits",
+    "lib/party-forge/gesture/**",
+    "tests/party-gesture.test.mjs",
+    "tests/browser/party-gesture.spec.ts",
+    "docs/party-gesture-feasibility.md",
+    "unrelated docs/research/**",
+    "all shared API/runtime/schema/package/config overrides"
+  ],
+  "files": [
+    {
+      "path": "PRD.md",
+      "sourceTask": "product",
+      "sha256": "e9b203ccf870bbada52aaf1423f4c23eeef9e31bea144488c76855493c215b0e"
+    },
+    {
+      "path": "components/party-forge/README.md",
+      "sourceTask": "avatars",
+      "sha256": "8b2900148f8a347fe6ec47bbe1c5cdc3b050ca666820a4b968614cea9f0296b3"
+    },
+    {
+      "path": "components/party-forge/room-status.module.css",
+      "sourceTask": "avatars",
+      "sha256": "b9394cb8fb8a53fae824c113703ac68cbe92bfb08bf4eb30e06fafa046505dc2"
+    },
+    {
+      "path": "components/party-forge/room-status.tsx",
+      "sourceTask": "avatars",
+      "sha256": "d25df51889a48f516fb1d6a7814e1124199c405c270d2825b873ac9e183f5841"
+    },
+    {
+      "path": "docs/card-catalog.md",
+      "sourceTask": "product",
+      "sha256": "40fa54eb78927be14b58926aedc5ef15a356923110f59940dbc299480d01bb00"
+    },
+    {
+      "path": "docs/design/avatars/calico.svg",
+      "sourceTask": "avatars",
+      "sha256": "95b90437cb1c489e150b154e819c5f7b9fdcd7afc7a7d05f87a000c9ab24fbf1"
+    },
+    {
+      "path": "docs/design/avatars/cloud.svg",
+      "sourceTask": "avatars",
+      "sha256": "f0809daa1c5f0059eb2e2b607f46bac5a3565e2ec28ccfa7ca8d84c17739ab59"
+    },
+    {
+      "path": "docs/design/avatars/lilac.svg",
+      "sourceTask": "avatars",
+      "sha256": "83df9e118e22df137f5668f501964173925de7c47c26b56e78f7e1d0598fa123"
+    },
+    {
+      "path": "docs/design/avatars/marmalade.svg",
+      "sourceTask": "avatars",
+      "sha256": "8d650a423b11489c3dea18f2efe815f9a4d68d085f624e63d0ca7d480187fcd1"
+    },
+    {
+      "path": "docs/design/avatars/midnight.svg",
+      "sourceTask": "avatars",
+      "sha256": "07d2ec836898e35cc3b47e1ab16469cd874e1e9bea8e50e86c6fbebecc9c90f7"
+    },
+    {
+      "path": "docs/design/avatars/tuxedo.svg",
+      "sourceTask": "avatars",
+      "sha256": "1039e597608dba15155dd3a6b0dabc42286544abe2faacf3e63c3754d25757ee"
+    },
+    {
+      "path": "docs/design/pc-04-cards/README.md",
+      "sourceTask": "cards",
+      "sha256": "83d27a5d178c2287ba947c883c4fa5c20f6649afd8ea3fa9f5caf1d8e22de2ca"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/avatars/lilac-3d.svg",
+      "sourceTask": "cards",
+      "sha256": "128f3c59d53ffaa7679f9f042e4ec92dd2129f349127cfc05e3de8121f47ca48"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/avatars/lilac.svg",
+      "sourceTask": "cards",
+      "sha256": "83df9e118e22df137f5668f501964173925de7c47c26b56e78f7e1d0598fa123"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/avatars/marmalade-3d.svg",
+      "sourceTask": "cards",
+      "sha256": "3b2b7277a2d2b1f64c2355cd451a9b7791bd8f35207bb758b403151c4e7a409d"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/avatars/marmalade.svg",
+      "sourceTask": "cards",
+      "sha256": "8d650a423b11489c3dea18f2efe815f9a4d68d085f624e63d0ca7d480187fcd1"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/avatars/tuxedo-3d.svg",
+      "sourceTask": "cards",
+      "sha256": "d2b77ccae943c9966151e283c98ee46ca93e4f673c02495f3dce54312bc52f51"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/avatars/tuxedo.svg",
+      "sourceTask": "cards",
+      "sha256": "1039e597608dba15155dd3a6b0dabc42286544abe2faacf3e63c3754d25757ee"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/shared-world-exploration.png",
+      "sourceTask": "cards",
+      "sha256": "6dbdf6c45baf298ac2f62a911f339d0d4da9c6a377f223503cd25f446eb40362"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/typography-exploration.png",
+      "sourceTask": "cards",
+      "sha256": "5ebea414ceef6a06cd08e99eb3e069b31f74b4bd827131bfb9bf0a9a3101e099"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/world-2d.svg",
+      "sourceTask": "cards",
+      "sha256": "a732eb3dfadb003294bce5e647832749ba7f5a8bc52474e948b357bf7e326ec8"
+    },
+    {
+      "path": "docs/design/pc-04-cards/assets/world-3d.svg",
+      "sourceTask": "cards",
+      "sha256": "f0fae1e328f6a9c35eb31ee4011bdf2254f11ac4f205742276acc13b3031710b"
+    },
+    {
+      "path": "docs/design/pc-04-cards/browser-check.mjs",
+      "sourceTask": "cards",
+      "sha256": "8c15e2d3cac6cc6f586cf76a493d436e24ef29f650456edf4628bdb9cc55c9ce"
+    },
+    {
+      "path": "docs/design/pc-04-cards/cards.css",
+      "sourceTask": "cards",
+      "sha256": "1e9c44e3a9ef4fe477a2f8a5fd5dff126cf6af99263b5b880a0d93a0e6664504"
+    },
+    {
+      "path": "docs/design/pc-04-cards/concepts.js",
+      "sourceTask": "cards",
+      "sha256": "0ece3f2b5e29bd4c091cad960ab144eea07bd3034f85bf331380797047aa791f"
+    },
+    {
+      "path": "docs/design/pc-04-cards/demo-choices.js",
+      "sourceTask": "cards",
+      "sha256": "6e36b5f2dbb6bd5247393ee2c51d9243848312a5866a19b70c4e5f7a4916da3a"
+    },
+    {
+      "path": "docs/design/pc-04-cards/demo-combinations.json",
+      "sourceTask": "cards",
+      "sha256": "3aac3d231bbac6081bfb5f175cd1d91d9b1cc9b0625113e6d61b5595358ef010"
+    },
+    {
+      "path": "docs/design/pc-04-cards/demo-combinations.md",
+      "sourceTask": "cards",
+      "sha256": "bd0f5b469e912148b63a065905461b7ee0c60b128ab4e7aa4fbece573f707343"
+    },
+    {
+      "path": "docs/design/pc-04-cards/forge-card.js",
+      "sourceTask": "cards",
+      "sha256": "eadd5867ab234f4f8379e6ce6a153b260d88c57b3e0eda7b99ec9d251027a2d7"
+    },
+    {
+      "path": "docs/design/pc-04-cards/hero-swat-check.mjs",
+      "sourceTask": "cards",
+      "sha256": "bd91c5da4a808a31fbfaba71434fe78464f4ca7ab8e96eb3b3e3758034a90c83"
+    },
+    {
+      "path": "docs/design/pc-04-cards/hero-swat.css",
+      "sourceTask": "cards",
+      "sha256": "33107fcfc97b1511778cd68c728ec54208ca9f533cd7c500b8d8ee2d6ddc997b"
+    },
+    {
+      "path": "docs/design/pc-04-cards/hero-swat.js",
+      "sourceTask": "cards",
+      "sha256": "0cb147d4f2c41ca32f282bf870e6dfd7a2c5a7b2dbb9b98959e98eddfc4727eb"
+    },
+    {
+      "path": "docs/design/pc-04-cards/image-prompts.md",
+      "sourceTask": "cards",
+      "sha256": "3fdc9752148c3f8619fa9d7d13a0fe0202a5df1140860d318b4bbd7c94896c03"
+    },
+    {
+      "path": "docs/design/pc-04-cards/index.html",
+      "sourceTask": "cards",
+      "sha256": "e24b01ea6f3eca633fc8e89b72276634a9a0a50362a2fda722c68881216ec1e5"
+    },
+    {
+      "path": "docs/design/pc-04-cards/mini-demos.js",
+      "sourceTask": "cards",
+      "sha256": "b34bf457beb0dff3650f00f5af63e07e46e9377cd07ac53c80d2b637c0324c02"
+    },
+    {
+      "path": "docs/design/pc-04-cards/onboarding-check.mjs",
+      "sourceTask": "cards",
+      "sha256": "dd62b117c3af5afabd4edb13d1652530692dcab3d9b595f416c46c026385f6db"
+    },
+    {
+      "path": "docs/design/pc-04-cards/onboarding.css",
+      "sourceTask": "cards",
+      "sha256": "0acdfb322bc0b8288e9c1847ad2f48e212e6df33ef3d7c278248cc535053d1e9"
+    },
+    {
+      "path": "docs/design/pc-04-cards/onboarding.js",
+      "sourceTask": "cards",
+      "sha256": "62628a9f9b651b96c15eba20553ddf0f737ca588b042ae6a2125617dec1fa43e"
+    },
+    {
+      "path": "docs/design/pc-04-cards/play.html",
+      "sourceTask": "cards",
+      "sha256": "91076264fae7e2ed00a91bf972e4d359552834df4cabaf6e939706c7c6bd9a2c"
+    },
+    {
+      "path": "docs/design/pc-04-cards/player-wait.css",
+      "sourceTask": "cards",
+      "sha256": "de81d68a03cd91b4b786dae82cf861774bd72659a2729a0b78be23f0524a383c"
+    },
+    {
+      "path": "docs/design/pc-04-cards/player-wait.js",
+      "sourceTask": "cards",
+      "sha256": "52b8546a72b4048137454603e165f87b2e90f1da749fb7c6e2badc7353bfa94c"
+    },
+    {
+      "path": "docs/design/pc-04-cards/presentation.css",
+      "sourceTask": "cards",
+      "sha256": "76b1573f24580cf66b5b12c3d2f2eff94bbd655917642d10efbbaba279b2c492"
+    },
+    {
+      "path": "docs/design/pc-04-cards/presentation.js",
+      "sourceTask": "cards",
+      "sha256": "486a6d960a0f02c0c32303fe627c60e2afe38026fb13b5653b93bdac5273eb36"
+    },
+    {
+      "path": "docs/design/pc-04-cards/study.css",
+      "sourceTask": "cards",
+      "sha256": "6ffd635c73db879abadc75200d59e965b809b084ce42da23595e52c6978ee755"
+    },
+    {
+      "path": "docs/design/pc-04-cards/study.js",
+      "sourceTask": "cards",
+      "sha256": "a3d34c9f815219b942c9e2a6e1966fa2d0bea1ae993d925f4675fe860e3f0590"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification.md",
+      "sourceTask": "cards",
+      "sha256": "2a37b699167c305b12bb43cbdd227698f1da703e5bca3d46e15fc51bc7d08793"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/card-inspect-mobile.png",
+      "sourceTask": "cards",
+      "sha256": "15610b765a860563f20ff0e5fc0a282243385a6ffdb079f02ad2abf3667af04c"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/card-table-desktop.png",
+      "sourceTask": "cards",
+      "sha256": "11472745f0070019724216677c69717b44c1f43528eecb1515c5f66454ffa278"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/cat-wait-desktop.png",
+      "sourceTask": "cards",
+      "sha256": "1303d82f531ce59e8d834d826c1ef9393ad31f10bde0ef10d7a3db495222c4a5"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/cat-wait-mobile.png",
+      "sourceTask": "cards",
+      "sha256": "4bf9bbc9d8790a6161ae936bfc2f81f0abb35fb9ab9b0ed94d9f7ce4121d851f"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/clean-table-1440.png",
+      "sourceTask": "cards",
+      "sha256": "ac2faf4e5caea1832243223c60a2d70bdb41e9df1847d2bce1d93f0f54b4469c"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/clean-table-390.png",
+      "sourceTask": "cards",
+      "sha256": "104e4e08e7a62dc36ec46e213b71a96ef8198391de99349e11c74ebad1325db7"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/hero-swat-contact.png",
+      "sourceTask": "cards",
+      "sha256": "b040f302d82fb77f435812e5a0c59ac69d0c3423dced77a69360054a931a0839"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/hero-swat-mobile-reduced.png",
+      "sourceTask": "cards",
+      "sha256": "192727340fd7ea84903f600c0c2e4e3c0c6286da6479cabc29c146e5d45d2d70"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/onboarding-desktop.png",
+      "sourceTask": "cards",
+      "sha256": "202622624f3367f761e752a3b93233deea56ce043073f03a0b93c529d52ebfe1"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/onboarding-mobile.png",
+      "sourceTask": "cards",
+      "sha256": "fffcdc45f62d1f2e3085c5702d9cbf42b0c5e5b09936cf1be2d318eb4ca77baa"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/site-2d-1440.png",
+      "sourceTask": "cards",
+      "sha256": "6b5e97f7b3ebb92371f55b1d55ab8f02cba821f6e5eb0b82e6da00e6c86b984a"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/site-2d-390.png",
+      "sourceTask": "cards",
+      "sha256": "3aa160175bc4780ae60145f9ab7717bc348ec40f9e711dd645f3661c89c6b716"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/site-3d-1440.png",
+      "sourceTask": "cards",
+      "sha256": "5e9674d899d41bc3db5a1afe93449e0bd84dd986ba6b51c17b5a910223e94b10"
+    },
+    {
+      "path": "docs/design/pc-04-cards/verification/site-3d-390.png",
+      "sourceTask": "cards",
+      "sha256": "59c2b70e0a409db15eb53f251849fe37e659230b9fb3bca1286704fc8669e366"
+    },
+    {
+      "path": "docs/design/pc-04-cards/world-scene.js",
+      "sourceTask": "cards",
+      "sha256": "99b5882f6e29f33099b0d7daedbd6242a7e8c3c7a6a8a0d3d1ee1954a05a72f6"
+    },
+    {
+      "path": "docs/design/pc-04-player-wait-states.md",
+      "sourceTask": "avatars",
+      "sha256": "e5fd803075f7245d7971426c85b6363ffdd7f0fc4d8d083fd0ddd9479ebd525e"
+    },
+    {
+      "path": "docs/issues/PC-04.md",
+      "sourceTask": "reconciliation",
+      "sha256": "da92bb3429abb63666901e60f4f20fd954e1aff73ec4576912a92db784bfa3ec"
+    },
+    {
+      "path": "public/party-forge/avatars/calico.svg",
+      "sourceTask": "avatars",
+      "sha256": "95b90437cb1c489e150b154e819c5f7b9fdcd7afc7a7d05f87a000c9ab24fbf1"
+    },
+    {
+      "path": "public/party-forge/avatars/cloud.svg",
+      "sourceTask": "avatars",
+      "sha256": "f0809daa1c5f0059eb2e2b607f46bac5a3565e2ec28ccfa7ca8d84c17739ab59"
+    },
+    {
+      "path": "public/party-forge/avatars/lilac.svg",
+      "sourceTask": "avatars",
+      "sha256": "83df9e118e22df137f5668f501964173925de7c47c26b56e78f7e1d0598fa123"
+    },
+    {
+      "path": "public/party-forge/avatars/marmalade.svg",
+      "sourceTask": "avatars",
+      "sha256": "8d650a423b11489c3dea18f2efe815f9a4d68d085f624e63d0ca7d480187fcd1"
+    },
+    {
+      "path": "public/party-forge/avatars/midnight.svg",
+      "sourceTask": "avatars",
+      "sha256": "07d2ec836898e35cc3b47e1ab16469cd874e1e9bea8e50e86c6fbebecc9c90f7"
+    },
+    {
+      "path": "public/party-forge/avatars/tuxedo.svg",
+      "sourceTask": "avatars",
+      "sha256": "1039e597608dba15155dd3a6b0dabc42286544abe2faacf3e63c3754d25757ee"
+    },
+    {
+      "path": "tests/fixtures/party-ui/index.html",
+      "sourceTask": "avatars",
+      "sha256": "68d2dae4a589f776508a00d626ab14108742b3e23d905f8b258121ceefa04120"
+    },
+    {
+      "path": "tests/fixtures/party-ui/preview.mjs",
+      "sourceTask": "avatars",
+      "sha256": "ff058dd3979442089bc2cff9855105233cf9406a7a9340815d006f17cc3e1e98"
+    },
+    {
+      "path": "tests/fixtures/party-ui/preview.tsx",
+      "sourceTask": "avatars",
+      "sha256": "06430e50b717678e92206ac037df208eca2504f7cb7ef38fcb8b03f312656018"
+    },
+    {
+      "path": "tests/room-status.test.mjs",
+      "sourceTask": "avatars",
+      "sha256": "54e530b22844bb9e135d7fdc3f301344678d1a7fb0e621f36f58dd2e6ab2b996"
+    }
+  ]
+}

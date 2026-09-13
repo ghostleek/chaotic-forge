@@ -15,7 +15,7 @@ import {
   parseQualificationBudget,
 } from '../lib/party-forge/generation/benchmark.ts';
 
-test('qualification requires an initial mashup and two cumulative pairs of edits', () => {
+void test('qualification requires an initial mashup and two cumulative pairs of edits', () => {
   assert.deepEqual(
     BENCHMARK_STAGES.map((stage) => stage.contributions.length),
     [3, 5, 7],
@@ -49,7 +49,7 @@ test('qualification requires an initial mashup and two cumulative pairs of edits
   assert.equal(BENCHMARK_POLICY.adaptation, 'off');
 });
 
-test('benchmark attribution cannot masquerade as actual users or production manifests', () => {
+void test('benchmark attribution cannot masquerade as actual users or production manifests', () => {
   for (const stage of BENCHMARK_STAGES) {
     assert.equal(
       contributionHistorySchema.safeParse(stage.contributions).success,
@@ -82,7 +82,7 @@ test('benchmark attribution cannot masquerade as actual users or production mani
   );
 });
 
-test('malformed stages cannot omit witnesses, reuse edit roles or skip a remix', () => {
+void test('malformed stages cannot omit witnesses, reuse edit roles or skip a remix', () => {
   const invalid = [
     (stage) => {
       stage.expectedWitnessIds.pop();
@@ -110,7 +110,7 @@ test('malformed stages cannot omit witnesses, reuse edit roles or skip a remix',
   }
 });
 
-test('remix prompts preserve exact rules and require retained parent source without declaring success', () => {
+void test('remix prompts preserve exact rules and require retained parent source without declaring success', () => {
   const hash = `sha256:${'a'.repeat(64)}`;
   for (const stage of BENCHMARK_STAGES) {
     const prompt = buildBenchmarkPrompt(
@@ -143,7 +143,7 @@ test('remix prompts preserve exact rules and require retained parent source with
   }, TypeError);
 });
 
-test('spend and duration limits must be explicit, finite and positive before preparation', () => {
+void test('spend and duration limits must be explicit, finite and positive before preparation', () => {
   const valid = {
     spendCeilingUsd: 15,
     perJobSpendCeilingUsd: 5,

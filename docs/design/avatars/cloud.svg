@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="cloud-title cloud-desc">
+  <title id="cloud-title">Cloud the fluffy cat</title>
+  <desc id="cloud-desc">A soft cream cat with fluffy cheek tufts, small rounded ears and a contented smile. Original flat vector artwork authored by Codex.</desc>
+  <g stroke="#292735" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#F3E6CA" d="M43 88C31 94 25 107 25 121h78c0-14-6-27-18-33Z"/>
+    <path fill="#FFFAEC" stroke="none" d="m46 95 7 4 4-3 7 7 7-7 4 3 7-4 7 26H39Z"/>
+    <path fill="#F3E6CA" d="m26 47 1-26q1-7 7-2l15 14q15-5 30 0l15-14q6-5 7 2l1 26q7 8 6 17l7 7-10 3 6 9-12 1c-5 12-18 18-35 18S34 96 29 84l-12-1 6-9-10-3 7-7q-1-9 6-17Z"/>
+    <path fill="#DBB7A7" stroke="none" d="m34 29 1 17 10-8Zm60 0L83 38l10 8Z"/>
+    <path fill="#FFFAEC" stroke="none" d="m48 35 7 10 9-8 9 8 7-10q-16-7-32 0Z"/>
+    <path fill="none" d="M40 65q6-7 12 0m24 0q6-7 12 0"/>
+    <path fill="#DBB7A7" stroke="none" d="M34 74h11v5H34Zm49 0h11v5H83Z"/>
+    <path fill="#A4736F" stroke-width="2" d="m60 77 4 4 4-4Z"/>
+    <path fill="none" stroke-width="2.5" d="M64 81v3m0 0q-5 5-9 0m9 0q5 5 9 0M41 114v7m46-7v7"/>
+  </g>
+</svg>

@@ -44,7 +44,7 @@ const fixture = `
   };
 })();`;
 
-test(
+void test(
   'authored replay repeats all proposals, hashes full states and samples transitions without accepting behavior',
   { timeout: 40_000 },
   async () => {
@@ -79,7 +79,7 @@ test(
   },
 );
 
-test(
+void test(
   'authored source infinite loop is killed by the Node wall clock outside the renderer',
   { timeout: 15_000 },
   async () => {
@@ -103,7 +103,7 @@ test(
   },
 );
 
-test(
+void test(
   'authored fixture with oversized snapshot fails instead of crossing the output boundary',
   { timeout: 15_000 },
   async () => {
@@ -122,7 +122,7 @@ test(
   },
 );
 
-test(
+void test(
   'authored fixture with score-changing render fails qualification replay',
   { timeout: 15_000 },
   async () => {
@@ -141,7 +141,7 @@ test(
   },
 );
 
-test(
+void test(
   'observer uses captured serialization after authored source poisons JSON and inherited toJSON',
   { timeout: 20_000 },
   async () => {
@@ -164,7 +164,7 @@ test(
   },
 );
 
-test(
+void test(
   'source initialization error after defining a runtime remains a replay failure',
   { timeout: 20_000 },
   async () => {
@@ -181,7 +181,7 @@ test(
   },
 );
 
-test(
+void test(
   'startup Math.random state is rejected by fresh source initialization even when reset repeats match',
   { timeout: 30_000 },
   async () => {
@@ -208,7 +208,7 @@ test(
   },
 );
 
-test(
+void test(
   'incomplete reset remains detectable despite clean state after fresh source initialization',
   { timeout: 30_000 },
   async () => {
@@ -236,7 +236,7 @@ test(
   },
 );
 
-test(
+void test(
   'rebinding globalThis cannot replace the observer with forged output when no runtime exists',
   { timeout: 15_000 },
   async () => {

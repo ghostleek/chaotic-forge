@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="midnight-title midnight-desc">
+  <title id="midnight-title">Midnight the moon cat</title>
+  <desc id="midnight-desc">A navy cat with tall ears, a little cream crescent on its forehead and bright curious eyes. Original flat vector artwork authored by Codex.</desc>
+  <g stroke="#292735" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path fill="#515C83" d="M43 88C31 94 25 107 25 121h78c0-14-6-27-18-33Z"/>
+    <path fill="#8491B7" stroke="none" d="m48 96 16 7 16-7-4 25H52Z"/>
+    <path fill="#515C83" d="m25 48 1-33q0-7 5-2l17 20q16-6 32 0l17-20q5-5 5 2l1 33q9 11 6 26c-4 19-22 28-45 28S23 93 19 74q-3-15 6-26Z"/>
+    <path fill="#A799BC" stroke="none" d="m33 25 1 21 11-8Zm62 0L83 38l11 8Z"/>
+    <path fill="#F5E5BB" stroke="none" d="M69 36a10 10 0 1 0 5 16 9 9 0 0 1-5-16Z"/>
+    <ellipse cx="45" cy="66" rx="6.5" ry="7.5" fill="#F5E5BB" stroke="none"/>
+    <ellipse cx="83" cy="66" rx="6.5" ry="7.5" fill="#F5E5BB" stroke="none"/>
+    <ellipse cx="46" cy="66" rx="2.5" ry="5" fill="#292735" stroke="none"/>
+    <ellipse cx="84" cy="66" rx="2.5" ry="5" fill="#292735" stroke="none"/>
+    <path fill="#B9A6C3" stroke="none" d="m60 79 4 4 4-4Z"/>
+    <path fill="none" stroke="#CFD4E5" stroke-width="2.5" d="M64 83v2m0 0q-5 5-9 0m9 0q5 5 9 0M30 79l10 2m-10 6 10-1m58-7-10 2m10 6-10-1M41 114v7m46-7v7"/>
+  </g>
+</svg>

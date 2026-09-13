@@ -42,7 +42,7 @@ function candidate(stageId = 'initial', parent) {
 }
 const encode = (value) => Buffer.from(JSON.stringify(value));
 
-test('CLI rejects a FIFO before reading instead of waiting indefinitely for a writer', () => {
+void test('CLI rejects a FIFO before reading instead of waiting indefinitely for a writer', () => {
   const directory = mkdtempSync(join(tmpdir(), 'pc09a-intake-'));
   try {
     const fifo = join(directory, 'candidate.json');
@@ -71,7 +71,7 @@ test('CLI rejects a FIFO before reading instead of waiting indefinitely for a wr
   }
 });
 
-test('candidate intake hashes exact bytes while retaining every evidence limitation', () => {
+void test('candidate intake hashes exact bytes while retaining every evidence limitation', () => {
   const bytes = encode(candidate());
   const { report } = inspectCandidate(bytes, 'initial');
   assert.equal(report.artifactHash, sha256(bytes));
@@ -87,7 +87,7 @@ test('candidate intake hashes exact bytes while retaining every evidence limitat
   assert.equal(report.witnessProposals, 3);
 });
 
-test('each successive intake requires its exact predecessor and every retained/new witness', () => {
+void test('each successive intake requires its exact predecessor and every retained/new witness', () => {
   const initial = encode(candidate());
   const first = encode(candidate('remix-1', initial));
   const second = encode(candidate('remix-2', first));
@@ -133,7 +133,7 @@ test('each successive intake requires its exact predecessor and every retained/n
   }
 });
 
-test('intake rejects oversized bytes, invalid UTF8, extra claims, and incomplete/out-of-range traces', () => {
+void test('intake rejects oversized bytes, invalid UTF8, extra claims, and incomplete/out-of-range traces', () => {
   assert.throws(
     () => inspectCandidate(Buffer.alloc(MAX_CANDIDATE_BYTES + 1), 'initial'),
     /4 MiB/,
@@ -162,7 +162,7 @@ test('intake rejects oversized bytes, invalid UTF8, extra claims, and incomplete
   }
 });
 
-test('preflight never treats key presence as actual API/generation acceptance or exposes the key', () => {
+void test('preflight never treats key presence as actual API/generation acceptance or exposes the key', () => {
   const without = qualificationPreflight({});
   const withKey = qualificationPreflight({
     OPENAI_API_KEY: 'fixture-not-a-real-key',
@@ -174,7 +174,7 @@ test('preflight never treats key presence as actual API/generation acceptance or
   assert.ok(!JSON.stringify(withKey).includes('fixture-not-a-real-key'));
 });
 
-test('access probe makes no request without credentials and strips unrelated session contents', async () => {
+void test('access probe makes no request without credentials and strips unrelated session contents', async () => {
   let requests = 0;
   const fetchFixture = async (url, options) => {
     requests++;
@@ -211,7 +211,7 @@ test('access probe makes no request without credentials and strips unrelated ses
   assert.ok(!JSON.stringify(report).includes('do-not-retain'));
 });
 
-test('access probe fails closed on HTTP/transport/schema/size failures without logging response bodies', async () => {
+void test('access probe fails closed on HTTP/transport/schema/size failures without logging response bodies', async () => {
   const fixtures = [
     async () => new Response('fixture-secret', { status: 403 }),
     async () => {

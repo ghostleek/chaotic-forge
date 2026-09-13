@@ -47,7 +47,7 @@ import {
   validateMechanicCorpus,
 } from '../lib/mechanics/schema.ts';
 
-test('validation corpus has ten unique, versioned implementation cards', () => {
+void test('validation corpus has ten unique, versioned implementation cards', () => {
   assert.equal(VALIDATION_CORPUS.length, 10);
   assert.equal(new Set(VALIDATION_CORPUS.map((card) => card.id)).size, 10);
   assert.ok(
@@ -59,7 +59,7 @@ test('validation corpus has ten unique, versioned implementation cards', () => {
   assert.deepEqual(validateMechanicCorpus(VALIDATION_CORPUS), []);
 });
 
-test('catalog groups concrete implementations into stable game and mechanic paths', () => {
+void test('catalog groups concrete implementations into stable game and mechanic paths', () => {
   const games = buildGameCollections(VALIDATION_CORPUS);
   const returnal = findGameCollection(VALIDATION_CORPUS, 'returnal');
 
@@ -77,7 +77,7 @@ test('catalog groups concrete implementations into stable game and mechanic path
   );
 });
 
-test('dash adaptation changes one user rule while preserving every invariant', () => {
+void test('dash adaptation changes one user rule while preserving every invariant', () => {
   for (const option of DASH_RECHARGE_OPTIONS) {
     const experiment = buildDashExperiment(
       'Test aggressive movement',
@@ -94,7 +94,7 @@ test('dash adaptation changes one user rule while preserving every invariant', (
   }
 });
 
-test('dash exports retain provenance, diff, risks, and evidence plan', () => {
+void test('dash exports retain provenance, diff, risks, and evidence plan', () => {
   const experiment = buildDashExperiment();
   const markdown = serializeDashExperimentMarkdown(experiment);
   const json = JSON.parse(serializeDashExperimentJson(experiment));
@@ -112,7 +112,7 @@ test('dash exports retain provenance, diff, risks, and evidence plan', () => {
   assert.equal(json.risks.length, 2);
 });
 
-test('dash preview uses the same deterministic seed and resets exactly', () => {
+void test('dash preview uses the same deterministic seed and resets exactly', () => {
   const initial = createDashPreviewRun();
   const first = startDashPreviewRun(initial);
   const second = startDashPreviewRun(createDashPreviewRun());
@@ -125,7 +125,7 @@ test('dash preview uses the same deterministic seed and resets exactly', () => {
   assert.deepEqual(createDashPreviewRun(), initial);
 });
 
-test('dash preview isolates timer and mutation recharge rules', () => {
+void test('dash preview isolates timer and mutation recharge rules', () => {
   const controlDash = advanceDashPreviewRun(
     startDashPreviewRun(createDashPreviewRun({ variant: 'control' })),
     50,
@@ -145,7 +145,7 @@ test('dash preview isolates timer and mutation recharge rules', () => {
   assert.equal(advanceDashPreviewRun(mutationDash, 3_000).dashReady, false);
 });
 
-test('projectile-crossing mutation recharges only after a protected crossing', () => {
+void test('projectile-crossing mutation recharges only after a protected crossing', () => {
   let state = advanceDashPreviewRun(
     startDashPreviewRun(
       createDashPreviewRun({
@@ -174,7 +174,7 @@ test('projectile-crossing mutation recharges only after a protected crossing', (
   );
 });
 
-test('dash preview completes at 45 seconds and excludes every event from evidence', () => {
+void test('dash preview completes at 45 seconds and excludes every event from evidence', () => {
   const complete = runDashPreviewToCompletion(createDashPreviewRun());
 
   assert.equal(complete.status, 'complete');
@@ -184,7 +184,7 @@ test('dash preview completes at 45 seconds and excludes every event from evidenc
   assert.equal(complete.preview, true);
 });
 
-test('local demo report reveals the fixed blind order without claiming external evidence', () => {
+void test('local demo report reveals the fixed blind order without claiming external evidence', () => {
   const firstRun = runDashPreviewToCompletion(
     createDashPreviewRun({ variant: DASH_DEMO_ORDER[0] }),
   );
@@ -219,7 +219,7 @@ test('local demo report reveals the fixed blind order without claiming external 
   );
 });
 
-test('demo decisions remain explicitly local, non-durable records', () => {
+void test('demo decisions remain explicitly local, non-durable records', () => {
   const record = recordDashDemoDecision(
     'revise',
     '  Run five durable external sessions next.  ',
@@ -232,7 +232,7 @@ test('demo decisions remain explicitly local, non-durable records', () => {
   assert.equal(new Date(record.recordedAt).toISOString(), record.recordedAt);
 });
 
-test('every causal and comparison claim resolves to visible source metadata', () => {
+void test('every causal and comparison claim resolves to visible source metadata', () => {
   for (const card of VALIDATION_CORPUS) {
     const sourceIds = new Set(card.sources.map((source) => source.id));
     const statements = [
@@ -254,7 +254,7 @@ test('every causal and comparison claim resolves to visible source metadata', ()
   }
 });
 
-test('behavior search is case-insensitive and supports design-problem language', () => {
+void test('behavior search is case-insensitive and supports design-problem language', () => {
   assert.deepEqual(
     searchMechanicCards(VALIDATION_CORPUS, 'RECOVER after taking damage').map(
       (card) => card.id,
@@ -270,7 +270,7 @@ test('behavior search is case-insensitive and supports design-problem language',
   );
 });
 
-test('all documented discovery filter dimensions compose predictably', () => {
+void test('all documented discovery filter dimensions compose predictably', () => {
   const results = searchMechanicCards(VALIDATION_CORPUS, '', {
     behaviors: ['convert defense into offense'],
     systemFamilies: ['timing-defense'],
@@ -289,7 +289,7 @@ test('all documented discovery filter dimensions compose predictably', () => {
   );
 });
 
-test('dependency filters require every requested dependency', () => {
+void test('dependency filters require every requested dependency', () => {
   assert.deepEqual(
     searchMechanicCards(VALIDATION_CORPUS, '', {
       dependencies: ['stamina resource', 'timing feedback'],
@@ -305,7 +305,7 @@ test('dependency filters require every requested dependency', () => {
   );
 });
 
-test('comparison output preserves every dimension and its provenance', () => {
+void test('comparison output preserves every dimension and its provenance', () => {
   const rows = buildComparisonRows(VALIDATION_CORPUS.slice(0, 3));
 
   assert.deepEqual(
@@ -333,7 +333,7 @@ test('comparison output preserves every dimension and its provenance', () => {
   );
 });
 
-test('runtime validation rejects schema drift and broken attribution', () => {
+void test('runtime validation rejects schema drift and broken attribution', () => {
   const wrongVersion = structuredClone(VALIDATION_CORPUS[0]);
   wrongVersion.schemaVersion = '9.9.9';
 
@@ -349,7 +349,7 @@ test('runtime validation rejects schema drift and broken attribution', () => {
   );
 });
 
-test('runtime validation rejects duplicate implementation identifiers', () => {
+void test('runtime validation rejects duplicate implementation identifiers', () => {
   const duplicate = structuredClone(VALIDATION_CORPUS[0]);
   const issues = validateMechanicCorpus([VALIDATION_CORPUS[0], duplicate]);
 
@@ -358,7 +358,7 @@ test('runtime validation rejects duplicate implementation identifiers', () => {
   );
 });
 
-test('runtime validation rejects unusable source metadata', () => {
+void test('runtime validation rejects unusable source metadata', () => {
   const invalidUrl = structuredClone(VALIDATION_CORPUS[0]);
   invalidUrl.sources[0].url = 'https://';
 
@@ -376,7 +376,7 @@ test('runtime validation rejects unusable source metadata', () => {
   assert.ok(issues.some((issue) => issue.path.endsWith('game.releaseYear')));
 });
 
-test('Explore state supports query, filtering, chip removal, and full reset', () => {
+void test('Explore state supports query, filtering, chip removal, and full reset', () => {
   const queried = exploreReducer(INITIAL_EXPLORE_STATE, {
     type: 'suggestion.chosen',
     query: 'move through danger',
@@ -406,7 +406,7 @@ test('Explore state supports query, filtering, chip removal, and full reset', ()
   assert.equal(getActiveFilterCount(reset), 0);
 });
 
-test('Explore exposes options for every documented filter dimension', () => {
+void test('Explore exposes options for every documented filter dimension', () => {
   const options = buildFilterOptions(VALIDATION_CORPUS);
   assert.deepEqual(Object.keys(options), [
     'behavior',
@@ -422,7 +422,7 @@ test('Explore exposes options for every documented filter dimension', () => {
   assert.ok(Object.values(options).every((values) => values.length > 0));
 });
 
-test('Explore explains active matches without presenting synthesis as observation', () => {
+void test('Explore explains active matches without presenting synthesis as observation', () => {
   const state = exploreReducer(INITIAL_EXPLORE_STATE, {
     type: 'query.changed',
     query: 'reward precise defensive timing',
@@ -448,7 +448,7 @@ test('Explore explains active matches without presenting synthesis as observatio
   );
 });
 
-test('Explore keyboard shortcuts never hijack editable fields or modifiers', () => {
+void test('Explore keyboard shortcuts never hijack editable fields or modifiers', () => {
   assert.equal(
     getExploreShortcut({
       key: '/',

@@ -1,0 +1,93 @@
+.forge-onboarding {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px;
+  margin: 22px 0 0;
+  padding: 22px 66px 22px 24px;
+  border: 1px solid var(--line, #d1d3c8);
+  border-radius: 10px;
+  background: #fcfaf4;
+  color: var(--ink, #20231f);
+}
+
+[hidden] > .forge-onboarding { display: none; }
+.onboarding-copy { min-width: 0; }
+.forge-onboarding .onboarding-eyebrow {
+  margin: 0 0 8px;
+  font-size: 9px;
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: .15em;
+}
+
+.forge-onboarding h2 {
+  margin: 0 0 9px;
+  font-size: 27px;
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+
+.forge-onboarding .onboarding-instruction {
+  max-width: 70ch;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.forge-onboarding .onboarding-preview {
+  max-width: 88ch;
+  margin: 10px 0 0;
+  color: var(--muted, #696d63);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.onboarding-start {
+  min-height: 44px;
+  padding: 12px 17px;
+  border: 1px solid var(--ink, #20231f);
+  border-radius: 6px;
+  background: var(--ink, #20231f);
+  color: #fffefa;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.onboarding-start span { margin-left: 18px; }
+.onboarding-start:hover { background: #3c4433; }
+.onboarding-dismiss {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted, #696d63);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.onboarding-dismiss:hover { background: #eeece3; color: var(--ink, #20231f); }
+.forge-onboarding button:focus-visible {
+  outline: 3px solid #687a3d;
+  outline-offset: 4px;
+}
+
+@media (max-width: 700px) {
+  .forge-onboarding {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px;
+  }
+  .forge-onboarding h2 { padding-right: 22px; font-size: 25px; }
+  .forge-onboarding .onboarding-eyebrow { padding-right: 24px; }
+  .onboarding-start { justify-self: start; }
+}

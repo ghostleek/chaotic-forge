@@ -22,7 +22,7 @@ const resultKeys = [
   'geolocationDenied',
 ];
 
-test(
+void test(
   'authored iframe probe cannot access parent state, navigate, or make fetch/frame requests',
   {
     timeout: 30_000,

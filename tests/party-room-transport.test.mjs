@@ -21,7 +21,7 @@ const rejectsStatus = (promise, status) =>
     (error) => error instanceof RoomHttpError && error.status === status,
   );
 
-test('room transport counts streamed bytes before JSON parsing without trusting content-length', async () => {
+void test('room transport counts streamed bytes before JSON parsing without trusting content-length', async () => {
   const stream = new ReadableStream({
     start(controller) {
       controller.enqueue(new Uint8Array(256_000));
@@ -37,7 +37,7 @@ test('room transport counts streamed bytes before JSON parsing without trusting 
   await rejectsStatus(readRoomJson(bodyRequest(oversizedUtf8)), 413);
 });
 
-test('room transport rejects malformed UTF-8, JSON, wrong content type and cross-origin commands', async () => {
+void test('room transport rejects malformed UTF-8, JSON, wrong content type and cross-origin commands', async () => {
   await rejectsStatus(
     readRoomJson(bodyRequest(new Uint8Array([0xc0, 0x80]))),
     400,
@@ -59,7 +59,7 @@ test('room transport rejects malformed UTF-8, JSON, wrong content type and cross
   );
 });
 
-test('participant capabilities are private bearer secrets, not room IDs or actor IDs', async () => {
+void test('participant capabilities are private bearer secrets, not room IDs or actor IDs', async () => {
   const secret = 'a1'.repeat(32);
   assert.equal(
     participantCapability(
