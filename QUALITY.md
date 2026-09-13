@@ -12,6 +12,8 @@ Every product change is reviewed against the same minimum gate before it is merg
 
 PC-01 adds `npm run build:worker` (the same production build gate), `npm run db:generate`, `npm run db:migrate:local`, and `npm run test:party`. Network/storage packets must also pass `test:party` after building. It applies packaged migrations to real local D1, exercises the shared persistence helper through a local-only wrapper around the built Worker, races expected-revision writes, and kills/restarts the Worker before rereading the record. Three isolated browser contexts verify the HTTP boundary. This is local host evidence; deployed access and multiplayer product acceptance remain separate. See [host contract and evidence](./docs/party-forge-host.md).
 
+PC-03 extends `test:party` with real room commands from three isolated browser contexts: server-clock trials, authoritative results, cumulative ordered additions, command races, host/editor absence, abort/retry, restart and storage-failure recovery. Node tests also exercise the reducer, streamed request bounds and SQLite transaction rollback. The golden suite accepts an optional `PARTY_TEST_PORT` for simultaneous worktrees; its default remains 3107 and it still refuses an existing server.
+
 ## Scoped lint exceptions
 
 Several installed UI primitives intentionally use polymorphic rendering or ARIA roles that Oxlint's static JSX rules cannot resolve correctly. The lint configuration disables only the affected rules for the affected generated primitive files:
