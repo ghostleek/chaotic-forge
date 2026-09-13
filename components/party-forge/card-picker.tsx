@@ -17,6 +17,7 @@ export function InstructionEditor({initial='',disabled,onConfirm,label='Your ins
   return <form className={styles.editor} onSubmit={e=>{e.preventDefault();if(text.trim())onConfirm(text.trim());}}>
     <label className={styles.eyebrow} htmlFor="instruction-text">{label}</label>
     <textarea id="instruction-text" maxLength={240} required rows={4} placeholder="What should happen in our game?" value={text} onChange={e=>setText(e.target.value)} disabled={disabled}/>
+    <p>Build around Snake, Invaders or Bounce. Add food, enemies, wrapping or scoring rules. Rhythm and audio are not supported yet.</p>
     <div className={styles.editorFooter}><span>{text.length}/240</span><button className={styles.primary} disabled={disabled||!text.trim()}>{disabled?'Saving…':confirmed?'Update instruction':'Confirm instruction'}</button></div>
     <details><summary>Need an idea? Pick a starter.</summary><div className={styles.starters}>{STARTERS.map(([title,instruction,sprite])=><button type="button" key={title} onClick={()=>setText(instruction)} disabled={disabled}><PixelSprite kind={sprite} size={24}/><span>{title}</span></button>)}</div><p>Starters fill your card. Change any words before confirming.</p></details>
   </form>;

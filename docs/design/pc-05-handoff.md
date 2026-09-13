@@ -21,3 +21,11 @@ Validation: fresh lint, TypeScript and production build pass with two-player sup
 Timebox: urgent local demonstration and requested GPT Sites publish. Cut decorative work and unsupported rule combinations first. Rollback: restore prior Sites publication and revert the incremental pixel changes, preserving stored/retained old runtime resources. No merge authorized.
 
 Deployment source is a snapshot of project commit `76f1caf3d7d7e0087254df0a2e364de1378ac7d2` on the existing Sites history. The unused 94 MB historical reference ZIP is omitted solely from this deployment checkout because Sites rejected its size; it remains unchanged in the project/GitHub history. Runtime source and legacy behaviors are retained.
+
+## Generation failure fix — 13 September 2026
+
+Live D1 recorded an old generic output-limit failure for the instruction pair “tap tap revenge” and “sound turns off every 5 seconds.” The original code used that message for every non-completed model status, so the provider's precise incomplete reason was not retained. The current bounded runtime supports neither rhythm lanes nor audio. A mandatory recipe even for unsupported requests encouraged unnecessary output.
+
+Unsupported requests can now return a null recipe with a concise explanation; supported requests still require complete validated rules. Output budget is 6,000 tokens. Provider status, incomplete reason, response ID and output-token count are retained for future failures without storing prompts or credentials in logs. Only the legacy known terminal failure can use a fresh policy-specific cache key; completed and uncertain jobs remain deduplicated, and the three-job room cap remains enforced.
+
+Fresh live request checks: the exact reported unsupported pair returned a correct concise explanation with null recipe in 4 seconds (49 output tokens); the two-card Snake demo returned supported wrapping/food/scoring rules in 5 seconds (234 output tokens). Three focused regression checks passed. Full gameplay was not rerun because the retained executable did not change. Previous full local two-player golden flow remains the gameplay evidence; this is not a complete QUALITY.md pass or PC-09 acceptance.
