@@ -1,13 +1,15 @@
 # Mechanic Forge project rules
 
-- Follow the G1–G4 golden flow in `PLAN.md`; protect the single Returnal dash path first.
+- Follow the current product direction in `PRD.md` and the selected packet in `PLAN.md`. Preserve the legacy G1–G4 Returnal dash flow in `archive/2026-09-13-mechanic-lab/PLAN-v0.2-mechanic-lab.md` and its behavioral tests.
 - Preserve explicit Source, Forge interpretation, and User decision provenance.
 - Never present simulated, preview, or local demo data as observed external evidence.
-- Keep one hypothesis and one changed rule per microplay test.
-- During the hackathon, do not expand the corpus or add auth, persistence, or general graph editing.
+- Keep one hypothesis and one changed rule per legacy microplay test. The revised party loop follows the cumulative winner/loser additions specified in `PRD.md`.
+- Do not expand the reference corpus, add account systems, or revive general graph editing. The revised party scope includes own-browser rooms and durable saved games as specified in `PRD.md`.
 - Do not imply a live model call where the product uses deterministic local behavior.
 - Treat tests as behavioral guarantees and keep the complete golden path covered.
 - Run the exact gates in `QUALITY.md` before merging, including the final independent review.
+
+The user approved mostly independent stacked PRs for Kahhow and Lance. Follow the explicit bases, shared-file ownership, serialized merges and revalidation policy in `PLAN.md`. Archived proposals and instructions are historical reference, not the active execution queue.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
