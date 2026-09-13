@@ -102,7 +102,7 @@ class TrialController {
     this.update({
       ...EMPTY,
       status: 'loading',
-      message: 'Loading the retained executable…',
+      message: 'Loading your game…',
     });
     try {
       const { createRetainedRuntime } =
@@ -122,7 +122,7 @@ class TrialController {
         status: 'ready',
         snapshot: runtime.snapshot(),
         message:
-          'Executable loaded. Review the controls, then confirm readiness.',
+          'Ready when you are.',
       });
     } catch (error) {
       if (this.active && generation === this.generation)
@@ -151,7 +151,7 @@ class TrialController {
         this.update({
           status: 'accepted',
           message:
-            'The server accepted your input trace. Waiting for the other players.',
+            'Score confirmed. Waiting for the other players.',
         });
       else {
         // A known revision rejection can resend the same captured attempt against the fresh snapshot.
@@ -246,7 +246,8 @@ class TrialController {
     const now = performance.now();
     const serverNow = this.client.serverNow();
     const projectedServer = this.round.startsAt + now - this.capture.start;
-    if (this.capture.frames.length < 3600 && serverNow !== null && Math.abs(serverNow - projectedServer) > 500) {
+    // Pixel rounds keep the monotonic start anchor. Poll latency is not a clock interruption.
+    if (this.state.snapshot?.state.kind !== 'pixel' && this.capture.frames.length < 3600 && serverNow !== null && Math.abs(serverNow - projectedServer) > 500) {
       this.clearInput();
       this.update({
         status: 'incomplete',
@@ -276,6 +277,8 @@ class TrialController {
       }
       const snapshot = this.runtime.snapshot();
       const complete = snapshot.completed;
+      const gameOver = snapshot.state.gameOver === true;
+      if (gameOver) this.clearInput();
       this.update({
         snapshot,
         feedback,
@@ -283,8 +286,8 @@ class TrialController {
         seconds: Math.ceil((3600 - snapshot.tick) / 60),
         countdown: 0,
         message: complete
-          ? 'Trial complete. Your captured inputs are ready to submit.'
-          : '',
+          ? 'Round complete. Confirming scores…'
+          : gameOver ? 'Your score is locked. Results when the round timer ends.' : '',
       });
       if (
         complete &&
@@ -314,11 +317,20 @@ class TrialController {
       room.build.status !== 'playable'
     )
       return;
-    await this.client.command({
-      type: 'acknowledge-build',
-      buildId: room.build.manifest.buildId,
-      buildHash: room.build.manifest.contentHash,
-    });
+    for (let attempt = 0; attempt < 2; attempt++) {
+      await this.client.command({
+        type: 'acknowledge-build',
+        buildId: room.build.manifest.buildId,
+        buildHash: room.build.manifest.contentHash,
+      });
+      const current = this.client.snapshot();
+      const receipt = current.lastReceipt;
+      if (!this.active || receipt?.type !== 'acknowledge-build' ||
+          receipt.receipt.status !== 'rejected' || receipt.receipt.reason !== 'stale-revision' ||
+          current.room?.phase !== 'ready' || current.room.build.status !== 'playable' ||
+          current.room.build.manifest.contentHash !== room.build.manifest.contentHash) break;
+      // Both players may press Ready together. Only a known rejected revision is retried.
+    }
   }
   async submit() {
     const state = this.client.snapshot();
@@ -344,7 +356,7 @@ class TrialController {
     this.submitted = true;
     this.update({
       status: 'sending',
-      message: 'Sending captured inputs for server scoring…',
+      message: 'Confirming your score…',
     });
     await this.client.command({
       type: 'submit-trial',
@@ -364,6 +376,7 @@ class TrialController {
     return (
       this.active &&
       !!this.round &&
+      this.state.snapshot?.state.gameOver !== true &&
       ['running', 'countdown'].includes(this.state.status) &&
       (this.client.serverNow() ?? Infinity) < this.round.submissionDeadline
     );

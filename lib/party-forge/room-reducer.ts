@@ -420,7 +420,7 @@ export async function reduceRoom(
         requireCondition(now <= room.round.startsAt, 'deadline', 'Ready expired; acknowledge again to reopen the window');
         requireCondition(room.acknowledgments.length === room.round.roster.length && room.participants.every(p =>
           p.presence === 'present' && now - p.lastSeenAt < DEMO_POLICY.hostGraceMs), 'unavailable', 'Every participant in the frozen roster must be present and acknowledge');
-        const startsAt = now + ROUND_START_LEAD_MS;
+        const startsAt = now + (room.build.status === 'playable' && room.build.manifest.catalogVersion === 'pixel-arcade/1' ? 6000 : ROUND_START_LEAD_MS);
         room.round.startsAt = startsAt;
         room.round.submissionDeadline = startsAt + 60_000;
         room.round.transportDeadline = startsAt + 60_000 + DEMO_POLICY.transportGraceMs;
@@ -454,6 +454,11 @@ export async function reduceRoom(
           next.recovery = false;
           next.retryBuild = null;
         }
+        break;
+      }
+      case 'replay-round': {
+        requireCondition(['results', 'end-vote'].includes(room.phase) && isPixelHistory(room.contributions), 'invalid-phase', 'Replay a completed pixel game');
+        retryRound(next, now);
         break;
       }
       case 'vote': {

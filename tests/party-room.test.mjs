@@ -375,7 +375,7 @@ void test('fewer than three participants can explicitly discard an unplayed evol
     assert.equal(aborted.receipt.status, 'accepted');
     assert.equal(aborted.history.length, 1);
     assert.equal(aborted.history[0].status, 'evolution-aborted');
-    assert.match(aborted.history[0].reason, /fewer than three/);
+    assert.match(aborted.history[0].reason, /fewer than the required participants/);
     assert.deepEqual(aborted.record.snapshot.build.manifest, played);
     assert.equal(aborted.record.recovery, true);
     let ended = await accept(aborted.record, 'one', 'vote', { vote: 'end' });

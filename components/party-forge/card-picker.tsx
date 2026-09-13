@@ -19,7 +19,6 @@ export function InstructionEditor({initial='',disabled,onConfirm,label='Your ins
   return <form className={styles.editor} onSubmit={e=>{e.preventDefault();if(!disabled&&!unsupported&&text.trim())onConfirm(text.trim());}}>
     <label className={styles.eyebrow} htmlFor="instruction-text">{label}</label>
     <textarea id="instruction-text" maxLength={240} required rows={4} placeholder="What should happen in our game?" value={text} onChange={e=>setText(e.target.value)} disabled={disabled} aria-invalid={!!unsupported} aria-describedby={unsupported?'instruction-feedback':undefined}/>
-    <p>Quick demo: one player chooses Snake, the other Space Invaders. This pair uses saved AI-generated rules. Custom instructions use live generation.</p>
     {unsupported ? <p id="instruction-feedback" role="alert">{unsupported}</p> : null}
     <div className={styles.editorFooter}><span>{text.length}/240</span><button className={styles.primary} disabled={disabled||!text.trim()||!!unsupported}>{disabled?'Saving…':confirmed?'Update instruction':'Confirm instruction'}</button></div>
     <details><summary>Need an idea? Pick a starter.</summary><div className={styles.starters}>{STARTERS.map(([title,instruction,sprite])=><button type="button" key={title} onClick={()=>setText(instruction)} disabled={disabled}><PixelSprite kind={sprite} size={24}/><span>{title}</span></button>)}</div><p>Starters fill your card. Change any words before confirming.</p></details>

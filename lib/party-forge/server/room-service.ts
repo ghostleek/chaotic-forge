@@ -54,7 +54,7 @@ const responseHeaders = {
 };
 
 function json(body: unknown, status = 200): Response {
-  return Response.json(body, { status, headers: responseHeaders });
+  return Response.json(body, { status, headers: {...responseHeaders, 'x-party-server-time': String(Date.now())} });
 }
 
 async function requireRoom(

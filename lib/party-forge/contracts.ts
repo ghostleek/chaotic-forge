@@ -640,6 +640,7 @@ export const roomCommandSchema = z.discriminatedUnion('type', [
       'retry-forge',
       'cancel-forge',
       'start-round',
+      'replay-round',
       'abort-round',
       'abort-evolution',
       'leave',

@@ -158,8 +158,16 @@ export class RoomClient {
         data.snapshot?.participants.find(
           (p) => p.id === this.state.access?.participantId,
         )?.lastSeenAt;
-      if (response.ok && typeof seen === 'number')
+      const pixel = data.snapshot?.build.status === 'playable' && data.snapshot.build.manifest.catalogVersion === 'pixel-arcade/1';
+      const serverTime = Number(response.headers.get('x-party-server-time'));
+      // Processing time is not network transit. Anchor to response time, then keep
+      // the active pixel round's monotonic clock fixed despite slow later polls.
+      if (pixel && Number.isSafeInteger(serverTime) && serverTime > 0) {
+        if (!this.clock || data.snapshot?.phase !== 'playing')
+          this.clock = {server: serverTime, local: performance.now()};
+      } else if (response.ok && typeof seen === 'number' && !(pixel && data.snapshot?.phase === 'playing' && this.clock)) {
         this.clock = { server: seen, local: (sentAt + performance.now()) / 2 };
+      }
       return { response, data };
     } finally {
       clearTimeout(timeout);

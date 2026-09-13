@@ -1,6 +1,7 @@
 import type { BuildManifest } from '../contracts.ts';
 import { snakeInvadersDemoOrder } from '../demo-match.ts';
-import { createInstructionBuild, PIXEL_RUNTIME_RESOURCE } from '../runtimes/pixel-arcade-v1/manifest.ts';
+import { PIXEL_RUNTIME_RESOURCE } from '../runtimes/pixel-arcade-v1/manifest.ts';
+import { createInstructionBuild } from '../runtimes/pixel-arcade-v2/manifest.ts';
 import { cachedSnakeInvaders } from './cached-snake-invaders.ts';
 
 /** Rebind the verified model output to this room's actual cards without a model call. */
@@ -15,6 +16,6 @@ export async function cachedInstructionDemo(contributions: BuildManifest['contri
   };
   return createInstructionBuild(contributions, null, recipe, {
     ...retained.origin,
-    reuse: {kind:'cached-demo',version:'snake-invaders-v1',sourceBuildId:retained.buildId,sourceBuildHash:retained.contentHash},
+    reuse: {kind:'cached-demo',version:'snake-invaders-three-lives-v2',sourceBuildId:retained.buildId,sourceBuildHash:retained.contentHash},
   });
 }

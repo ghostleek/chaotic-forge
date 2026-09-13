@@ -2,6 +2,8 @@ import { buildManifestSchema, type BuildManifest } from './contracts.ts';
 import { ARCHIVE_POLICY, createArchiveRuntime, loadArchiveBuild } from './runtimes/kitchen-chaos-v1/archive-runtime.ts';
 import { createPixelRuntime } from './runtimes/pixel-arcade-v1/retained/engine.js';
 import { loadPixelBuild, PIXEL_RUNTIME_RESOURCE } from './runtimes/pixel-arcade-v1/manifest.ts';
+import { createPixelRuntime as createPixelRuntimeV2 } from './runtimes/pixel-arcade-v2/retained/engine.js';
+import { loadPixelBuild as loadPixelBuildV2, PIXEL_RUNTIME_RESOURCE as PIXEL_RUNTIME_V2 } from './runtimes/pixel-arcade-v2/manifest.ts';
 import { freezeJson, hashValue } from './runtimes/kitchen-chaos-v1/integrity.ts';
 
 const kitchenAssets: BuildManifest['assets'] = ARCHIVE_POLICY.manifest.assets;
@@ -12,6 +14,7 @@ const kitchenAssets: BuildManifest['assets'] = ARCHIVE_POLICY.manifest.assets;
  * Registry keys never become fetch URLs, dynamic imports, or executable input.
  */
 export const RETAINED_RUNTIMES = freezeJson([
+  { runtime: PIXEL_RUNTIME_V2, resolverVersion: null, presetVersion: null, validatorVersion: null, assets: [] as BuildManifest['assets'] },
   { runtime: PIXEL_RUNTIME_RESOURCE, resolverVersion: null, presetVersion: null, validatorVersion: null, assets: [] as BuildManifest['assets'] },
   {
     runtime: { ...ARCHIVE_POLICY.manifest.runtime },
@@ -76,10 +79,10 @@ export async function loadRetainedBuild(value: unknown) {
   const availability = checkRuntimeAvailability(build);
   if (availability.status === 'unavailable') throw new UnavailableRuntimeError(availability.reason);
   // v1 validates exact authored rules, qualification hashes and asset references.
-  return build.catalogVersion === 'pixel-arcade/1' ? loadPixelBuild(build) : loadArchiveBuild(build);
+  return build.runtime.version === 'pixel-arcade-v2' ? loadPixelBuildV2(build) : build.catalogVersion === 'pixel-arcade/1' ? loadPixelBuild(build) : loadArchiveBuild(build);
 }
 
 export async function createRetainedRuntime(value: unknown, seed: number) {
   const { build } = await loadRetainedBuild(value);
-  return build.catalogVersion === 'pixel-arcade/1' ? createPixelRuntime(build, seed) : createArchiveRuntime(build, seed);
+  return build.runtime.version === 'pixel-arcade-v2' ? createPixelRuntimeV2(build, seed) : build.catalogVersion === 'pixel-arcade/1' ? createPixelRuntime(build, seed) : createArchiveRuntime(build, seed);
 }

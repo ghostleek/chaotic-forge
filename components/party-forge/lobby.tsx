@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { PixelSprite } from './pixel-sprite.tsx';
 import { useRoom } from '../../lib/party-forge/client/use-room.ts';
 import { nextAddition } from '../../lib/party-forge/client/demo-path.ts';
-import { snakeInvadersDemoOrder } from '../../lib/party-forge/demo-match.ts';
 import { CARDS } from '../../lib/party-forge/cards.ts';
 import {
   RoomStatus,
@@ -14,6 +13,7 @@ import {
 import { CardPicker, InstructionEditor } from './card-picker.tsx';
 import { GameViewport } from './game-viewport.tsx';
 import { useTrialController } from './use-trial-controller.ts';
+import { RoundResults } from './round-results.tsx';
 import { RecipeSummary } from './recipe-summary.tsx';
 import styles from './party-room.module.css';
 
@@ -176,8 +176,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
           ) : null}
           <RecipeSummary room={room} />
           {room.phase === 'lobby' && room.build.status === 'empty' && room.participants.length >= minimumPlayers && room.contributions.length === room.participants.length ? <section>
-            {room.hostId === me ? <button className={styles.primary} disabled={disabled} onClick={()=>void client.command({type:'retry-forge'})}>{pending ? 'Preparing your game…' : snakeInvadersDemoOrder(room.contributions) ? 'Load cached demo' : 'Generate our game'}</button> : <p>Everyone’s cards are in. The host can generate your game.</p>}
-            <p className={styles.endNote}>AI combines supported pixel rules. Review the interpretation before playing. Three generation attempts per room.</p>
+            {room.hostId === me ? <button className={styles.primary} disabled={disabled} onClick={()=>void client.command({type:'retry-forge'})}>{pending ? 'Preparing your game…' : 'Build game'}</button> : <p>Everyone’s cards are in. The host can generate your game.</p>}
           </section> : null}
           {room.phase === 'forging' ? (
             <section>
@@ -253,7 +252,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
                   }
                   onClick={() => void client.command({ type: 'start-round' })}
                 >
-                  Start 60-second round
+                  Start round
                 </button>
               ) : (
                 <p>The host starts when everyone in the room is ready.</p>
@@ -286,7 +285,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
           ) : null}
           {room.lastCompleted &&
           ['results', 'end-vote', 'additions', 'ended'].includes(room.phase) ? (
-            <section>
+            pixelRoom ? <RoundResults key={room.lastCompleted.round.roundId} room={room} me={me} disabled={disabled} onReplay={()=>void client.command({type:'replay-round'})} /> : <section>
               <h2>Round results</h2>
               <ol>
                 {room.lastCompleted.results.map((result) => (
