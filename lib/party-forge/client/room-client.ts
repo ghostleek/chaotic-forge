@@ -22,6 +22,7 @@ export type ClientState = {
   pending: boolean;
   uncertain: boolean;
   connected: boolean;
+  storageUnavailable: boolean;
   terminal: boolean;
   lastReceipt: {
     type: RoomCommand['type'];
@@ -48,6 +49,7 @@ const EMPTY: ClientState = {
   pending: false,
   uncertain: false,
   connected: false,
+  storageUnavailable: false,
   terminal: false,
   lastReceipt: null,
   error: null,
@@ -97,11 +99,16 @@ export class RoomClient {
       JSON.stringify({ access: this.state.access, request: this.request }),
     );
   }
-  start(storage: Storage) {
-    this.storage = storage;
+  start(storage: Storage | (() => Storage)) {
+    try {
+      this.storage = typeof storage === 'function' ? storage() : storage;
+    } catch {
+      this.update({ storageUnavailable: true, error: 'Browser storage is unavailable. Room access cannot be retained.' });
+      return;
+    }
     this.active = true;
     try {
-      const saved = JSON.parse(storage.getItem(this.key) ?? 'null');
+      const saved = JSON.parse(this.storage.getItem(this.key) ?? 'null');
       if (
         saved?.access &&
         saved.access.roomId === this.roomId &&

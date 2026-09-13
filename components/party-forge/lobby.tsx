@@ -25,6 +25,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
     pending,
     uncertain,
     connected,
+    storageUnavailable,
     terminal,
     error,
   } = useRoom(roomId);
@@ -136,7 +137,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
             </label>
             <button
               className={styles.primary}
-              disabled={pending || uncertain || !nickname.trim()}
+              disabled={pending || uncertain || storageUnavailable || !nickname.trim()}
             >
               {pending ? 'Connecting…' : roomId ? 'Join room' : 'Create room'}
             </button>

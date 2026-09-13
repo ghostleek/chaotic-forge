@@ -3,6 +3,7 @@ test('starters prefill, explain API access and require explicit confirmation', a
   page,
 }) => {
   await page.goto('/');
+  await page.getByRole('button', { name: 'Skip introduction' }).click();
   await page.getByRole('textbox', { name: 'Your name' }).fill('Starter test');
   await page.getByRole('button', { name: 'Create room', exact: true }).click();
   await expect(
