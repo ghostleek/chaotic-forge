@@ -36,7 +36,7 @@ async function completedArchive(db: D1Database, record: RoomRecord): Promise<Gam
     builds.push(manifest);
   }
   return validateArchive({
-    protocolVersion: PROTOCOL_VERSION, archiveId: crypto.randomUUID(), savedAt: Date.now(),
+    protocolVersion: PROTOCOL_VERSION, archiveId: crypto.randomUUID(), savedAt: Math.max(Date.now(), record.snapshot.updatedAt),
     parentArchiveId: record.parentArchiveId ?? null, forkSetup: record.forkSetup ?? null,
     finalBuild: record.lastPlayedBuild, builds, history, traceRetentionDays: 0,
   });
