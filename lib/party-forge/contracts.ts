@@ -157,6 +157,12 @@ export const buildManifestSchema = z
         service: text,
         model: text,
         modelVersion: text,
+        reuse: z.strictObject({
+          kind: z.literal('cached-demo'),
+          version: id,
+          sourceBuildId: id,
+          sourceBuildHash: hash,
+        }).optional(),
       }),
     ]),
     runtime: retainedResourceSchema,

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { PixelSprite } from './pixel-sprite.tsx';
 import { useRoom } from '../../lib/party-forge/client/use-room.ts';
 import { nextAddition } from '../../lib/party-forge/client/demo-path.ts';
+import { snakeInvadersDemoOrder } from '../../lib/party-forge/demo-match.ts';
 import { CARDS } from '../../lib/party-forge/cards.ts';
 import {
   RoomStatus,
@@ -175,7 +176,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
           ) : null}
           <RecipeSummary room={room} />
           {room.phase === 'lobby' && room.build.status === 'empty' && room.participants.length >= minimumPlayers && room.contributions.length === room.participants.length ? <section>
-            {room.hostId === me ? <button className={styles.primary} disabled={disabled} onClick={()=>void client.command({type:'retry-forge'})}>{pending ? 'Meshing your instructions…' : 'Generate our game'}</button> : <p>Everyone’s cards are in. The host can generate your game.</p>}
+            {room.hostId === me ? <button className={styles.primary} disabled={disabled} onClick={()=>void client.command({type:'retry-forge'})}>{pending ? 'Preparing your game…' : snakeInvadersDemoOrder(room.contributions) ? 'Load cached demo' : 'Generate our game'}</button> : <p>Everyone’s cards are in. The host can generate your game.</p>}
             <p className={styles.endNote}>AI combines supported pixel rules. Review the interpretation before playing. Three generation attempts per room.</p>
           </section> : null}
           {room.phase === 'forging' ? (

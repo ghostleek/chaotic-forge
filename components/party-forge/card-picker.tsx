@@ -5,8 +5,8 @@ import { LegacyCardPicker } from './legacy-card-picker.tsx';
 import { PixelSprite } from './pixel-sprite.tsx';
 import styles from './party-room.module.css';
 const STARTERS = [
-  ['Snake', 'Steer a snake around the board. Collect food to grow your tail.', 'snake'],
-  ['Invaders', 'Move a ship left and right and shoot descending pixel invaders.', 'alien'],
+  ['Snake', 'Snake', 'snake'],
+  ['Space Invaders', 'Space Invaders', 'alien'],
   ['Bounce', 'Bounce a ball between platforms and collect food. Steer left and right.', 'bounce'],
   ['Wraparound', 'Let the player wrap around the edges instead of hitting a wall.', 'bounce'],
   ['A little chaos', 'Add slow descending invaders as obstacles to avoid.', 'alien'],
@@ -17,7 +17,7 @@ export function InstructionEditor({initial='',disabled,onConfirm,label='Your ins
   return <form className={styles.editor} onSubmit={e=>{e.preventDefault();if(text.trim())onConfirm(text.trim());}}>
     <label className={styles.eyebrow} htmlFor="instruction-text">{label}</label>
     <textarea id="instruction-text" maxLength={240} required rows={4} placeholder="What should happen in our game?" value={text} onChange={e=>setText(e.target.value)} disabled={disabled}/>
-    <p>Mix references like “Snake” + “Space Invaders,” or describe a mechanic. Forge combines their playable elements into one pixel game. Rhythm and audio are not supported yet.</p>
+    <p>Quick demo: one player chooses Snake, the other Space Invaders. This pair uses saved AI-generated rules. Custom instructions use live generation.</p>
     <div className={styles.editorFooter}><span>{text.length}/240</span><button className={styles.primary} disabled={disabled||!text.trim()}>{disabled?'Saving…':confirmed?'Update instruction':'Confirm instruction'}</button></div>
     <details><summary>Need an idea? Pick a starter.</summary><div className={styles.starters}>{STARTERS.map(([title,instruction,sprite])=><button type="button" key={title} onClick={()=>setText(instruction)} disabled={disabled}><PixelSprite kind={sprite} size={24}/><span>{title}</span></button>)}</div><p>Starters fill your card. Change any words before confirming.</p></details>
   </form>;
