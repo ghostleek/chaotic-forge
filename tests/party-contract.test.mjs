@@ -364,6 +364,48 @@ test('exhausted saved games retain additions during explicit fork setup; all-kep
   assert.throws(() => parseForkSetup(source, setup));
 });
 
+test('pending editor choices and rights survive forging and a failed evolution', () => {
+  const prior = makeBuild();
+  const room = {
+    ...makeRoom(),
+    phase: 'forging',
+    contributions: prior.contributions,
+    build: {
+      status: 'forging',
+      jobId: 'evolution-job',
+      contributionRevision: 7,
+      previous: prior,
+    },
+    lastCompleted: makeResult(),
+    editSlots: [
+      {
+        participantId: 'player-a',
+        role: 'winner',
+        resolution: { status: 'chosen', cardId: 'dinner-bell' },
+      },
+      {
+        participantId: 'player-c',
+        role: 'loser',
+        resolution: { status: 'chosen', cardId: 'hot-potato' },
+      },
+    ],
+  };
+  assert.equal(roomSnapshotSchema.safeParse(room).success, true);
+  room.build = {
+    ...room.build,
+    status: 'failed',
+    reason: 'Validation failed',
+    affectedContributionIds: ['pending-dinner-bell'],
+  };
+  assert.equal(roomSnapshotSchema.safeParse(room).success, true);
+  assert.equal(
+    roomSnapshotSchema.safeParse({ ...room, editSlots: [] }).success,
+    false,
+  );
+  room.lastCompleted.round.buildId = 'different-build';
+  assert.equal(roomSnapshotSchema.safeParse(room).success, false);
+});
+
 test('archives reject surplus unplayed candidates and record evolution abort without inventing a trial', () => {
   const archive = makeArchive();
   const candidate = makeBuild(undefined, ['dinner-bell']);

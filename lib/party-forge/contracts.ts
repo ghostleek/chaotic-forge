@@ -664,14 +664,19 @@ export const roomSnapshotSchema = z
         (room.build.status !== 'playable' || !room.round)) ||
       (['results', 'end-vote', 'additions', 'ended'].includes(room.phase) &&
         (!room.lastCompleted || room.build.status !== 'playable')) ||
-      (room.phase === 'additions' &&
+      ((room.phase === 'additions' ||
+        (room.phase === 'forging' && room.lastCompleted !== null)) &&
         (room.editSlots.length !== 2 ||
           room.editSlots.some(
             (s, i) =>
               s.participantId !== room.lastCompleted?.editors.order[i] ||
               s.participantId !== room.lastCompleted?.editors[s.role],
           ))) ||
-      (room.phase !== 'additions' && room.editSlots.length !== 0) ||
+      (room.phase !== 'additions' &&
+        !(room.phase === 'forging' && room.lastCompleted !== null) &&
+        room.editSlots.length !== 0) ||
+      (room.phase === 'forging' &&
+        ['empty', 'playable'].includes(room.build.status)) ||
       (room.phase === 'ended' && endVoteOutcome(members, room.votes) !== 'end');
     if (bad)
       ctx.addIssue({
@@ -693,6 +698,18 @@ export const roomSnapshotSchema = z
         code: 'custom',
         message:
           'Snapshot history must equal accepted build history; pending edits belong in edit slots',
+      });
+    }
+    if (
+      room.phase === 'forging' &&
+      room.lastCompleted &&
+      (accepted?.buildId !== room.lastCompleted.round.buildId ||
+        accepted?.contentHash !== room.lastCompleted.round.buildHash)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'Pending evolution must retain the last completed build and its editor rights',
       });
     }
     if (room.build.status === 'playable') {
@@ -723,7 +740,7 @@ export const roomSnapshotSchema = z
         code: 'custom',
         message: 'Ended room requires the final played build',
       });
-    if (room.phase === 'additions') {
+    if (room.editSlots.length > 0) {
       const chosen = room.editSlots.flatMap((s) =>
         s.resolution.status === 'chosen' ? [s.resolution.cardId] : [],
       );

@@ -110,8 +110,10 @@ test('built Worker + real local D1: migrate, separate browsers, race, restart, r
       'cleanup also resolves after an unexpected signaled exit',
       async () => {
         const exited = once(host!.child, 'exit');
-        host!.child.kill('SIGTERM');
+        host!.child.kill('SIGKILL');
         await exited;
+        expect(host!.child.exitCode).toBeNull();
+        expect(host!.child.signalCode).toBe('SIGKILL');
         await host!.stop();
         host = undefined;
       },
