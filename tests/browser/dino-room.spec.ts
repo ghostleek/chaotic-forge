@@ -5,10 +5,13 @@ test('two own-browser players build the authored remix, compete and contribute t
   const guestContext = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const guest = await guestContext.newPage();
   try {
+    // Local UI funding fixture; the retained authored game makes no model call.
+    await page.route('**/api/forge/access', route => route.fulfill({ json: { csrf: 'local-test', billing: { admin: true, hasKey: false, trial: false, remaining: 0, email: 'fixture@example.com', userId: 'fixture' } } }));
     await page.goto('/');
     await page.getByRole('button', { name: 'Skip introduction' }).click();
     await page.getByRole('textbox', { name: 'Your name' }).fill('Dino player');
     await page.getByRole('button', { name: 'Create room', exact: true }).click();
+    await page.getByRole('button', { name: 'Create live room', exact: true }).click();
     const invite = page.getByRole('link', { name: /^Room / });
     await expect(invite).toBeVisible();
     await guest.goto(new URL((await invite.getAttribute('href'))!, page.url()).href);

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { RoomAccess } from './room-access';
 import { PixelSprite } from './pixel-sprite.tsx';
 import { useRoom } from '../../lib/party-forge/client/use-room.ts';
 import { nextAddition } from '../../lib/party-forge/client/demo-path.ts';
@@ -17,7 +18,7 @@ import { RoundResults } from './round-results.tsx';
 import { RecipeSummary } from './recipe-summary.tsx';
 import styles from './party-room.module.css';
 
-export function Lobby({ roomId }: { roomId?: string }) {
+export function Lobby({ roomId, initialNickname = '', initialStartRoom = false }: { roomId?: string; initialNickname?: string; initialStartRoom?: boolean }) {
   const {
     client,
     room,
@@ -29,7 +30,8 @@ export function Lobby({ roomId }: { roomId?: string }) {
     terminal,
     error,
   } = useRoom(roomId);
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState(initialNickname);
+  const [startingRoom, setStartingRoom] = useState(initialStartRoom);
   const [onboarding, setOnboarding] = useState(true);
 
   const { controller, view } = useTrialController(client);
@@ -118,10 +120,11 @@ export function Lobby({ roomId }: { roomId?: string }) {
       {!access ? (
         <section>
           <h2>{roomId ? 'Join your friends' : 'Bring a friend.'}</h2>
-          <form
+          {startingRoom && !roomId ? <RoomAccess nickname={nickname} disabled={pending || uncertain || storageUnavailable} onContinue={() => void client.enroll(nickname)} onCancel={() => setStartingRoom(false)} /> : <form
             onSubmit={(event) => {
               event.preventDefault();
-              void client.enroll(nickname);
+              if (roomId) void client.enroll(nickname);
+              else setStartingRoom(true);
             }}
           >
             <label>
@@ -141,7 +144,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
             >
               {pending ? 'Connecting…' : roomId ? 'Join room' : 'Create room'}
             </button>
-          </form>
+          </form>}
         </section>
       ) : null}
       {room && access ? (

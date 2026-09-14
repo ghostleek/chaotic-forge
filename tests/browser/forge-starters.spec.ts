@@ -2,10 +2,13 @@ import { test, expect } from '@playwright/test';
 test('starters prefill, explain API access and require explicit confirmation', async ({
   page,
 }) => {
+  // UI-only access fixture; starter selection does not call a model.
+  await page.route('**/api/forge/access', route => route.fulfill({ json: { csrf: 'local-test', billing: { admin: true, hasKey: false, trial: false, remaining: 0, email: 'fixture@example.com', userId: 'fixture' } } }));
   await page.goto('/');
   await page.getByRole('button', { name: 'Skip introduction' }).click();
   await page.getByRole('textbox', { name: 'Your name' }).fill('Starter test');
   await page.getByRole('button', { name: 'Create room', exact: true }).click();
+  await page.getByRole('button', { name: 'Create live room', exact: true }).click();
   await expect(
     page.getByRole('textbox', { name: 'Your instruction' }),
   ).toBeVisible();

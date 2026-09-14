@@ -14,7 +14,11 @@ export function Billing({
   status,
   csrf,
   refresh,
+  roomSetup = false,
+  returnTo = '/forge/create',
 }: {
+  roomSetup?: boolean;
+  returnTo?: string;
   status: BillingStatus;
   csrf: string;
   refresh: () => Promise<void>;
@@ -66,9 +70,9 @@ export function Billing({
         builds are canceled and active Agents builds receive a cancellation
         request.
       </p>
-      <p>
+      {!roomSetup && <p>
         <Link href="/">Create or join a pixel game →</Link>
-      </p>
+      </p>}
       <label htmlFor="openai-key">
         OpenAI application API key {status.hasKey ? '(saved)' : ''}
       </label>
@@ -98,7 +102,7 @@ export function Billing({
         {/* Dispatch owns sign-out; it requires a top-level navigation. */}
         {/* eslint-disable-next-line nextjs/no-html-link-for-pages */}
         <a
-          href="/signout-with-chatgpt?return_to=%2Fforge%2Fcreate"
+          href={`/signout-with-chatgpt?return_to=${encodeURIComponent(returnTo)}`}
           target="_top"
         >
           Sign out
