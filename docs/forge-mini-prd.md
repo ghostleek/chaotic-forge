@@ -47,3 +47,7 @@ Owner: Kahhow for UX and acceptance; Lance for backend, shared files and data. I
 Implementation passed 183 unit tests, 24 full browser checks, 2 additional starter-button checks, and an independent review. Final storage checks and production verification are in progress. Deployment outcome will be appended here. The mobile follow-up is scheduled in Codex; device notification delivery depends on the app’s notification settings.
 
 Four additional custom gameplay patterns have local deterministic runtime fixtures: wrapping Snake, ricochet Invaders, valuable-food Bounce, and Snake hit penalties. Each is checked at three seeds. These validate executable rules, not whether a live model will interpret every phrasing correctly.
+
+## Public Snake remix correction — 14 September 2026
+
+The direct Snake/Invaders demo link had incorrectly opened a separately authored game. It now uses the already-retained `Snake Invaders: Eat 10, Blast 25` rule output and the same three-life pixel engine used by the party demo. Food is worth 10 points, aliens 25, and shooting automatically follows travel direction. Standalone practice uses seed 73 and repeats that setup on restart. It requires no login or key and makes no generation request. Display cards explain the saved source; they do not claim new player contributions or a new model call. The Dino demo and paid-generation access policy are preserved.
