@@ -12,9 +12,11 @@ import {
   DINO_MARIO as C,
 } from '@/lib/party-forge/demos/dino-mario-progressive';
 import { DemoIntroduction, DemoProvenance } from './demo-introduction';
+import { useDinoSprites } from './use-dino-sprites';
 import styles from './dino-mario.module.css';
 
 export function DinoMarioDemo() {
+  const { sprites, failed: spritesFailed } = useDinoSprites();
   const [game, setGame] = useState(createDinoMarioGame);
   const [paused, setPaused] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -76,8 +78,8 @@ export function DinoMarioDemo() {
     };
   }, []);
   useEffect(() => {
-    if (canvas.current) drawDino(canvas.current, game, dinoDistance(game.tick), Infinity);
-  }, [game]);
+    if (canvas.current) drawDino(canvas.current, game, dinoDistance(game.tick), Infinity, sprites);
+  }, [game, sprites]);
 
   useEffect(() => {
     const ctx = spikeLegend.current?.getContext('2d');
@@ -86,14 +88,14 @@ export function DinoMarioDemo() {
 
   const message =
     game.status === 'ready'
-      ? 'Ready when you are. Start the course, then jump.'
+      ? spritesFailed ? 'Sprites could not load. Reload to try again.' : !sprites ? 'Loading sprites…' : 'Ready when you are. Start the course, then jump.'
       : game.status === 'won'
         ? 'Course complete! Same jump, two uses.'
         : game.status === 'lost'
           ? 'No lives left. Restart for another run.'
           : paused
             ? 'Paused. Resume when you are ready.'
-            : game.protection > 0 ? 'Ouch! One life lost. Keep running.' : game.big ? 'Powered up! Bigger dino, bonus life.' : 'Jump over spikes. Stomp walkers. Eat meat to grow.';
+            : game.protection > 0 ? 'Ouch! One life lost. Keep running.' : game.growth === 2 ? 'Fully grown! Spiny giant, maximum size.' : game.big ? 'First growth! Eat again to become a spiny giant.' : 'Jump over spikes. Stomp walkers. Eat meat to grow.';
 
   return (
     <main className={styles.page}>
@@ -138,6 +140,7 @@ export function DinoMarioDemo() {
             data-feet={game.feet.toFixed(2)}
             data-status={game.status}
             data-big={game.big}
+            data-growth={game.growth}
             data-lives={game.lives}
             aria-label="Dino Mario course. Space jumps. Escape pauses. A Jump button is available below."
             onKeyDown={(event) => {
@@ -167,7 +170,7 @@ export function DinoMarioDemo() {
           <div className={styles.gameFooter}>
             <output className={styles.status}>{message}</output>
             <div className={styles.actions}>
-              <button type="button" className={styles.primary} onClick={start} onBlur={leaveControl}>
+              <button type="button" className={styles.primary} disabled={!sprites} onClick={start} onBlur={leaveControl}>
                 {game.status === 'ready' ? 'Start' : 'Restart'}
               </button>
               {game.status === 'playing' ? (
@@ -225,7 +228,7 @@ export function DinoMarioDemo() {
           <div className={styles.rule}>
             <canvas ref={spikeLegend} className={styles.spikeSymbol} width={28} height={38} aria-label="Red spike trap" />
             <p>
-              <b>Dino / Dodge the spikes</b>Keep running: speed increases continuously, with no cap. Time your jump to pass
+              <b>Dino / Dodge the spikes</b>Keep running: speed increases continuously, with no cap, and spikes arrive more often. Time your jump to pass
               over the red spike traps.
             </p>
           </div>
@@ -237,7 +240,7 @@ export function DinoMarioDemo() {
             </p>
           </div>
           <p className={styles.disclosure}>
-            Start with three lives. Meat makes you bigger and adds one life, up to four. A hit shrinks you and costs one life. Brief protection prevents repeated damage.
+            Start with three lives. Eat meat to grow twice: first bigger, then a spiny giant. Each meat adds one life, up to four; further meat keeps you at maximum size. A hit shrinks you one stage and costs one life. Brief protection prevents repeated damage.
           </p>
           <p className={styles.disclosure}>
             This prepared game does not call AI or generate a new game.

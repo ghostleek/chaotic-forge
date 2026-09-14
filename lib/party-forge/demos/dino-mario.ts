@@ -36,6 +36,8 @@ export type DinoMarioState = {
   stomps: number;
   lives: number;
   big: boolean;
+  /** Defined only by the evolving demo; absent on retained v2 games. */
+  growth?: 0 | 1 | 2;
   protection: number;
   hits: number;
   meat: number;
@@ -85,6 +87,7 @@ export function createDinoMarioGame(): DinoMarioState {
 }
 
 export function dinoPlayerSize(game: DinoMarioState) {
+  if (game.growth === 2) return { width: 64, height: 64 };
   const scale = game.big ? 1.4 : 1;
   return { width: DINO_MARIO.playerWidth * scale, height: DINO_MARIO.playerHeight * scale };
 }
@@ -175,15 +178,17 @@ export function stepDinoMarioGame(
     game.encounters = game.encounters.filter((e) => e.id !== contact.entity.id);
     if (contact.entity.kind === 'meat') {
       game.meat++;
+      if (game.growth !== undefined) game.growth = Math.min(2, game.growth + 1) as 0 | 1 | 2;
       game.big = true;
       game.lives = Math.min(c.maxLives, game.lives + 1);
     } else if (contact.entity.kind === 'walker' && contact.top) {
       game.stomps++;
-      game.vy = c.bounce;
+      game.vy = game.growth === 2 ? c.bounce - 2 : c.bounce;
     } else {
       game.hits++;
       game.lives--;
-      game.big = false;
+      if (game.growth !== undefined) game.growth = Math.max(0, game.growth - 1) as 0 | 1 | 2;
+      game.big = game.growth !== undefined && game.growth > 0;
       game.protection = c.protectionTicks;
       if (game.lives === 0) {
         game.status = 'lost';

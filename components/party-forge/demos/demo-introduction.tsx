@@ -5,6 +5,9 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { DINO_MARIO_PROVENANCE as provenance } from '@/lib/party-forge/demos/dino-mario';
 import styles from './dino-mario.module.css';
 
+import { drawDinoGrowthPreview } from '@/lib/party-forge/presentation/dino-view';
+import { useDinoSprites } from './use-dino-sprites';
+
 const DISMISSED = 'forge/dino-mario-introduction/2';
 let dismissedInMemory = false;
 
@@ -25,51 +28,13 @@ export function DemoProvenance() {
 }
 
 function RemixSketch() {
-  return (
-    <svg className={styles.sketch} viewBox="0 0 600 175" aria-hidden="true">
-      <path d="M0 142H600" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M92 124V96H108V65H139V91H154V101H123V117H112V132H102V124Z"
-        fill="#456850"
-      />
-      <path d="M93 111H78V99H84V105H95" fill="#456850" />
-      <rect x="130" y="72" width="4" height="4" fill="#f7f4e9" />
-      <path
-        d="M172 113Q228 -8 281 108"
-        fill="none"
-        stroke="#456850"
-        strokeWidth="2"
-        strokeDasharray="5 6"
-      />
-      <path
-        d="M273 99L282 111L285 96"
-        fill="none"
-        stroke="#456850"
-        strokeWidth="2"
-      />
-      <path d="M196 142L203 112L210 142L218 112L225 142Z" fill="#b72e32" />
-      <path
-        d="M275 142V131H270V121L279 113H297L306 121V131H301V142H294V135H282V142Z"
-        fill="#79648b"
-      />
-      <path d="M280 123H284M294 123H298" stroke="#f7f4e9" strokeWidth="3" />
-      <path
-        d="M315 106Q371 -13 428 107"
-        fill="none"
-        stroke="#79648b"
-        strokeWidth="2"
-        strokeDasharray="5 6"
-      />
-      <path
-        d="M420 98L429 111L432 96"
-        fill="none"
-        stroke="#79648b"
-        strokeWidth="2"
-      />
-      <path d="M354 142L361 112L368 142L376 112L383 142Z" fill="#b72e32" />
-      <path d="M473 142V77H512L497 92H473" fill="#456850" />
-    </svg>
-  );
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const { sprites, failed } = useDinoSprites();
+  useEffect(() => { if (canvas.current && sprites) drawDinoGrowthPreview(canvas.current, sprites); }, [sprites]);
+  return <>
+    <canvas ref={canvas} data-sprites-ready={Boolean(sprites)} className={styles.sketch} width={600} height={185} aria-label="Growth preview: starting Dino, first meat grows it, second meat transforms it into a spiny giant." />
+    {failed ? <p>Sprite preview unavailable. Each of the first two meats grows your Dino.</p> : null}
+  </>;
 }
 
 export function DemoIntroduction({
@@ -209,7 +174,7 @@ export function DemoIntroduction({
           </div>
           <p id={`${id}-description`} className={styles.disclosure}>
             This prepared example runs locally. Playing it does not generate a
-            game or call AI. Start with three lives; meat makes you bigger and adds a life. Space or Jump is all you need.
+            game or call AI. Start with three lives; eat meat to grow twice and gain a life (up to four). The second growth becomes a spiny giant. A hit shrinks you one stage. Speed and spike frequency increase as you survive. Space or Jump is all you need.
           </p>
           </>}
           <DemoProvenance />

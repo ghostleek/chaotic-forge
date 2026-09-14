@@ -133,7 +133,7 @@ test('the browser continues beyond 30 seconds and 2x, then restart resets speed'
   await expect(page.getByTestId('speed')).toHaveText('1.00×');
   await expect(page.getByLabel('Red spike trap', { exact: true })).toBeVisible();
   let tick = 0;
-  for (const press of [143, 293, 543, 693, 977, 1127, 1393]) {
+  for (const press of [133, 276, 471, 580, 788, 889, 1058, 1385, 1459, 1612, 1671, 1831]) {
     await page.clock.runFor(((press - tick) * 1000) / 60 + 0.05);
     await expect(canvas).toHaveAttribute('data-tick', String(press));
     await page.keyboard.down('Space');
@@ -141,15 +141,18 @@ test('the browser continues beyond 30 seconds and 2x, then restart resets speed'
     await page.keyboard.up('Space');
     tick = press + 1;
   }
-  await page.clock.runFor(((1800 - tick) * 1000) / 60 + 0.05);
+  await page.clock.runFor(((1860 - tick) * 1000) / 60 + 0.05);
   await expect(canvas).toHaveAttribute('data-status', 'playing');
-  await expect(page.getByTestId('stomps')).toHaveText('4');
-  await expect(page.getByTestId('speed')).toHaveText('2.00×');
-  await page.clock.runFor(1000);
-  await expect(canvas).toHaveAttribute('data-tick', '1860');
+  await expect(page.getByTestId('stomps')).toHaveText('6');
+  await expect(canvas).toHaveAttribute('data-growth', '2');
   await expect(page.getByTestId('speed')).toHaveText('2.03×');
+  await page.screenshot({ path: 'outputs/dino-growth/final-stage.png' });
+  await page.clock.runFor(1000);
+  await expect(canvas).toHaveAttribute('data-tick', '1920');
+  await expect(page.getByTestId('speed')).toHaveText('2.07×');
   await page.getByRole('button', { name: 'Restart', exact: true }).click();
   await expect(canvas).toHaveAttribute('data-tick', '0');
+  await expect(canvas).toHaveAttribute('data-growth', '0');
   await expect(page.getByTestId('speed')).toHaveText('1.00×');
   await expect(page.getByTestId('stomps')).toHaveText('0');
   await page.clock.runFor(30000);
@@ -196,7 +199,18 @@ test('contributions precede the output and both steps work with keyboard focus',
   await expect(intro.getByRole('link', { name: 'Try simulated demo' })).toHaveCount(0);
   await intro.getByRole('button', { name: 'See the remix' }).click();
   await expect(intro.getByRole('heading', { name: 'Dino × Mario' })).toBeFocused();
+  await expect(intro.getByLabel('Growth preview:', { exact: false })).toHaveAttribute('data-sprites-ready', 'true');
+  await expect(intro.getByText('eat meat to grow twice', { exact: false })).toBeVisible();
   await page.screenshot({ path: `outputs/dino-v2/remix-output-${testInfo.project.name}.png` });
   await intro.getByRole('button', { name: 'Back', exact: true }).click();
   await expect(intro.getByRole('heading', { name: 'Two players. One remix.' })).toBeFocused();
+});
+
+
+test('missing sprite assets prevent invisible gameplay and show a retry instruction', async ({ page }) => {
+  await page.route('**/party-forge/dino/evolved-v1.png', route => route.abort());
+  await page.goto('/play/dino-mario');
+  await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeDisabled();
+  await expect(page.getByRole('status')).toContainText('Sprites could not load');
+  await expect(page.getByLabel('Dino Mario course.', { exact: false })).toHaveAttribute('data-tick', '0');
 });
