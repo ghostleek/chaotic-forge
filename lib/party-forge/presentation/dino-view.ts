@@ -1,6 +1,16 @@
-import { DINO_MARIO as C, encounterSize, dinoPlayerSize, type DinoMarioState } from '../demos/dino-mario.ts';
+import {
+  DINO_MARIO as C,
+  encounterSize,
+  dinoPlayerSize,
+  type DinoMarioState,
+} from '../demos/dino-mario.ts';
 
-export function drawDino(canvas: HTMLCanvasElement, game: DinoMarioState) {
+export function drawDino(
+  canvas: HTMLCanvasElement,
+  game: DinoMarioState,
+  distance = game.tick * C.speed,
+  finishDistance = C.finishTick * C.speed,
+) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   ctx.fillStyle = '#f7f4e9';
@@ -26,26 +36,14 @@ export function drawDino(canvas: HTMLCanvasElement, game: DinoMarioState) {
   ctx.lineTo(C.width, C.ground);
   ctx.stroke();
   ctx.fillStyle = '#d5d2c3';
-  for (let x = -((game.tick * C.speed) % 64); x < C.width; x += 64)
+  for (let x = -(distance % 64); x < C.width; x += 64)
     ctx.fillRect(x, C.ground + 13, 18, 2);
   for (const e of game.encounters) {
     const size = encounterSize(e.kind),
       y = C.ground - size.height;
     if (e.x > C.width) continue;
     if (e.kind === 'block') {
-      ctx.fillStyle = '#b72e32';
-      ctx.fillRect(e.x, y + 25, size.width, 13);
-      ctx.beginPath();
-      ctx.moveTo(e.x, y + 25);
-      ctx.lineTo(e.x + 7, y);
-      ctx.lineTo(e.x + 14, y + 25);
-      ctx.lineTo(e.x + 21, y);
-      ctx.lineTo(e.x + 28, y + 25);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#ffe16a';
-      ctx.fillRect(e.x + 4, y + 29, 7, 4);
-      ctx.fillRect(e.x + 18, y + 29, 7, 4);
+      drawDinoSpike(ctx, e.x, y);
     } else if (e.kind === 'meat') {
       ctx.fillStyle = '#fff4df';
       ctx.fillRect(e.x + 2, y + 14, 15, 5);
@@ -68,14 +66,19 @@ export function drawDino(canvas: HTMLCanvasElement, game: DinoMarioState) {
     }
   }
   const size = dinoPlayerSize(game);
-  const x = C.playerX, y = game.feet - size.height;
-  const stride = game.status === 'playing' && game.feet >= C.ground
-    ? Math.sin(game.tick * Math.PI / 6) : 0;
+  const x = C.playerX,
+    y = game.feet - size.height;
+  const stride =
+    game.status === 'playing' && game.feet >= C.ground
+      ? Math.sin((game.tick * Math.PI) / 6)
+      : 0;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(size.width / C.playerWidth, size.height / C.playerHeight);
-  ctx.globalAlpha = game.protection > 0 && Math.floor(game.tick / 5) % 2 ? 0.4 : 1;
-  ctx.fillStyle = game.status === 'lost' ? '#a14c3b' : game.big ? '#315d3d' : '#456850';
+  ctx.globalAlpha =
+    game.protection > 0 && Math.floor(game.tick / 5) % 2 ? 0.4 : 1;
+  ctx.fillStyle =
+    game.status === 'lost' ? '#a14c3b' : game.big ? '#315d3d' : '#456850';
   const bob = Math.abs(stride) * 2;
   ctx.fillRect(8, bob, 20, 18);
   ctx.fillRect(2, 14 + bob, 19, 18);
@@ -89,7 +92,7 @@ export function drawDino(canvas: HTMLCanvasElement, game: DinoMarioState) {
   ctx.fillStyle = '#f7f4e9';
   ctx.fillRect(20, 5 + bob, 4, 4);
   ctx.restore();
-  const finishX = C.playerX + (C.finishTick - game.tick) * C.speed;
+  const finishX = C.playerX + finishDistance - distance;
   if (finishX < C.width) {
     ctx.fillStyle = '#456850';
     ctx.fillRect(finishX, C.ground - 85, 3, 85);
@@ -97,3 +100,23 @@ export function drawDino(canvas: HTMLCanvasElement, game: DinoMarioState) {
   }
 }
 
+/** One sprite shared by the course and its legend. */
+export function drawDinoSpike(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+) {
+  ctx.fillStyle = '#b72e32';
+  ctx.fillRect(x, y + 25, 28, 13);
+  ctx.beginPath();
+  ctx.moveTo(x, y + 25);
+  ctx.lineTo(x + 7, y);
+  ctx.lineTo(x + 14, y + 25);
+  ctx.lineTo(x + 21, y);
+  ctx.lineTo(x + 28, y + 25);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#ffe16a';
+  ctx.fillRect(x + 4, y + 29, 7, 4);
+  ctx.fillRect(x + 18, y + 29, 7, 4);
+}

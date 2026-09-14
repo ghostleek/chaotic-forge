@@ -115,11 +115,11 @@ test('Tab reaches Jump and Enter activates it without pausing within game contro
   await expect(page.getByRole('button', { name: 'Jump', exact: false })).toBeFocused();
   await page.keyboard.press('Enter');
   await page.clock.runFor(1000 / 60 + 0.05);
-  await expect(page.locator('canvas')).toBeFocused();
-  expect(Number(await page.locator('canvas').getAttribute('data-feet'))).toBeLessThan(258);
+  await expect(page.getByLabel('Dino Mario course.', { exact: false })).toBeFocused();
+  expect(Number(await page.getByLabel('Dino Mario course.', { exact: false }).getAttribute('data-feet'))).toBeLessThan(258);
 });
 
-test('the browser executes the full seven-jump course and restart retains the authored version', async ({
+test('the browser continues beyond 30 seconds and 2x, then restart resets speed', async ({
   page,
 }) => {
   await page.goto('/play/dino-mario');
@@ -129,7 +129,9 @@ test('the browser executes the full seven-jump course and restart retains the au
   await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
   await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
   await page.getByRole('button', { name: 'Start', exact: true }).click();
-  const canvas = page.locator('canvas');
+  const canvas = page.getByLabel('Dino Mario course.', { exact: false });
+  await expect(page.getByTestId('speed')).toHaveText('1.00×');
+  await expect(page.getByLabel('Red spike trap', { exact: true })).toBeVisible();
   let tick = 0;
   for (const press of [143, 293, 543, 693, 977, 1127, 1393]) {
     await page.clock.runFor(((press - tick) * 1000) / 60 + 0.05);
@@ -140,13 +142,15 @@ test('the browser executes the full seven-jump course and restart retains the au
     tick = press + 1;
   }
   await page.clock.runFor(((1800 - tick) * 1000) / 60 + 0.05);
-  await expect(canvas).toHaveAttribute('data-status', 'won');
-  await expect(page.getByRole('status')).toContainText('Course complete');
+  await expect(canvas).toHaveAttribute('data-status', 'playing');
   await expect(page.getByTestId('stomps')).toHaveText('4');
+  await expect(page.getByTestId('speed')).toHaveText('2.00×');
   await page.clock.runFor(1000);
-  await expect(canvas).toHaveAttribute('data-tick', '1800');
+  await expect(canvas).toHaveAttribute('data-tick', '1860');
+  await expect(page.getByTestId('speed')).toHaveText('2.03×');
   await page.getByRole('button', { name: 'Restart', exact: true }).click();
   await expect(canvas).toHaveAttribute('data-tick', '0');
+  await expect(page.getByTestId('speed')).toHaveText('1.00×');
   await expect(page.getByTestId('stomps')).toHaveText('0');
   await page.clock.runFor(30000);
   await expect(canvas).toHaveAttribute('data-status', 'lost');

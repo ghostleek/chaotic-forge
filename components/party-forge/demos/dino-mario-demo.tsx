@@ -1,14 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { drawDino } from '@/lib/party-forge/presentation/dino-view';
+import { drawDino, drawDinoSpike } from '@/lib/party-forge/presentation/dino-view';
 import { useEffect, useRef, useState, type FocusEvent } from 'react';
 import {
   createDinoMarioGame,
   stepDinoMarioGame,
   dinoScore,
+  dinoSpeed,
+  dinoDistance,
   DINO_MARIO as C,
-} from '@/lib/party-forge/demos/dino-mario';
+} from '@/lib/party-forge/demos/dino-mario-progressive';
 import { DemoIntroduction, DemoProvenance } from './demo-introduction';
 import styles from './dino-mario.module.css';
 
@@ -16,6 +18,7 @@ export function DinoMarioDemo() {
   const [game, setGame] = useState(createDinoMarioGame);
   const [paused, setPaused] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
+  const spikeLegend = useRef<HTMLCanvasElement>(null);
   const input = useRef({ held: false, pulse: false });
   const running = game.status === 'playing' && !paused;
 
@@ -73,8 +76,13 @@ export function DinoMarioDemo() {
     };
   }, []);
   useEffect(() => {
-    if (canvas.current) drawDino(canvas.current, game);
+    if (canvas.current) drawDino(canvas.current, game, dinoDistance(game.tick), Infinity);
   }, [game]);
+
+  useEffect(() => {
+    const ctx = spikeLegend.current?.getContext('2d');
+    if (ctx) { ctx.clearRect(0, 0, 28, 38); drawDinoSpike(ctx, 0, 0); }
+  }, []);
 
   const message =
     game.status === 'ready'
@@ -110,12 +118,13 @@ export function DinoMarioDemo() {
         <section className={styles.gamePanel} aria-label="Dino Mario game">
           <div className={styles.scorebar}>
             <span>
-              COURSE <b>{Math.min(30, Math.floor(game.tick / 60))} / 30 s</b>
+              TIME <b>{Math.floor(game.tick / 60)} s</b>
             </span>
             <span>
               LOCAL STOMPS <b data-testid="stomps">{game.stomps}</b>
             </span>
             <span>LIVES <b data-testid="lives" aria-label={`${game.lives} lives`}>{'♥'.repeat(game.lives)}{'♡'.repeat(C.maxLives - game.lives)}</b></span>
+            <span>SPEED <b data-testid="speed">{(dinoSpeed(game.tick) / C.speed).toFixed(2)}×</b></span>
             <span>SCORE <b data-testid="score">{dinoScore(game)}</b></span>
           </div>
           <canvas
@@ -214,9 +223,9 @@ export function DinoMarioDemo() {
             Grow. Compete.
           </h2>
           <div className={styles.rule}>
-            <span className={styles.blockSymbol} aria-hidden="true" />
+            <canvas ref={spikeLegend} className={styles.spikeSymbol} width={28} height={38} aria-label="Red spike trap" />
             <p>
-              <b>Dino / Dodge the spikes</b>Keep moving. Time your jump to pass
+              <b>Dino / Dodge the spikes</b>Keep running: speed increases continuously, with no cap. Time your jump to pass
               over the red spike traps.
             </p>
           </div>
@@ -224,7 +233,7 @@ export function DinoMarioDemo() {
             <span className={styles.walkerSymbol} aria-hidden="true" />
             <p>
               <b>Mario / Stomp &amp; bounce</b>Land on a walker while falling.
-              It disappears; you bounce over the next block.
+              It disappears; you bounce over the next spike trap.
             </p>
           </div>
           <p className={styles.disclosure}>
@@ -233,7 +242,7 @@ export function DinoMarioDemo() {
           <p className={styles.disclosure}>
             This prepared game does not call AI or generate a new game.
           </p>
-          <p className={styles.disclosure}>Score: 10 points per second, 100 per stomp and 50 per meat. Finish for 500 plus 100 per remaining life. More points wins; fewer hits breaks ties.</p>
+          <p className={styles.disclosure}>Endless demo score: 10 points per second, 100 per stomp and 50 per meat. Survive as long as you can; the run ends when no lives remain.</p>
 <p className={styles.disclosure}>For online competition, open a room and choose the Chrome Dino and Mario starters. Each player confirms a card before the shared round.</p>
           <DemoProvenance />
         </aside>

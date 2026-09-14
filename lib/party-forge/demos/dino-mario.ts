@@ -114,6 +114,8 @@ function axisTimes(
 export function stepDinoMarioGame(
   previous: DinoMarioState,
   jumpDown = false,
+  scrollSpeed: number = DINO_MARIO.speed,
+  finishTick: number = DINO_MARIO.finishTick,
 ): DinoMarioState {
   if (previous.status !== 'playing') return previous;
   const c = DINO_MARIO;
@@ -132,7 +134,7 @@ export function stepDinoMarioGame(
   // Each stomp removes an entity, so this loop is bounded by the fixed course size + 1.
   let remaining = 1;
   while (remaining > 0) {
-    const dx = c.speed * remaining;
+    const dx = scrollSpeed * remaining;
     const dy = game.vy * remaining;
     let contact: { entity: Encounter; time: number; top: boolean } | undefined;
     const player = dinoPlayerSize(game);
@@ -198,7 +200,7 @@ export function stepDinoMarioGame(
     (e) => e.x + encounterSize(e.kind).width >= 0,
   );
   // Resolve contact before finish: losing the last life on this tick still loses.
-  if (game.status === 'playing' && game.tick >= c.finishTick)
+  if (game.status === 'playing' && game.tick >= finishTick)
     game.status = 'won';
   return game;
 }
