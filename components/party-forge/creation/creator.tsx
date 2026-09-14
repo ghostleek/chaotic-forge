@@ -317,7 +317,7 @@ export function Creator({ signedIn = false }: { signedIn?: boolean }) {
         <section className={styles.card}>
           <h2>Play without waiting.</h2>
           <p>
-            Snake × Space Invaders is a fixed authored demo. No code, no
+            Snake × Space Invaders replays the saved remix. No sign-in, no
             generation request, just play.
           </p>
           <Link className={styles.textLink} href="/play/snake-space-invaders">

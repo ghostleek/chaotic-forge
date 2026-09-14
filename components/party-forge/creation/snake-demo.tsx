@@ -1,230 +1,263 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type FocusEvent } from 'react';
 import Link from 'next/link';
-import {
-  BOARD,
-  newSnakeGame,
-  stepSnakeGame,
-  type Direction,
-} from '@/lib/party-forge/generation/snake-demo';
+import type { BuildManifest } from '@/lib/party-forge/contracts';
+import { createPixelRuntime } from '@/lib/party-forge/runtimes/pixel-arcade-v2/retained/engine.js';
+import { renderPixel } from '@/lib/party-forge/presentation/pixel-view';
+import { SAVED_SNAKE_SEED } from '@/lib/party-forge/demos/saved-snake-seed';
 import styles from './creation.module.css';
+const KEYS: Record<string, number> = {
+  ArrowUp: 1,
+  KeyW: 1,
+  ArrowDown: 2,
+  KeyS: 2,
+  ArrowLeft: 4,
+  KeyA: 4,
+  ArrowRight: 8,
+  KeyD: 8,
+};
 
-export function SnakeDemo() {
-  const [game, setGame] = useState(newSnakeGame);
-  const [paused, setPaused] = useState(false);
+export function SnakeDemo({ build }: { build: BuildManifest }) {
+  const runtime = useRef<ReturnType<typeof createPixelRuntime> | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const turn = useRef<Direction | undefined>(undefined);
-  const firing = useRef(false);
-  const keys: Record<string, Direction> = {
-    ArrowUp: 'up',
-    w: 'up',
-    ArrowDown: 'down',
-    s: 'down',
-    ArrowLeft: 'left',
-    a: 'left',
-    ArrowRight: 'right',
-    d: 'right',
-  };
+  const buttons = useRef(0);
+  const [snapshot, setSnapshot] = useState(() =>
+    createPixelRuntime(build, SAVED_SNAKE_SEED).snapshot(),
+  );
+  const [status, setStatus] = useState<'ready' | 'playing' | 'finished'>(
+    'ready',
+  );
+  const [paused, setPaused] = useState(false);
+  const running = status === 'playing' && !paused;
+  function pause() {
+    buttons.current = 0;
+    setPaused(true);
+  }
+  function leaveControl(e: FocusEvent<HTMLElement>) {
+    buttons.current = 0;
+    if (!e.currentTarget.closest('section')?.contains(e.relatedTarget)) pause();
+  }
+  function start() {
+    runtime.current = createPixelRuntime(build, SAVED_SNAKE_SEED);
+    setSnapshot(runtime.current.snapshot());
+    buttons.current = 0;
+    setStatus('playing');
+    setPaused(false);
+    canvas.current?.focus();
+  }
+  function togglePause() {
+    buttons.current = 0;
+    setPaused((p) => !p);
+    canvas.current?.focus();
+  }
   useEffect(() => {
-    if (game.status !== 'playing' || paused) return;
-    const timer = setInterval(() => {
-      setGame((g) => stepSnakeGame(g, turn.current, firing.current));
-      turn.current = undefined;
-    }, 145);
-    return () => clearInterval(timer);
-  }, [game.status, paused]);
+    if (!running) return;
+    let last = performance.now(),
+      elapsed = 0;
+    const timer = window.setInterval(() => {
+      const now = performance.now();
+      elapsed += Math.min(now - last, 100);
+      last = now;
+      const game = runtime.current;
+      if (!game) return;
+      let next = game.snapshot();
+      while (elapsed >= 1000 / 60 && !next.completed && !next.state.gameOver) {
+        game.input({
+          tick: next.tick,
+          buttons: buttons.current,
+          yaw: 0,
+          pitch: 0,
+        });
+        next = game.step();
+        elapsed -= 1000 / 60;
+      }
+      setSnapshot(next);
+      if (next.completed || next.state.gameOver) {
+        buttons.current = 0;
+        setStatus('finished');
+      }
+    }, 1000 / 60);
+    return () => window.clearInterval(timer);
+  }, [running]);
   useEffect(() => {
-    const blur = () => {
-      firing.current = false;
-      setPaused(true);
-    };
-    window.addEventListener('blur', blur);
     const hidden = () => {
-      if (document.hidden) blur();
+      if (document.hidden) pause();
     };
+    window.addEventListener('blur', pause);
     document.addEventListener('visibilitychange', hidden);
     return () => {
-      window.removeEventListener('blur', blur);
+      window.removeEventListener('blur', pause);
       document.removeEventListener('visibilitychange', hidden);
     };
   }, []);
   useEffect(() => {
     const ctx = canvas.current?.getContext('2d');
-    if (!ctx) return;
-    const cell = 20;
-    ctx.fillStyle = '#101b25';
-    ctx.fillRect(0, 0, 560, 560);
-    ctx.strokeStyle = '#1c2a36';
-    ctx.lineWidth = 0.5;
-    for (let i = 0; i <= BOARD; i++) {
-      ctx.beginPath();
-      ctx.moveTo(i * cell, 0);
-      ctx.lineTo(i * cell, 560);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(0, i * cell);
-      ctx.lineTo(560, i * cell);
-      ctx.stroke();
-    }
-    game.snake.forEach((p, i) => {
-      ctx.fillStyle = i === 0 ? '#ecff7a' : '#8aa63b';
-      ctx.fillRect(p.x * cell + 2, p.y * cell + 2, 16, 16);
-    });
-    game.enemies.forEach((p) => {
-      ctx.fillStyle = '#e8a2fc';
-      ctx.fillRect(p.x * cell + 2, p.y * cell + 4, 16, 12);
-      ctx.fillStyle = '#101b25';
-      ctx.fillRect(p.x * cell + 5, p.y * cell + 7, 3, 3);
-      ctx.fillRect(p.x * cell + 12, p.y * cell + 7, 3, 3);
-    });
-    ctx.fillStyle = '#fbc464';
-    ctx.beginPath();
-    ctx.arc(
-      game.pickup.x * cell + 10,
-      game.pickup.y * cell + 10,
-      6,
-      0,
-      Math.PI * 2,
-    );
-    ctx.fill();
-    ctx.fillStyle = '#f4ffb0';
-    game.shots.forEach((p) => ctx.fillRect(p.x * cell + 8, p.y * cell, 4, 12));
-    ctx.fillStyle = '#ff786f';
-    game.bombs.forEach((p) =>
-      ctx.fillRect(p.x * cell + 8, p.y * cell + 4, 5, 10),
-    );
-  }, [game]);
-  function start() {
-    setGame({ ...newSnakeGame(), status: 'playing' });
-    turn.current = undefined;
-    firing.current = false;
-    setPaused(false);
-    canvas.current?.focus();
-  }
+    if (ctx) renderPixel(ctx, snapshot);
+  }, [snapshot]);
+  const message =
+    status === 'ready'
+      ? 'The saved remix is ready to play.'
+      : status === 'finished'
+        ? snapshot.state.gameOver
+          ? 'Game over. No lives left.'
+          : '60 seconds complete.'
+        : paused
+          ? 'Paused. Resume when ready.'
+          : 'Eat 10. Blast 25. Auto-fire follows your direction.';
   return (
     <main className={styles.page}>
       <nav className={styles.nav}>
         <Link href="/">FORGE /</Link>
-        <Link href="/forge/create">Create a game ↗</Link>
+        <Link href="/">Play with friends →</Link>
       </nav>
       <div className={styles.heading}>
-        <p className={styles.eyebrow}>PLAYABLE REMIX / 001</p>
-        <h1>
-          Snake.
-          <br />
-          <span>Meet Space Invaders.</span>
-        </h1>
-        <p>
-          Grow your trail. Clear the fleet. Try not to become your own worst
-          enemy.
-        </p>
+        <p className={styles.eyebrow}>SAVED REMIX</p>
+        <h1>{build.pixelRules!.title}</h1>
+        <p>{build.objective}</p>
       </div>
       <div className={styles.playLayout}>
         <section
           className={styles.gamePanel}
-          aria-label="Snake Space Invaders game"
+          aria-label="Saved Snake Space Invaders game"
         >
           <div className={styles.scorebar}>
             <span>
-              LOCAL SCORE <b>{game.score.toString().padStart(5, '0')}</b>
+              SCORE <b>{snapshot.points}</b>
             </span>
             <span>
-              FLEET <b>{game.enemies.length}/18</b>
+              LIVES <b data-testid="snake-lives">{snapshot.state.lives}</b>
             </span>
             <span>
-              TRAIL <b>{game.snake.length}</b>
+              TIME <b>{Math.floor(snapshot.tick / 60)} / 60 s</b>
             </span>
           </div>
           <canvas
             ref={canvas}
-            width={560}
-            height={560}
+            onBlur={leaveControl}
+            width={256}
+            height={192}
             tabIndex={0}
-            aria-label="Game board. Arrow keys or WASD turn. Hold Space to fire. Escape pauses."
+            data-tick={snapshot.tick}
+            data-runtime={build.runtime.version}
+            data-shots={snapshot.state.metrics.shots}
+            aria-label="Saved pixel arena. Arrows or WASD steer. Auto-fire follows your direction. Escape pauses."
             onKeyDown={(e) => {
-              const direction = keys[e.key];
-              if (direction || e.key === ' ' || e.key === 'Escape')
+              if (KEYS[e.code]) {
                 e.preventDefault();
-              if (direction && !turn.current) turn.current = direction;
-              if (e.key === ' ') firing.current = true;
-              if (e.key === 'Escape' && !e.repeat) setPaused((p) => !p);
+                if (running) buttons.current = KEYS[e.code];
+              }
+              if (e.key === 'Escape' && !e.repeat && status === 'playing') {
+                e.preventDefault();
+                togglePause();
+              }
             }}
             onKeyUp={(e) => {
-              if (e.key === ' ') firing.current = false;
-            }}
-            onBlur={() => {
-              firing.current = false;
-              setPaused(true);
+              if (KEYS[e.code] === buttons.current) buttons.current = 0;
             }}
           />
           <div className={styles.gameFooter}>
-            <output>
-              {game.status === 'ready'
-                ? 'Your first collision of ideas starts here.'
-                : game.status === 'playing'
-                  ? paused
-                    ? 'Paused. Take a breath.'
-                    : 'Clear the fleet before it reaches row 22.'
-                  : game.reason}
-            </output>
+            <output>{message}</output>
             <div className={styles.actions}>
-              <button className={styles.primary} onClick={start}>
-                {game.status === 'ready' ? 'Play demo' : 'Restart'}
+              <button
+                className={styles.primary}
+                onBlur={leaveControl}
+                onClick={start}
+              >
+                {status === 'ready' ? 'Play demo' : 'Restart'}
               </button>
-              {game.status === 'playing' && (
-                <button
-                  onPointerDown={(e) => e.preventDefault()}
-                  onClick={() => {
-                    setPaused((p) => !p);
-                    canvas.current?.focus();
-                  }}
-                >
+              {status === 'playing' ? (
+                <button onBlur={leaveControl} onClick={togglePause}>
                   {paused ? 'Resume' : 'Pause'}
                 </button>
-              )}
+              ) : null}
             </div>
+          </div>
+          <div className={styles.actions} aria-label="Touch direction pad">
+            {(
+              [
+                ['↑', 1, 'up'],
+                ['←', 4, 'left'],
+                ['↓', 2, 'down'],
+                ['→', 8, 'right'],
+              ] as const
+            ).map(([glyph, bit, label]) => (
+              <button
+                key={label}
+                aria-label={`Steer ${label}`}
+                disabled={!running}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                  buttons.current = bit;
+                }}
+                onPointerUp={() => {
+                  buttons.current = 0;
+                }}
+                onPointerCancel={() => {
+                  buttons.current = 0;
+                }}
+                onLostPointerCapture={() => {
+                  buttons.current = 0;
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    buttons.current = bit;
+                  }
+                }}
+                onKeyUp={() => {
+                  buttons.current = 0;
+                }}
+                onBlur={leaveControl}
+              >
+                {glyph}
+              </button>
+            ))}
           </div>
         </section>
         <aside className={styles.sidebar}>
-          <span className={styles.badge}>AUTHORED DEMO · NO CODE NEEDED</span>
-          <h2>
-            Two familiar rules.
-            <br />
-            One strange game.
-          </h2>
+          <span className={styles.badge}>SAVED REMIX · NO API USAGE</span>
+          <h2>Eat 10. Blast 25.</h2>
           <article>
-            <span>01 / SNAKE</span>
-            <h3>Your trail is your obstacle.</h3>
-            <p>
-              Collect amber energy to grow. Avoid the boundary and your own
-              body.
-            </p>
+            <h3>Snake</h3>
+            <p>{build.pixelRules!.interpretations[0].interpretation}</p>
           </article>
           <article>
-            <span>02 / SPACE INVADERS</span>
-            <h3>The fleet is closing in.</h3>
-            <p>
-              Fire upward to clear 18 invaders. Dodge red shots and keep the
-              fleet away.
-            </p>
+            <h3>Space Invaders</h3>
+            <p>{build.pixelRules!.interpretations[1].interpretation}</p>
           </article>
           <div className={styles.controls}>
-            <b>DESKTOP CONTROLS</b>
+            <b>ARROWS / WASD / TOUCH BUTTONS</b>
             <p>
-              ↑ ↓ ← → / WASD — turn
-              <br />
-              Space — hold to fire
-              <br />
-              Esc — pause
+              Steer the snake. Firing is automatic in your travel direction.
+              Three lives; one lost per collision. Stop at zero lives or 60
+              seconds.
             </p>
           </div>
           <p className={styles.muted}>
-            This is a fixed, authored game. Playing and restarting do not call
-            AI. Scores stay in this browser run.
+            Reuses the existing saved rules and the party demo’s retained
+            three-life engine. No sign-in, key or new model call. Restart
+            repeats the same seed; scores stay in this run.
           </p>
-          <Link className={styles.textLink} href="/forge/create">
-            Have a creator code? Make something new →
-          </Link>
+          <details>
+            <summary>Source, interpretation &amp; decision</summary>
+            <p>
+              Source: the retained Snake + Space Invaders recipe from OpenAI
+              Responses, GPT-6 Astra.
+            </p>
+            <p>
+              Forge interpretation: generated rule configuration executed by the
+              retained pixel engine, not newly generated game code.
+            </p>
+            <p>
+              User decision: restore this saved remix as the public demo. The
+              two source cards are presented here without creating players or a
+              room.
+            </p>
+            {build.origin.kind === 'generated' && build.origin.reuse ? (
+              <p>Saved source build: {build.origin.reuse.sourceBuildId}</p>
+            ) : null}
+          </details>
         </aside>
       </div>
     </main>

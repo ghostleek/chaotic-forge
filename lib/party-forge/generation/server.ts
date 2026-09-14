@@ -154,8 +154,8 @@ export async function forgeRequest(
     if (path[0] === 'demo' && request.method === 'GET')
       return json({
         href: '/play/snake-space-invaders',
-        origin: 'authored',
-        version: 'snake-invaders/1',
+        origin: 'cached-demo',
+        version: 'snake-invaders-three-lives-v2',
       });
     configured(env);
     const now = Date.now();
