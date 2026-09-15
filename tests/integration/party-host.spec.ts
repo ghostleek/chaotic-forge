@@ -30,7 +30,7 @@ test('built Worker + real local D1: migrate, separate browsers, race, restart, r
     const baseURL = host.baseURL;
     const pages = await Promise.all(contexts.map((c) => c.newPage()));
     for (const page of pages) {
-      await page.goto(baseURL);
+      await page.goto(`${baseURL}/explore`);
       await expect(
         page.getByRole('heading', {
           name: 'Start with a game. Leave with a testable mechanic.',

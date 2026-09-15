@@ -13,10 +13,11 @@ export const hostEnvironment = {
   MINIFLARE_REGISTRY_PATH: resolve('.wrangler/registry'),
 };
 
-/** @param {{ directory?: string, proofToken?: string }} [options] */
+/** @param {{ directory?: string, proofToken?: string, vars?: Record<string,string> }} [options] */
 export async function prepareHostConfig({
   directory = '.wrangler/party-host',
   proofToken,
+  vars = {},
 } = {}) {
   const built = await checkBuild();
   await mkdir(directory, { recursive: true });
@@ -30,6 +31,8 @@ export async function prepareHostConfig({
       ...db,
       migrations_dir: resolve('dist/.openai/drizzle'),
     })),
+    r2_buckets: built.r2_buckets ?? [],
+    vars,
     no_bundle: true,
     rules: built.rules,
   };
@@ -42,7 +45,7 @@ export async function prepareHostConfig({
     );
     config.main = entry;
     config.no_bundle = false;
-    config.vars = { PROOF_TOKEN: proofToken };
+    config.vars = { ...vars, PROOF_TOKEN: proofToken };
   }
   const configPath = resolve(directory, 'wrangler.json');
   await writeFile(configPath, JSON.stringify(config, null, 2));

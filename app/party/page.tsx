@@ -1,4 +1,5 @@
-import { Lobby } from '../../components/party-forge/lobby';
+import { redirect } from 'next/navigation';
+
 export default function PartyPage() {
-  return <Lobby />;
+  redirect('/');
 }

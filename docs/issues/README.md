@@ -19,7 +19,3 @@ Updated 2026-09-13. The user authorized publication and assignment of all eleven
 Start with PC-01. After the accepted shared foundation, PC-02 (Lance) and PC-04 (Kahhow) can progress in parallel, with PC-09 qualification also eligible to start. Follow each packet’s dependencies; PC-10 and PC-11 remain optional later work.
 
 Legacy MFH issues #9–29 are being reconciled against this series. Their closure is pending; none is claimed completed by the product pivot.
-
-## Accepted standalone onboarding supplement
-
-[PC-12](./PC-12.md) adds the Dino × Mario simulated example and [compact game-creation instruction](../game-creation-instruction-draft.md). Kahhow is accountable; Codex implements; Lance is the human acceptance reviewer. It is independent of paid generation, uses merged main `1dbccea77d4d2707328c704f1d20be8aabc3b2ac`, and does not change the existing party recipe. PR and validation status live in the packet.

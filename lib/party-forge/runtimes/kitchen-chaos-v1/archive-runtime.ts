@@ -1,6 +1,7 @@
 import {
   buildManifestSchema,
   contributionHistorySchema,
+  isPixelHistory,
   inputFrameSchema,
   trialInputSchema,
   type BuildManifest,
@@ -29,12 +30,13 @@ const objectives: Record<string, string> = policy.objectives;
 const qualifications: Record<string, { completingTraceHash: string; witnesses: Record<string, string> }> = certificate.recipes;
 
 function archivedRecipe(contributions: Contribution[]): KitchenRecipe {
+  if (isPixelHistory(contributions)) throw new Error('Instruction cards cannot use the retained Kitchen runtime');
   const initial = contributions.filter((entry) => entry.kind === 'initial');
   return {
     fps: initial.find((entry) => entry.choice.slot === 'fps')!.choice.cardId as KitchenRecipe['fps'],
     zombies: initial.find((entry) => entry.choice.slot === 'zombies')!.choice.cardId as KitchenRecipe['zombies'],
     cooking: initial.find((entry) => entry.choice.slot === 'cooking')!.choice.cardId as KitchenRecipe['cooking'],
-    additions: contributions.filter((entry) => entry.kind === 'addition').map((entry) => entry.cardId),
+    additions: contributions.filter((entry) => entry.kind === 'addition').map((entry) => entry.cardId) as KitchenRecipe['additions'],
   };
 }
 

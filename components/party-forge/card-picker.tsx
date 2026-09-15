@@ -1,85 +1,135 @@
+'use client';
 import { useState } from 'react';
-import { CARDS } from '../../lib/party-forge/cards.ts';
-import { INITIAL_PATH } from '../../lib/party-forge/client/demo-path.ts';
 import type {
   InitialCard,
   RoomSnapshot,
 } from '../../lib/party-forge/contracts.ts';
+import { LegacyCardPicker } from './legacy-card-picker.tsx';
+import { PixelSprite } from './pixel-sprite.tsx';
+import { unsupportedInstructionReason } from '../../lib/party-forge/instruction-policy.ts';
 import styles from './party-room.module.css';
-
-export function CardPicker({
-  room,
-  participantId,
+import { INSTRUCTION_STARTERS } from '../../lib/party-forge/instruction-starters.ts';
+export function InstructionEditor({
+  initial = '',
   disabled,
   onConfirm,
+  label = 'Your instruction',
+  confirmed = false,
 }: {
+  initial?: string;
+  disabled: boolean;
+  onConfirm: (text: string) => void;
+  label?: string;
+  confirmed?: boolean;
+}) {
+  const [text, setText] = useState(initial);
+  const unsupported = unsupportedInstructionReason([text]);
+  return (
+    <form
+      className={styles.editor}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!disabled && !unsupported && text.trim()) onConfirm(text.trim());
+      }}
+    >
+      <label className={styles.eyebrow} htmlFor="instruction-text">
+        {label}
+      </label>
+      <textarea
+        id="instruction-text"
+        maxLength={240}
+        required
+        rows={4}
+        placeholder="What should happen in our game?"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        disabled={disabled}
+        aria-invalid={!!unsupported}
+        aria-describedby={unsupported ? 'instruction-feedback' : undefined}
+      />
+      {unsupported ? (
+        <p id="instruction-feedback" role="alert">
+          {unsupported}
+        </p>
+      ) : null}
+      <div className={styles.editorFooter}>
+        <span>{text.length}/240</span>
+        <button
+          className={styles.primary}
+          disabled={disabled || !text.trim() || !!unsupported}
+        >
+          {disabled
+            ? 'Saving…'
+            : confirmed
+              ? 'Update instruction'
+              : 'Confirm instruction'}
+        </button>
+      </div>
+      <details>
+        <summary>Need an idea? Pick a starter.</summary>
+        <div className={styles.starters}>
+          {INSTRUCTION_STARTERS.map(
+            ({ title, text: instruction, sprite, hint }) => (
+              <button
+                type="button"
+                key={title}
+                title={hint}
+                onClick={() => setText(instruction)}
+                disabled={disabled}
+              >
+                <PixelSprite kind={sprite} size={24} />
+                <span>{title}</span>
+                <small>{hint}</small>
+              </button>
+            ),
+          )}
+        </div>
+        <p>
+          Starters only prefill your card; confirm it when ready. The exact
+          Snake + Space Invaders pair, in either order (including a repeated
+          third card), reuses the saved demo. Chrome Dino + Mario selects the authored runner. Only the listed Dino scoring modifiers match its remix. Other edits and combinations need
+          API access.
+        </p>
+      </details>
+    </form>
+  );
+}
+export function CardPicker(props: {
   room: RoomSnapshot;
   participantId: string;
   disabled: boolean;
   onConfirm: (choice: InitialCard) => void;
 }) {
-  const [selected, setSelected] = useState<InitialCard | null>(null);
-  const chosen = room.contributions.some(
-    (c) => c.participantId === participantId,
-  );
-  const claimed = (choice: InitialCard) =>
+  const { room, participantId, disabled, onConfirm } = props;
+  if (
     room.contributions.some(
-      (c) => c.kind === 'initial' && c.choice.slot === choice.slot,
-    );
+      (c) => c.kind === 'initial' && c.choice.slot !== 'instruction',
+    )
+  )
+    return <LegacyCardPicker {...props} />;
+  const mine = room.contributions.find(
+    (c) => c.participantId === participantId && c.kind === 'initial',
+  );
+  const initial =
+    mine?.kind === 'initial' && mine.choice.slot === 'instruction'
+      ? mine.choice.text
+      : '';
   return (
     <section aria-labelledby="hand-title">
-      <h2 id="hand-title">One card. Your contribution.</h2>
-      <p>
-        Choose an available card. Together, these three ideas make Kitchen
-        Chaos.
-      </p>
-      <div className={styles.hand}>
-        {INITIAL_PATH.map((choice) => (
-          <article
-            className={styles.card}
-            key={choice.cardId}
-            data-selected={selected?.cardId === choice.cardId}
-          >
-            <span className={styles.eyebrow}>{choice.slot}</span>
-            <h3>{CARDS[choice.cardId].title}</h3>
-            <p>{CARDS[choice.cardId].interpretation}</p>
-            <details>
-              <summary>See how it works</summary>
-              <p>
-                {choice.slot === 'fps'
-                  ? 'Aim → shoot → push a zombie away.'
-                  : choice.slot === 'zombies'
-                    ? 'Move near a zombie → it follows → protect the cooking station.'
-                    : 'Prepare → cook → collect → deliver.'}
-              </p>
-            </details>
-            <button
-              type="button"
-              disabled={disabled || chosen || claimed(choice)}
-              aria-pressed={selected?.cardId === choice.cardId}
-              onClick={() => setSelected(choice)}
-            >
-              {claimed(choice)
-                ? 'Contributed'
-                : selected?.cardId === choice.cardId
-                  ? 'Selected'
-                  : `Select ${CARDS[choice.cardId].title}`}
-            </button>
-          </article>
-        ))}
+      <div className={styles.sectionHeading}>
+        <h2 id="hand-title">One person. One rule.</h2>
+        <span>
+          {room.contributions.length}/{Math.max(2, room.participants.length)} IN
+        </span>
       </div>
-      <button
-        className={styles.primary}
-        type="button"
-        disabled={disabled || chosen || !selected || claimed(selected)}
-        onClick={() => selected && onConfirm(selected)}
-      >
-        {chosen
-          ? 'Contribution confirmed'
-          : disabled
-            ? 'Waiting for room updates'
-            : 'Confirm contribution'}
-      </button>
+      <InstructionEditor
+        initial={initial}
+        confirmed={!!mine}
+        disabled={disabled}
+        onConfirm={(text) =>
+          onConfirm({ slot: 'instruction', cardId: 'instruction', text })
+        }
+      />
     </section>
   );
 }

@@ -147,3 +147,68 @@ export const partyArchiveHistory = sqliteTable('party_archive_history', {
   check('party_archive_history_ordinal', sql`${table.ordinal} BETWEEN 0 AND 9999`),
   check('party_archive_history_json', sql`json_valid(${table.entry})`),
 ]);
+
+// One durable dispatch record prevents room retries from purchasing duplicate generations.
+export const partyPixelJobs = sqliteTable('party_pixel_jobs', {
+  roomId: text('room_id').notNull().references(() => partyRooms.id, { onDelete: 'cascade' }),
+  recipeKey: text('recipe_key').notNull(),
+  status: text('status').notNull(),
+  result: text('result'),
+  createdAt: integer('created_at').notNull(),
+}, table => [primaryKey({columns:[table.roomId,table.recipeKey]}), check('party_pixel_jobs_status',sql`${table.status} IN ('running','complete','failed')`)]);
+
+// Standalone PC-09 creator capabilities. Separate from party participant authority.
+export const forgeSessions = sqliteTable('forge_sessions', {
+  id: text('id').primaryKey(),
+  csrf: text('csrf').notNull(),
+  epoch: text('epoch').notNull(),
+  expires: integer('expires').notNull(),
+});
+export const forgeLimits = sqliteTable('forge_limits', {
+  id: text('id').primaryKey(),
+  count: integer('count').notNull(),
+  expires: integer('expires').notNull(),
+});
+export const forgeRunner = sqliteTable('forge_runner', {
+  id: text('id').primaryKey(),
+  seen: integer('seen').notNull(),
+});
+export const forgeJobs = sqliteTable(
+  'forge_jobs',
+  {
+    id: text('id').primaryKey(),
+    owner: text('owner').notNull(),
+    requestKey: text('request_key').notNull(),
+    digest: text('digest').notNull(),
+    cards: text('cards').notNull(),
+    parent: text('parent'),
+    status: text('status').notNull(),
+    created: integer('created').notNull(),
+    updated: integer('updated').notNull(),
+    lease: text('lease'),
+    leaseUntil: integer('lease_until'),
+    sessionId: text('session_id'),
+    turnId: text('turn_id'),
+    artifactHash: text('artifact_hash'),
+    evidence: text('evidence'),
+    model: text('model'),
+    error: text('error'),
+    billing: text('billing').notNull().default('legacy'),
+    keyCiphertext: text('key_ciphertext'),
+  },
+  (table) => [
+    check('forge_jobs_cards_json', sql`json_valid(${table.cards})`),
+    uniqueIndex('forge_job_request').on(table.owner, table.requestKey),
+  ],
+);
+
+export const forgeKeys = sqliteTable('forge_keys', {
+  owner: text('owner').primaryKey(),
+  ciphertext: text('ciphertext').notNull(),
+  updated: integer('updated').notNull(),
+});
+export const forgeTrials = sqliteTable('forge_trials', {
+  userId: text('user_id').primaryKey(),
+  expires: integer('expires').notNull(),
+  maxJobs: integer('max_jobs').notNull(),
+});

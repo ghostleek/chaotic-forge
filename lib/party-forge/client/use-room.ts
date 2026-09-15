@@ -10,7 +10,7 @@ export function useRoom(roomId?: string) {
     client.serverSnapshot,
   );
   useEffect(() => {
-    client.start(sessionStorage);
+    client.start(() => sessionStorage);
     return () => client.stop();
   }, [client]);
   return { client, ...state };

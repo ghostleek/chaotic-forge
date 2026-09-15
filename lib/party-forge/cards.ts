@@ -1,4 +1,4 @@
-import { contributionHistorySchema, type BuildManifest, type AdditionCard } from './contracts.ts';
+import { contributionHistorySchema, isPixelHistory, legalAdditions, type BuildManifest, type AdditionCard } from './contracts.ts';
 import type { KitchenRecipe } from './runtimes/kitchen-chaos-v1/engine.ts';
 import { freezeJson } from './runtimes/kitchen-chaos-v1/integrity.ts';
 
@@ -9,6 +9,7 @@ export type Contribution = BuildManifest['contributions'][number];
 
 /** Source is the authored demo deck; interpretation is executable behavior, not model output. */
 export const CARDS = freezeJson({
+  instruction: { slot: 'instruction', title: 'Your instruction', interpretation: 'Awaiting generated interpretation' },
   knockback: { slot: 'fps', title: 'Knockback', interpretation: 'Aimed shots repel the nearest visible zombie and push it away.' },
   'counter-ricochet': { slot: 'fps', title: 'Counter ricochet', interpretation: 'Aimed shots can reflect once from the marked counter to hit a zombie.' },
   pursuers: { slot: 'zombies', title: 'Pursuers', interpretation: 'Zombies pursue the player and interrupt nearby cooking through contact.' },
@@ -22,23 +23,29 @@ export const CARDS = freezeJson({
 
 export function recipeFromContributions(value: unknown): KitchenRecipe {
   const contributions = contributionHistorySchema.parse(value);
+  if (isPixelHistory(contributions)) throw new Error('Instructions require the generated pixel runtime');
   const initial = contributions.filter(c => c.kind === 'initial');
   // The shared schema establishes exactly one of each slot before this projection.
   return {
     fps: initial.find(c => c.choice.slot === 'fps')!.choice.cardId as KitchenRecipe['fps'],
     zombies: initial.find(c => c.choice.slot === 'zombies')!.choice.cardId as KitchenRecipe['zombies'],
     cooking: initial.find(c => c.choice.slot === 'cooking')!.choice.cardId as KitchenRecipe['cooking'],
-    additions: contributions.filter(c => c.kind === 'addition').map(c => c.cardId),
+    additions: contributions.filter(c => c.kind === 'addition').map(c => c.cardId) as KitchenRecipe['additions'],
   };
 }
 
 export function additionOptions(value: unknown): { cards: AdditionCard[]; pass: boolean; reason: string | null } {
-  const recipe = recipeFromContributions(value);
-  const cards = (['dinner-bell', 'hot-potato', 'zombie-pantry'] as AdditionCard[])
-    .filter(card => !recipe.additions.includes(card));
-  return { cards, pass: cards.length === 0, reason: cards.length ? null : 'All three additions are already present. Pass keeps every existing rule.' };
+  const history = contributionHistorySchema.parse(value);
+  const cards = legalAdditions(history);
+  return { cards, pass: cards.length === 0, reason: cards.length ? null : 'The bounded remix is complete. Pass keeps every accepted rule.' };
 }
 
 export function cardIdFor(contribution: Contribution): keyof typeof CARDS {
   return contribution.kind === 'initial' ? contribution.choice.cardId : contribution.cardId;
+}
+
+export function contributionText(contribution: Contribution): string {
+  if (contribution.kind === 'initial' && contribution.choice.slot === 'instruction') return contribution.choice.text;
+  if (contribution.kind === 'addition' && contribution.cardId === 'instruction') return contribution.text!;
+  return CARDS[cardIdFor(contribution)].interpretation;
 }

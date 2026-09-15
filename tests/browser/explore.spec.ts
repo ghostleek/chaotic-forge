@@ -13,8 +13,7 @@ const FILTER_LABELS = [
 ] as const;
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Skip introduction' }).click();
+  await page.goto('/explore');
   await expect(
     page.getByRole('heading', {
       name: 'Start with a game. Leave with a testable mechanic.',

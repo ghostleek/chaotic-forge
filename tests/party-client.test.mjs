@@ -236,3 +236,14 @@ await test('late loader callbacks cannot send mutations after client stops', asy
   assert.equal(posts, 0);
   assert.equal(client.state.pending, false);
 });
+
+await test('denied session storage getter leaves the room disconnected without requests', () => {
+  let calls = 0;
+  const client = new RoomClient(undefined, async () => { calls++; return response({}); });
+  client.start(() => { throw new Error('storage denied'); });
+  assert.equal(client.snapshot().connected, false);
+  assert.equal(client.snapshot().storageUnavailable, true);
+  assert.match(client.snapshot().error, /Browser storage is unavailable/);
+  assert.equal(calls, 0);
+  client.stop();
+});

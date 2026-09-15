@@ -22,6 +22,20 @@
       "when": 1789278858320,
       "tag": "0002_whole_sharon_carter",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1789283348963,
+      "tag": "0003_charming_baron_zemo",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1789297043552,
+      "tag": "0004_overconfident_mastermind",
+      "breakpoints": true
     }
   ]
 }

@@ -20,3 +20,11 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Latest decision — authenticated API access and saved permutations (13 September 2026)
+
+Paid generation requires BYOK unless ChatGPT-authenticated email is exactly kahhow@string.sg, leekahhow@gmail.com or lancetyw@gmail.com (case-normalized). Those admins may use the site key. This supersedes broader sponsored trials. Public saved-demo play makes no API call. Never accept client-provided identity as authorization.
+
+Current party creation uses GPT-6 Astra Responses structured rules; separate Agents code creation stays disabled until a supervised runner is qualified. Exact Snake/Invaders two- and three-player permutations reuse saved output; custom modifiers do not silently match. Starter buttons prefill with visible help and require confirmation. Preserve provenance and deterministic replay.
+
+Implementation/release packet: PC-09 supplement on current production base d766b394958dd6518d664b04e5f41cd00a2bca9f, preserving existing PC-03/05/06 runtime and migrations. Human owners Kahhow (UX) and Lance (backend/shared files); implementer Codex; independent review required. Allowed files: creator/auth routes, generation funding/resolver, starter UI, appended schema migration, focused tests, this guidance and mini PRD. No new GitHub issue/PR verified. Existing source dependencies remain; Agents runner is optional/disabled fallback. Run QUALITY.md gates and real Worker tests before release. Timebox: this deployment session; cut is public saved play plus protected Responses generation, with Agents disabled. Roll back Site version without dropping stored data.

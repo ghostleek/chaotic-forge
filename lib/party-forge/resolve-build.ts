@@ -1,4 +1,5 @@
-import { contributionHistorySchema, type BuildManifest } from './contracts.ts';
+import { contributionHistorySchema, isPixelHistory, type BuildManifest } from './contracts.ts';
+import { loadRetainedBuild } from './runtime-registry.ts';
 import { recipeFromContributions } from './cards.ts';
 import { loadBuild, manifestHash, qualifyBuild, retainedQualification, type Qualification } from './validate-build.ts';
 import { buildDescriptor } from './runtimes/kitchen-chaos-v1/manifest.ts';
@@ -17,7 +18,7 @@ export type ResolveResult =
 export async function resolveBuild(request: ResolveRequest): Promise<ResolveResult> {
   let previous: BuildManifest | null = null;
   try {
-    if (request.previous) previous = (await loadBuild(request.previous)).build;
+    if (request.previous) previous = (await loadRetainedBuild(request.previous)).build;
     const contributions = contributionHistorySchema.parse(request.contributions);
     if (previous) {
       if (canonicalJson(contributions) === canonicalJson(previous.contributions)) {
@@ -27,8 +28,11 @@ export async function resolveBuild(request: ResolveRequest): Promise<ResolveResu
           canonicalJson(contributions.slice(0, previous.contributions.length)) !== canonicalJson(previous.contributions)) {
         throw new Error('Evolution must retain every prior contribution unchanged and append at most two legal additions');
       }
-    } else if (contributions.length !== 3) {
+    } else if (contributions.length !== 3 && !isPixelHistory(contributions)) {
       throw new Error('An initial build requires exactly three concept contributions; additions need their playable parent');
+    }
+    if (isPixelHistory(contributions)) {
+      throw new Error('Instruction-based games require the configured generation service. Your text is retained; no preset was substituted.');
     }
     const descriptor = buildDescriptor(contributions, previous ? { buildId: previous.buildId, contentHash: previous.contentHash } : null);
     const recipe = recipeFromContributions(contributions);

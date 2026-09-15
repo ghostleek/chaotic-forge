@@ -1,0 +1,276 @@
+.page {
+  min-height: 100vh;
+  background: #f4f2e9;
+  color: #202820;
+  padding: 28px clamp(20px, 5vw, 80px) 64px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #cacdc0;
+  padding-bottom: 24px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.nav a {
+  text-decoration: none;
+  color: inherit;
+}
+.heading {
+  max-width: 1000px;
+  padding: 52px 0 32px;
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.17em;
+  font-weight: 800;
+}
+.heading h1 {
+  font-size: clamp(38px, 5.8vw, 78px);
+  line-height: 1.04;
+  letter-spacing: -0.055em;
+  margin: 20px 0;
+}
+.heading h1 span {
+  color: #6b755f;
+}
+.heading > p:last-child {
+  font-size: 17px;
+  color: #636958;
+  line-height: 1.7;
+}
+.playLayout {
+  display: grid;
+  grid-template-columns: minmax(340px, 650px) minmax(250px, 350px);
+  gap: clamp(30px, 5vw, 80px);
+  align-items: start;
+}
+.gamePanel {
+  background: #101b25;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 45px #1c281825;
+  color: #edf3e9;
+}
+.scorebar {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #293846;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #9aa9b5;
+}
+.scorebar b {
+  display: block;
+  font-size: 22px;
+  color: #eaff8e;
+  margin-top: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.gamePanel canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 560px;
+  object-fit: contain;
+  outline-offset: -4px;
+}
+.gameFooter {
+  padding: 20px 24px;
+  border-top: 1px solid #293846;
+}
+.gameFooter p {
+  font-size: 13px;
+  margin: 0 0 15px;
+  min-height: 18px;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.page button,
+.button {
+  font: inherit;
+  border: 1px solid #6b775e;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+  font-weight: 700;
+}
+.page .primary {
+  background: #dafa77;
+  color: #1c2a11;
+  border-color: #dafa77;
+}
+.page button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.page :focus-visible {
+  outline: 3px solid #ae7cd8;
+  outline-offset: 4px;
+}
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  border: 1px solid #a1ab90;
+  padding: 8px 10px;
+  border-radius: 4px;
+}
+.sidebar {
+  padding-top: 4px;
+}
+.sidebar h2 {
+  font-size: 28px;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+  margin: 25px 0;
+}
+.sidebar article {
+  border-top: 1px solid #ccd0bf;
+  padding: 20px 0;
+}
+.sidebar article span,
+.controls b {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: #626e54;
+}
+.sidebar h3 {
+  font-size: 16px;
+  margin: 10px 0;
+}
+.sidebar p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #626957;
+}
+.controls {
+  padding: 18px;
+  background: #e9ebdd;
+  border-radius: 8px;
+}
+.muted {
+  font-size: 12px !important;
+  color: #727967 !important;
+}
+.textLink {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: inherit;
+}
+.creator {
+  max-width: 780px;
+}
+.card {
+  padding: 28px;
+  border: 1px solid #c9cebc;
+  border-radius: 12px;
+  background: #fffef8;
+  margin-bottom: 20px;
+}
+.card h2 {
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px;
+}
+.card p {
+  line-height: 1.6;
+}
+.card label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+}
+.card input {
+  padding: 12px;
+  border: 1px solid #9da78d;
+  border-radius: 6px;
+  background: white;
+  color: #202820;
+  font: inherit;
+  width: 100%;
+  margin: 6px 0 16px;
+}
+.notice {
+  border-left: 3px solid #8a9c58;
+  padding: 10px 16px;
+  background: #e9eddd;
+  font-size: 14px;
+}
+.choices {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 22px 0;
+}
+.choices button[aria-pressed='true'] {
+  background: #e2efa7;
+  border-color: #6d8042;
+}
+.history {
+  list-style: none;
+  padding: 0;
+}
+.history li {
+  padding: 15px 0;
+  border-top: 1px solid #d3d7c8;
+}
+.history button {
+  margin-top: 10px;
+}
+.player {
+  width: 100%;
+  height: 620px;
+  border: 1px solid #b6bba9;
+  border-radius: 10px;
+  background: #101b25;
+}
+.error {
+  color: #9b352e;
+}
+.steps {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.steps b {
+  color: #48631b;
+}
+@media (max-width: 760px) {
+  .playLayout {
+    grid-template-columns: 1fr;
+  }
+  .heading {
+    padding-top: 32px;
+  }
+  .sidebar {
+    max-width: 600px;
+  }
+  .page {
+    padding: 20px 18px 40px;
+  }
+  .scorebar {
+    padding: 16px;
+  }
+  .card {
+    padding: 20px;
+  }
+  .player {
+    height: 480px;
+  }
+}

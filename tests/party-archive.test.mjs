@@ -270,9 +270,9 @@ void test('forks reject reused identities, duplicate inherited slots, same-card 
 });
 
 void test('the static registry pins and bundles the exact released v1 executable', async () => {
-  assert.ok(Object.isFrozen(RETAINED_RUNTIMES[0].runtime));
+  assert.ok(Object.isFrozen(RETAINED_RUNTIMES.find(entry=>entry.runtime.version==='kitchen-chaos-v1').runtime));
   const bytes = await readFile(new URL('../lib/party-forge/runtimes/kitchen-chaos-v1/retained/engine.js', import.meta.url));
-  assert.equal(`sha256:${createHash('sha256').update(bytes).digest('hex')}`, RETAINED_RUNTIMES[0].runtime.hash);
+  assert.equal(`sha256:${createHash('sha256').update(bytes).digest('hex')}`, RETAINED_RUNTIMES.find(entry=>entry.runtime.version==='kitchen-chaos-v1').runtime.hash);
   const publicBytes = await readFile(new URL('../public/party-forge/kitchen-chaos-v1/engine.js', import.meta.url));
   assert.deepEqual(publicBytes, bytes, 'The portable executable is the same exact module used for scoring');
   const source = (await archiveFixture()).finalBuild;

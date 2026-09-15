@@ -32,6 +32,7 @@ function parametersFor(contribution: Contribution): Record<string, number> {
     case 'hot-potato': return { carryTicks: RULES.hotPotatoCarryTicks, stackCap: RULES.additionStackCap };
     case 'zombie-pantry': return { pickupCap: RULES.pantryPickupCap, worldDropCap: RULES.pantryWorldDropCap,
       dropLifetimeTicks: RULES.pantryDropLifetimeTicks, pickupReach: RULES.pantryPickupReach, stackCap: RULES.additionStackCap };
+    default: throw new Error('Instructions require their generated pixel descriptor');
   }
 }
 

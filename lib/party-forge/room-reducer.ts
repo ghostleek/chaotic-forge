@@ -6,6 +6,8 @@ import {
   forkSetupSchema,
   gameHistorySchema,
   legalAdditions,
+  isPixelChoice,
+  isPixelHistory,
   rankResults,
   roomCommandSchema,
   roomSnapshotSchema,
@@ -112,7 +114,7 @@ export function joinRoom(record: RoomRecord, participantId: string, nickname: st
   assertTime(record, now);
   const next = structuredClone(record);
   const room = next.snapshot;
-  requireCondition(room.participants.length < DEMO_POLICY.players, 'unavailable', 'This demo supports exactly three players');
+  requireCondition(room.participants.length < DEMO_POLICY.players, 'unavailable', 'This room supports at most three players');
   requireCondition(['lobby', 'results', 'end-vote', 'additions'].includes(room.phase),
     'invalid-phase', 'Join at a round boundary');
   requireCondition(!room.participants.some(p => p.id === participantId), 'unauthorized', 'An invitation cannot reclaim a participant');
@@ -122,7 +124,7 @@ export function joinRoom(record: RoomRecord, participantId: string, nickname: st
   room.votes = []; // A newly active participant must participate in any End decision.
   if (room.phase === 'end-vote') room.phase = 'results';
   if (room.phase === 'lobby' && room.fork?.mode === 'play-again' &&
-      room.build.status === 'playable' && room.participants.length === DEMO_POLICY.players) {
+      room.build.status === 'playable' && room.participants.length >= minimumPlayers(room)) {
     prepareRound(next, room.build.manifest, now);
   }
   return finish(next, now);
@@ -167,9 +169,11 @@ function activeBuild(record: RoomRecord): BuildManifest {
   return build.manifest;
 }
 
+function minimumPlayers(room: RoomSnapshot) { return isPixelHistory(room.contributions) ? 2 : DEMO_POLICY.players; }
+
 function prepareRound(record: RoomRecord, manifest: BuildManifest, now: number) {
   const room = record.snapshot;
-  requireCondition(room.participants.length === DEMO_POLICY.players, 'unavailable', 'Wait for three participants before a trial');
+  requireCondition(room.participants.length >= minimumPlayers(room), 'unavailable', `Wait for ${minimumPlayers(room)} participants before a trial`);
   requireCondition(record.historyCount < ROOM_HISTORY_LIMIT, 'unavailable', 'The disclosed history capacity is reached');
   const startsAt = now + DEMO_POLICY.readyWindowMs;
   record.roundCounter += 1;
@@ -181,7 +185,7 @@ function prepareRound(record: RoomRecord, manifest: BuildManifest, now: number) 
     ticksPerSecond: DEMO_POLICY.ticksPerSecond, startsAt,
     submissionDeadline: startsAt + 60_000,
     transportDeadline: startsAt + 60_000 + DEMO_POLICY.transportGraceMs,
-    tieCursor: room.lastCompleted?.nextTieCursor ?? 0,
+    tieCursor: (room.lastCompleted?.nextTieCursor ?? 0) % room.participants.length,
   };
   room.phase = 'ready';
   room.build = { status: 'playable', manifest };
@@ -195,7 +199,12 @@ function prepareRound(record: RoomRecord, manifest: BuildManifest, now: number) 
   record.retryBuild = null;
 }
 
-function provenance(participantId: string, commandId: string, cardId: keyof typeof CARDS) {
+function provenance(participantId: string, commandId: string, cardId: keyof typeof CARDS, instruction?: string): Contribution['provenance'] {
+  if (cardId === 'instruction') {
+    if (!instruction) throw new Error('An instruction requires its submitted text');
+    return { source: { kind: 'user-concept', reference: instruction }, forgeInterpretation: 'Awaiting generated interpretation',
+      userDecision: { participantId, decisionId: commandId } };
+  }
   return {
     source: { kind: 'authored-demo' as const, reference: `Kitchen Chaos authored demo deck: ${CARDS[cardId].title}` },
     forgeInterpretation: CARDS[cardId].interpretation,
@@ -212,8 +221,9 @@ function evolutionContributions(record: RoomRecord): Contribution[] {
     contributions.push({
       id: decision.contributionId, participantId: slot.participantId, ordinal: contributions.length,
       kind: 'addition', cardId: slot.resolution.cardId,
+      ...(slot.resolution.text !== undefined ? { text: slot.resolution.text } : {}),
       afterRoundId: room.lastCompleted!.round.roundId, editorRole: slot.role,
-      provenance: provenance(slot.participantId, decision.commandId, slot.resolution.cardId),
+      provenance: provenance(slot.participantId, decision.commandId, slot.resolution.cardId, slot.resolution.text),
     });
   }
   return contributions;
@@ -221,14 +231,15 @@ function evolutionContributions(record: RoomRecord): Contribution[] {
 
 async function forge(record: RoomRecord, now: number, resolve: typeof resolveBuild) {
   const room = record.snapshot;
-  requireCondition(room.participants.length === DEMO_POLICY.players, 'unavailable', 'Wait for three participants before preparing the next trial');
+  requireCondition(room.participants.length >= minimumPlayers(room), 'unavailable', `Wait for ${minimumPlayers(room)} participants before preparing the next trial`);
+  if (!room.lastCompleted && isPixelHistory(room.contributions)) requireCondition(room.contributions.length === room.participants.length && room.participants.every(p => room.contributions.some(c => c.participantId === p.id)), 'unavailable', 'Every connected participant must submit an instruction before generation');
   const previous = record.lastPlayedBuild;
   const contributions = room.lastCompleted ? evolutionContributions(record) : room.contributions;
   const jobId = crypto.randomUUID();
   const contributionRevision = room.revision + 1;
   room.phase = 'forging';
   room.build = { status: 'forging', jobId, contributionRevision, previous };
-  // Authored resolution is one bounded operation. The service commits the entire
+  // Resolution is a bounded operation. The service commits the entire
   // result by expected-revision CAS, so obsolete work cannot overwrite new state.
   try {
     const result = await resolve({ contributions, previous });
@@ -238,14 +249,14 @@ async function forge(record: RoomRecord, now: number, resolve: typeof resolveBui
       room.build = {
         status: 'incompatible', jobId, contributionRevision, previous,
         affectedContributionIds: contributions.filter(c => !previous?.contributions.some(p => p.id === c.id)).map(c => c.id),
-        reason: result.reason.slice(0, 1000) || 'The authored preset could not be validated',
+        reason: result.reason.slice(0, 1000) || 'The game could not be generated or validated',
       };
     }
   } catch {
     room.build = {
       status: 'failed', jobId, contributionRevision, previous,
       affectedContributionIds: contributions.filter(c => !previous?.contributions.some(p => p.id === c.id)).map(c => c.id),
-      reason: 'The authored preset could not be validated. Retry or revise the pending choices.',
+      reason: 'The game could not be generated or validated. Retry or revise the pending instructions.',
     };
   }
 }
@@ -254,9 +265,9 @@ async function forgeFork(record: RoomRecord, now: number, resolve: typeof resolv
   const room = record.snapshot;
   const fork = room.fork;
   requireCondition(fork && record.sourceBuild && record.parentArchiveId, 'invalid-phase', 'A retained source game is required');
-  requireCondition(room.participants.length === DEMO_POLICY.players &&
+  requireCondition(room.participants.length === record.sourceBuild.contributions.filter(c => c.kind === 'initial').length &&
     room.participants.every(p => fork.decisions.some(d => d.participantId === p.id)),
-    'unavailable', 'Each of the three new participants must choose an inherited slot');
+    'unavailable', 'Each new participant must choose an inherited initial contribution');
   const setup = forkSetupSchema.parse({
     protocolVersion: PROTOCOL_VERSION, sourceArchiveId: record.parentArchiveId,
     sourceBuildId: record.sourceBuild.buildId, sourceBuildHash: record.sourceBuild.contentHash,
@@ -345,17 +356,18 @@ export async function reduceRoom(
         requireCondition(inherited?.kind === 'initial', 'invalid-choice', 'Claim an inherited initial concept slot');
         requireCondition(!room.fork.decisions.some(d => d.participantId !== actorId &&
           d.selection.inheritedContributionId === inherited.id), 'invalid-choice', 'Another participant has claimed this inherited slot');
+        requireCondition(!isPixelHistory(next.sourceBuild.contributions) || command.selection.kind === 'keep', 'invalid-choice', 'Saved instruction replacements require a new generated game; Play again retains the existing game');
         const choice = command.selection.kind === 'replace' ? command.selection.choice : inherited.choice;
         requireCondition(choice.slot === inherited.choice.slot &&
           (command.selection.kind === 'keep' || choice.cardId !== inherited.choice.cardId),
           'invalid-choice', 'Choose Keep or the other supported variant in that slot');
         room.fork.decisions = room.fork.decisions.filter(d => d.participantId !== actorId);
         room.fork.decisions.push({ participantId: actorId, selection: command.selection,
-          provenance: provenance(actorId, command.commandId, choice.cardId) });
+          provenance: provenance(actorId, command.commandId, choice.cardId, choice.slot === 'instruction' ? choice.text : undefined) });
         room.phase = 'lobby';
         room.build = { status: 'empty' };
         next.forkSetup = null;
-        if (room.fork.decisions.length === DEMO_POLICY.players) await forgeFork(next, now, services.resolveFork ?? resolveArchiveFork);
+        if (room.fork.decisions.length === next.sourceBuild.contributions.filter(c => c.kind === 'initial').length) await forgeFork(next, now, services.resolveFork ?? resolveArchiveFork);
         break;
       }
       case 'choose-initial': {
@@ -363,20 +375,22 @@ export async function reduceRoom(
         requireCondition(room.phase === 'lobby' || (room.phase === 'forging' && !room.lastCompleted && room.build.status !== 'forging'),
           'invalid-phase', 'Initial choices are editable before the first build is accepted');
         requireCondition(room.build.status !== 'playable', 'invalid-phase', 'The accepted recipe is frozen');
-        requireCondition(!room.contributions.some(c => c.kind === 'initial' && c.choice.slot === command.choice.slot && c.participantId !== actorId),
+        requireCondition(command.choice.slot === 'instruction' || !room.contributions.some(c => c.kind === 'initial' && c.choice.slot === command.choice.slot && c.participantId !== actorId),
           'invalid-choice', 'Another participant has claimed this concept slot');
+        requireCondition(!room.contributions.some(c => c.kind === 'initial' && c.participantId !== actorId &&
+          isPixelChoice(c.choice) !== isPixelChoice(command.choice)), 'invalid-choice', 'Every player must use the same game family');
         const existing = room.contributions.findIndex(c => c.participantId === actorId);
         const contribution: Contribution = {
           id: crypto.randomUUID(), participantId: actorId,
           ordinal: existing === -1 ? room.contributions.length : existing,
           kind: 'initial', choice: command.choice,
-          provenance: provenance(actorId, command.commandId, command.choice.cardId),
+          provenance: provenance(actorId, command.commandId, command.choice.cardId, command.choice.slot === 'instruction' ? command.choice.text : undefined),
         };
         if (existing === -1) room.contributions.push(contribution);
         else room.contributions[existing] = contribution;
         room.phase = 'lobby';
         room.build = { status: 'empty' };
-        if (room.contributions.length === DEMO_POLICY.players) await forge(next, now, services.resolve ?? (next.sourceBuild && next.lastPlayedBuild ? resolveArchiveEvolution : resolveBuild));
+        if (room.contributions.length === DEMO_POLICY.players && !isPixelHistory(room.contributions)) await forge(next, now, services.resolve ?? (next.sourceBuild && next.lastPlayedBuild ? resolveArchiveEvolution : resolveBuild));
         break;
       }
       case 'acknowledge-build': {
@@ -396,7 +410,7 @@ export async function reduceRoom(
       }
       case 'start-round': {
         hostOnly(room, actorId);
-        requireCondition(room.participants.length === DEMO_POLICY.players, 'unavailable', 'Wait for three participants before a trial');
+        requireCondition(room.participants.length >= minimumPlayers(room), 'unavailable', `Wait for ${minimumPlayers(room)} participants before a trial`);
         if ((room.phase === 'lobby' && room.build.status === 'playable') ||
             (['results', 'end-vote'].includes(room.phase) && next.recovery)) {
           retryRound(next, now);
@@ -404,9 +418,9 @@ export async function reduceRoom(
         }
         requireCondition(room.phase === 'ready' && room.round, 'invalid-phase', 'Prepare a playable build before starting');
         requireCondition(now <= room.round.startsAt, 'deadline', 'Ready expired; acknowledge again to reopen the window');
-        requireCondition(room.acknowledgments.length === DEMO_POLICY.players && room.participants.every(p =>
-          p.presence === 'present' && now - p.lastSeenAt < DEMO_POLICY.hostGraceMs), 'unavailable', 'All three participants must be present and acknowledge');
-        const startsAt = now + ROUND_START_LEAD_MS;
+        requireCondition(room.acknowledgments.length === room.round.roster.length && room.participants.every(p =>
+          p.presence === 'present' && now - p.lastSeenAt < DEMO_POLICY.hostGraceMs), 'unavailable', 'Every participant in the frozen roster must be present and acknowledge');
+        const startsAt = now + (room.build.status === 'playable' && ['pixel-arcade/1', 'dino-runner/2'].includes(room.build.manifest.catalogVersion) ? 6000 : ROUND_START_LEAD_MS);
         room.round.startsAt = startsAt;
         room.round.submissionDeadline = startsAt + 60_000;
         room.round.transportDeadline = startsAt + 60_000 + DEMO_POLICY.transportGraceMs;
@@ -416,18 +430,18 @@ export async function reduceRoom(
       case 'submit-trial': {
         requireCondition(room.phase === 'playing' && room.round, 'invalid-phase', 'No active scored trial');
         requireCondition(room.round.roster.includes(actorId), 'unauthorized', 'The active roster is frozen');
-        requireCondition(now >= room.round.submissionDeadline && now <= room.round.transportDeadline,
-          'deadline', 'Submit only after the full trial and within its original transport grace');
+        requireCondition(now >= (command.trial.endedEarly ? room.round.startsAt + Math.ceil(command.trial.frames.length * 1000 / room.round.ticksPerSecond) : room.round.submissionDeadline) && now <= room.round.transportDeadline,
+          'deadline', 'Submit only after the captured play time and within the transport grace');
         requireCondition(!next.submissions.some(s => s.participantId === actorId || s.attemptId === command.trial.attemptId),
           'incomplete-attempt', 'Only one accepted attempt per participant and round');
         let score: Awaited<ReturnType<typeof scoreTrial>>;
         try { score = await scoreTrial(activeBuild(next), room.round, command.trial); }
         catch { throw new RoomTransitionError('incomplete-attempt', 'The complete trace must match the frozen runtime, seed and input bounds'); }
         next.submissions.push({ participantId: actorId, ...score });
-        if (next.submissions.length === DEMO_POLICY.players) {
+        if (next.submissions.length === room.round.roster.length) {
           const ranked = rankResults(room.round, next.submissions);
           const result = completedResultSchema.parse({
-            protocolVersion: PROTOCOL_VERSION, round: room.round,
+            protocolVersion: PROTOCOL_VERSION, round: room.round, completedAt: now,
             results: next.submissions.map(s => ({ ...s, rank: ranked.ranks[s.participantId] })),
             editors: ranked.editors, nextTieCursor: ranked.nextTieCursor,
           });
@@ -440,6 +454,11 @@ export async function reduceRoom(
           next.recovery = false;
           next.retryBuild = null;
         }
+        break;
+      }
+      case 'replay-round': {
+        requireCondition(['results', 'end-vote'].includes(room.phase) && isPixelHistory(room.contributions), 'invalid-phase', 'Replay a completed pixel game');
+        retryRound(next, now);
         break;
       }
       case 'vote': {
@@ -472,25 +491,27 @@ export async function reduceRoom(
         requireCondition(slot, 'unauthorized', 'Only the winner and loser may add a mechanic');
         if (!revising) requireCondition(room.editSlots.find(s => s.resolution.status === 'pending') === slot,
           'unauthorized', 'Resolve exactly one editor slot in the announced order');
-        const available = legalAdditions(room.contributions).filter(card => !room.editSlots.some(s =>
-          s !== slot && s.resolution.status === 'chosen' && s.resolution.cardId === card));
+        const available = legalAdditions(room.contributions).filter(card => card === 'instruction'
+          ? room.contributions.length + room.editSlots.filter(s => s !== slot && s.resolution.status === 'chosen').length < 5
+          : !room.editSlots.some(s => s !== slot && s.resolution.status === 'chosen' && s.resolution.cardId === card));
         if (!('cardId' in command)) {
           requireCondition(available.length === 0, 'invalid-choice', 'Pass is available only when the compatible deck is exhausted');
           slot.resolution = { status: 'passed', reason: 'no-legal-addition' };
         } else {
           requireCondition(available.includes(command.cardId), 'invalid-choice', 'This card is already present or pending');
-          slot.resolution = { status: 'chosen', cardId: command.cardId };
+          slot.resolution = { status: 'chosen', cardId: command.cardId, ...(command.text !== undefined ? { text: command.text } : {}) };
           next.editDecisions = next.editDecisions.filter(d => d.participantId !== actorId);
           next.editDecisions.push({ participantId: actorId, commandId: command.commandId, contributionId: crypto.randomUUID() });
         }
-        if (room.editSlots.every(s => s.resolution.status !== 'pending') && room.participants.length === DEMO_POLICY.players) {
+        if (room.editSlots.every(s => s.resolution.status !== 'pending') && room.participants.length >= minimumPlayers(room)) {
           await forge(next, now, services.resolve ?? (next.sourceBuild && next.lastPlayedBuild ? resolveArchiveEvolution : resolveBuild));
         }
         break;
       }
       case 'retry-forge': {
         hostOnly(room, actorId);
-        requireCondition((room.phase === 'forging' && room.build.status !== 'forging') ||
+        requireCondition((room.phase === 'lobby' && room.build.status === 'empty' && room.contributions.length >= 2 && room.contributions.length === room.participants.length && isPixelHistory(room.contributions)) ||
+          (room.phase === 'forging' && room.build.status !== 'forging') ||
           (room.phase === 'additions' && room.editSlots.every(s => s.resolution.status !== 'pending')),
           'invalid-phase', 'Retry the retained failed or pending choices');
         if (room.fork && !room.lastCompleted) await forgeFork(next, now, services.resolveFork ?? resolveArchiveFork);
@@ -527,12 +548,12 @@ export async function reduceRoom(
       case 'abort-evolution': {
         hostOnly(room, actorId);
         requireCondition(room.phase === 'additions' || (room.phase === 'forging' && room.lastCompleted), 'invalid-phase', 'No pending evolution to abort');
-        requireCondition(room.participants.length < DEMO_POLICY.players ||
-          room.editSlots.some(slot => (slot.resolution.status === 'pending' || room.phase === 'forging') && room.participants.some(p =>
-            p.id === slot.participantId && now - p.lastSeenAt >= DEMO_POLICY.hostGraceMs)),
+        requireCondition(room.participants.length < minimumPlayers(room) ||
+          room.editSlots.some(slot => (slot.resolution.status === 'pending' || room.phase === 'forging') && (!room.participants.some(p => p.id === slot.participantId) || room.participants.some(p =>
+            p.id === slot.participantId && now - p.lastSeenAt >= DEMO_POLICY.hostGraceMs))),
           'unavailable', 'Preserve each pending editor slot throughout the disclosed absence grace');
-        recordEvolutionAbort(next, history, now, room.participants.length < DEMO_POLICY.players
-          ? 'The host explicitly aborted the unplayed evolution because fewer than three active participants remain; the last completed game was preserved.'
+        recordEvolutionAbort(next, history, now, room.participants.length < minimumPlayers(room)
+          ? 'The host explicitly aborted the unplayed evolution because fewer than the required participants remain; the last completed game was preserved.'
           : 'The host explicitly aborted an evolution after an editor exceeded the absence grace; no edit privilege was transferred.');
         break;
       }

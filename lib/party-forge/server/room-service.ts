@@ -1,3 +1,6 @@
+import { resolveArchiveEvolution } from '../archive.ts';
+import { isPixelHistory, contributionHistorySchema } from '../contracts.ts';
+import { resolveInstructionRequest } from './pixel-generation.ts';
 import { z } from 'zod';
 import { getDb } from '../../../db/index.ts';
 import {
@@ -51,7 +54,7 @@ const responseHeaders = {
 };
 
 function json(body: unknown, status = 200): Response {
-  return Response.json(body, { status, headers: responseHeaders });
+  return Response.json(body, { status, headers: {...responseHeaders, 'x-party-server-time': String(Date.now())} });
 }
 
 async function requireRoom(
@@ -308,6 +311,7 @@ export async function commandRoomResponse(
       : await reduceRoom(
           current, enrollment.participantId, command,
           Math.max(Date.now(), now, current.snapshot.updatedAt),
+          {resolve: request => current.sourceBuild && current.lastPlayedBuild && !isPixelHistory(contributionHistorySchema.parse(request.contributions)) ? resolveArchiveEvolution(request) : resolveInstructionRequest(request, db, roomId)},
         );
     if (
       await commitRoom(db, current.snapshot.revision, transition.record, {

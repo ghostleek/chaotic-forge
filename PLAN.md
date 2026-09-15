@@ -1,6 +1,13 @@
 # Competitive Forge delivery plan
 
-**Accepted additional PR — 13 September 2026:** [PC-12 Dino × Mario onboarding](./docs/issues/PC-12.md), owned by Kahhow with Lance for human acceptance, uses exact base `1dbccea77d4d2707328c704f1d20be8aabc3b2ac`. Its standalone authored demo and reusable instruction document do not change room/creator APIs. Follow the packet’s scoped files, quality gates and serialized-merge policy.
+## Latest user decision — pixel instruction demo (13 September 2026)
+
+This decision supersedes the fixed Kitchen demo and exactly-three-player defaults below for new pixel rooms. Two players can create and start; a third is optional, with a hard cap of three. Each connected player confirms one custom instruction card, optionally filled from a starter. The host explicitly asks Forge to mesh them into a single bounded pixel game. The model returns executable rule configuration for the retained Snake/Invaders/Bounce engine, including scoring weights and an interpretation for each card. It does not generate arbitrary JavaScript or satisfy all of PC-09.
+
+Players run concurrently in separate arenas with matching rules, seed and server start time. Highest points wins, with fewer hits as the next comparison. Existing room capabilities, captured inputs, server replay, results and archive contracts are reused. Winner and loser may each propose a further instruction while the bounded recipe has space. Source text, model interpretation and user confirmation stay distinct. Legacy Kitchen and G1–G4 remain retained.
+
+User authorized implementation and GPT Sites deployment on the PC-05 stack; broad edge-case suites remain paused, with one real local golden flow requested. Full QUALITY.md gates and independent acceptance remain required before merging. See [current handoff](docs/design/pc-05-handoff.md).
+
 
 **Updated:** 2026-09-13
 **Status:** Product planning; GitHub publication in progress. PC-01 is [issue #30](https://github.com/ghostleek/chaotic-forge/issues/30), assigned to Lance (@Leoendithas). PC-02–11 remain drafts pending publication after the main-branch sync. Implementation has not started.
@@ -112,3 +119,17 @@ PC-09 cannot be marked fulfilled by PC-01–08. A pending capability, unsupporte
 ## Planning validation
 
 This change authors a PRD delivery plan and issue specifications. GitHub publication status is recorded in the issue index. It does not implement the party game, provision, deploy, or report a fresh runtime quality pass. The previous plan is preserved byte-for-byte in the dated archive. Its historical relative-link base and path mappings are recorded in the archive README and manifest.
+
+## Latest decision — authenticated API access and saved permutations (13 September 2026)
+
+Paid generation requires BYOK unless ChatGPT-authenticated email is exactly kahhow@string.sg, leekahhow@gmail.com or lancetyw@gmail.com (case-normalized). Those admins may use the site key. This supersedes broader sponsored trials. Public saved-demo play makes no API call. Never accept client-provided identity as authorization.
+
+Current party creation uses GPT-6 Astra Responses structured rules; separate Agents code creation stays disabled until a supervised runner is qualified. Exact Snake/Invaders two- and three-player permutations reuse saved output; custom modifiers do not silently match. Starter buttons prefill with visible help and require confirmation. Preserve provenance and deterministic replay.
+
+Implementation/release packet: PC-09 supplement on current production base d766b394958dd6518d664b04e5f41cd00a2bca9f, preserving existing PC-03/05/06 runtime and migrations. Human owners Kahhow (UX) and Lance (backend/shared files); implementer Codex; independent review required. Allowed files: creator/auth routes, generation funding/resolver, starter UI, appended schema migration, focused tests, this guidance and mini PRD. No new GitHub issue/PR verified. Existing source dependencies remain; Agents runner is optional/disabled fallback. Run QUALITY.md gates and real Worker tests before release. Timebox: this deployment session; cut is public saved play plus protected Responses generation, with Agents disabled. Roll back Site version without dropping stored data.
+
+## PC-09 correction — public saved Snake remix (14 September 2026)
+
+User reported `/play/snake-space-invaders` was showing the wrong authored game. Restore the existing retained `Snake Invaders: Eat 10, Blast 25` recipe through `cachedInstructionDemo` and the existing three-life pixel runtime/renderer. Standalone practice uses seed 73, local controls and no API usage; no new players or room records are created. Preserve current production Dino work from exact base `b03246e`.
+
+Owner: Kahhow (route/player UX); shared backend owner: Lance; implementer: Codex; independent reviewer: review_creation. Allowed files are the public Snake route/player, saved-demo adapter/seed, demo metadata, focused behavioral tests and this documentation. Preserve auth/BYOK, room/archive contracts, runtime bytes and stored data. No new issue or PR verified. Selected skills: Sites building/hosting, Next.js boundary guidance, React checks. Gates: QUALITY lint, build, full tests, independent review and post-review focused verification. Timebox: this correction session. Rollback: previous Site version without deleting data.

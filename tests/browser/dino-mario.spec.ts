@@ -4,7 +4,7 @@ test('first-visit introduction is dismissible, session-scoped and reopenable', a
   page,
 }) => {
   await page.goto('/');
-  const intro = page.getByRole('dialog', { name: 'Dino × Mario' });
+  const intro = page.getByRole('dialog');
   await expect(intro).toBeVisible();
   await expect(
     intro.getByText('Simulated demo · fixed authored example'),
@@ -24,14 +24,14 @@ test('first-visit introduction is dismissible, session-scoped and reopenable', a
   await page.reload();
   await expect(
     page.getByRole('heading', {
-      name: 'Start with a game. Leave with a testable mechanic.',
+      name: 'Your rules. Our game.',
     }),
   ).toBeVisible();
   await expect(intro).not.toBeVisible();
-  await page.getByRole('searchbox').fill('roguelite');
+  await page.getByRole('textbox', { name: 'Your name' }).fill('Dino player');
   await page.getByRole('button', { name: 'How this remix works' }).click();
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('searchbox')).toHaveValue('roguelite');
+  await expect(page.getByRole('textbox', { name: 'Your name' })).toHaveValue('Dino player');
 });
 
 test('denied session storage still permits skip and reopen', async ({
@@ -51,6 +51,9 @@ test('denied session storage still permits skip and reopen', async ({
   await page.getByRole('button', { name: 'How this remix works' }).click();
   await page.getByRole('button', { name: 'Close introduction' }).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
+  await expect(page.getByText('Browser storage is unavailable. Room access cannot be retained.')).toBeVisible();
+  await page.getByRole('textbox', { name: 'Your name' }).fill('Storage test');
+  await expect(page.getByRole('button', { name: 'Create room', exact: true })).toBeDisabled();
   expect(errors).toEqual([]);
 });
 
@@ -65,6 +68,8 @@ test('public demo waits for Start, jumps with its button, pauses and preserves s
   });
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
+  await expect(page.getByText('Chrome offline', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: 'See the remix', exact: false }).click();
   await page.getByRole('link', { name: 'Try simulated demo' }).click();
   const canvas = page.getByLabel('Dino Mario course.', { exact: false });
   await expect(canvas).toHaveAttribute('data-tick', '0');
@@ -78,6 +83,7 @@ test('public demo waits for Start, jumps with its button, pauses and preserves s
     .toBeLessThan(250);
   await page.getByRole('button', { name: 'How this remix works' }).click();
   const tick = await canvas.getAttribute('data-tick');
+  await page.getByRole('button', { name: 'See the remix', exact: false }).click();
   await page.getByRole('button', { name: 'Back to demo' }).click();
   await expect(page.getByRole('status')).toContainText('Paused');
   await expect(canvas).toHaveAttribute('data-tick', tick!);
@@ -98,8 +104,8 @@ test('public demo waits for Start, jumps with its button, pauses and preserves s
 
 test('Tab reaches Jump and Enter activates it without pausing within game controls', async ({ page }) => {
   await page.goto('/play/dino-mario');
-  await page.clock.install();
-  await page.clock.pauseAt(new Date());
+  await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('button', { name: 'Restart', exact: true })).toBeFocused();
@@ -120,12 +126,12 @@ test('the browser executes the full seven-jump course and restart retains the au
   await expect(
     page.getByRole('button', { name: 'Start', exact: true }),
   ).toBeVisible();
-  await page.clock.install();
-  await page.clock.pauseAt(new Date());
+  await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   const canvas = page.locator('canvas');
   let tick = 0;
-  for (const press of [142, 289, 542, 689, 975, 1122, 1389]) {
+  for (const press of [143, 293, 543, 693, 977, 1127, 1393]) {
     await page.clock.runFor(((press - tick) * 1000) / 60 + 0.05);
     await expect(canvas).toHaveAttribute('data-tick', String(press));
     await page.keyboard.down('Space');
@@ -142,7 +148,7 @@ test('the browser executes the full seven-jump course and restart retains the au
   await page.getByRole('button', { name: 'Restart', exact: true }).click();
   await expect(canvas).toHaveAttribute('data-tick', '0');
   await expect(page.getByTestId('stomps')).toHaveText('0');
-  await page.clock.runFor(3000);
+  await page.clock.runFor(30000);
   await expect(canvas).toHaveAttribute('data-status', 'lost');
 });
 
@@ -174,4 +180,19 @@ test('introduction and controls fit a narrow reduced-motion viewport', async ({
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+
+test('contributions precede the output and both steps work with keyboard focus', async ({ page }, testInfo) => {
+  await page.goto('/');
+  const intro = page.getByRole('dialog');
+  await expect(intro.getByRole('heading', { name: 'Two players. One remix.' })).toBeVisible();
+  await expect(intro.getByText('PLAYER 1', { exact: true })).toBeVisible();
+  await expect(intro.getByText('PLAYER 2', { exact: true })).toBeVisible();
+  await expect(intro.getByRole('link', { name: 'Try simulated demo' })).toHaveCount(0);
+  await intro.getByRole('button', { name: 'See the remix' }).click();
+  await expect(intro.getByRole('heading', { name: 'Dino × Mario' })).toBeFocused();
+  await page.screenshot({ path: `outputs/dino-v2/remix-output-${testInfo.project.name}.png` });
+  await intro.getByRole('button', { name: 'Back', exact: true }).click();
+  await expect(intro.getByRole('heading', { name: 'Two players. One remix.' })).toBeFocused();
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import Image from 'next/image';
+import { PixelSprite } from './pixel-sprite.tsx';
 import styles from './room-status.module.css';
 
 export const CAT_AVATARS = [
@@ -206,24 +206,10 @@ export function RoomStatus({
                     disabled={avatarAction.disabled}
                     onClick={avatarAction.onActivate}
                   >
-                    <Image
-                      className={styles['fw-cat']}
-                      src={`/party-forge/avatars/${player.avatar}.svg`}
-                      width={128}
-                      height={128}
-                      alt={`${player.avatar} cat`}
-                      unoptimized
-                    />
+                    <PixelSprite kind="cat" size={64} />
                   </button>
                 ) : (
-                  <Image
-                    className={styles['fw-cat']}
-                    src={`/party-forge/avatars/${player.avatar}.svg`}
-                    width={128}
-                    height={128}
-                    alt={`${player.avatar} cat`}
-                    unoptimized
-                  />
+                  <PixelSprite kind="cat" size={64} />
                 )}
                 <span className={styles['fw-mark']} aria-hidden="true">
                   {!paused &&
@@ -341,13 +327,7 @@ export function RoomStatus({
                 aria-pressed={cat.id === local.avatar}
                 onClick={() => onAvatarChange(cat.id)}
               >
-                <Image
-                  src={`/party-forge/avatars/${cat.id}.svg`}
-                  width={64}
-                  height={64}
-                  alt=""
-                  unoptimized
-                />
+                <PixelSprite kind="cat" size={32} />
                 <span>{cat.name}</span>
               </button>
             ))}

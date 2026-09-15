@@ -7,6 +7,7 @@ export const INITIAL_PATH: readonly InitialCard[] = [
   { slot: 'cooking', cardId: 'quick-orders' },
 ];
 export function nextAddition(room: RoomSnapshot): AdditionCard | null {
+  if (room.contributions.some(c=>c.kind==='initial'&&c.choice.slot==='instruction')) return room.contributions.length + room.editSlots.filter(s=>s.resolution.status==='chosen').length < 5 ? 'instruction' : null;
   const used = new Set([
     ...room.contributions.flatMap((c) =>
       c.kind === 'addition' ? [c.cardId] : [],

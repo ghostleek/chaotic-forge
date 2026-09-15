@@ -1,6 +1,13 @@
 # Forge — competitive game creation
 
-**Accepted standalone supplement — 13 September 2026:** [PC-12 Dino × Mario](./docs/issues/PC-12.md) introduces a one-input authored runner with stomp bounce as the default simulated onboarding example. It preserves the party recipe, reference corpus and live-generation target. Play is local and does not call AI.
+## Latest user decision — pixel instruction demo (13 September 2026)
+
+This decision supersedes the fixed Kitchen demo and exactly-three-player defaults below for new pixel rooms. Two players can create and start; a third is optional, with a hard cap of three. Each connected player confirms one custom instruction card, optionally filled from a starter. The host explicitly asks Forge to mesh them into a single bounded pixel game. The model returns executable rule configuration for the retained Snake/Invaders/Bounce engine, including scoring weights and an interpretation for each card. It does not generate arbitrary JavaScript or satisfy all of PC-09.
+
+Players run concurrently in separate arenas with matching rules, seed and server start time. Highest points wins, with fewer hits as the next comparison. Existing room capabilities, captured inputs, server replay, results and archive contracts are reused. Winner and loser may each propose a further instruction while the bounded recipe has space. Source text, model interpretation and user confirmation stay distinct. Legacy Kitchen and G1–G4 remain retained.
+
+User authorized implementation and GPT Sites deployment on the PC-05 stack; broad edge-case suites remain paused, with one real local golden flow requested. Full QUALITY.md gates and independent acceptance remain required before merging. See [current handoff](docs/design/pc-05-handoff.md).
+
 
 **Version:** 0.4 · **Updated:** 13 September 2026
 **Status:** Current demo simplified to one fixed authored recipe and deterministic additions; no mixed-hand dealing or swapping. Broader open-deck generation below is deferred target direction. See the latest demo decision immediately below.
@@ -208,3 +215,11 @@ The [v0.2 PRD](./archive/2026-09-13-mechanic-lab/PRD-v0.2-mechanic-lab.md) and [
 The imported [ModeShift reference](./archive/2026-09-13-mechanic-lab/mechanic-forge-product-reconciliation.md) contributes a concrete playable artifact and meaningful perspective changes. Its authored 3D puzzle does not provide an arbitrary game generator, authoritative online room, or this mashup runtime. The older [concept exploration](./archive/2026-09-13-mechanic-lab/mechanic-forge-concept-directions.md) and [MFH candidate backlog](./archive/2026-09-13-mechanic-lab/mechanic-forge-split.md) are historical inputs, not the active delivery queue.
 
 This revision updates product/planning documents and design imagery only. [PC-01 PR #41](https://github.com/ghostleek/chaotic-forge/pull/41) has merged a Worker/D1 foundation, but its current `party-forge/1` contract still encodes distinct FPS/Zombies/Cooking slots, FPS inputs and order scoring. Those are superseded implementation constraints, not the corrected product direction. See the [contract amendment map](./docs/party-forge-host.md) before downstream work. No open-deck runtime, card replacement, online party journey, arbitrary generation or camera capability is claimed implemented.
+
+## Latest decision — authenticated API access and saved permutations (13 September 2026)
+
+Paid generation requires BYOK unless ChatGPT-authenticated email is exactly kahhow@string.sg, leekahhow@gmail.com or lancetyw@gmail.com (case-normalized). Those admins may use the site key. This supersedes broader sponsored trials. Public saved-demo play makes no API call. Never accept client-provided identity as authorization.
+
+Current party creation uses GPT-6 Astra Responses structured rules; separate Agents code creation stays disabled until a supervised runner is qualified. Exact Snake/Invaders two- and three-player permutations reuse saved output; custom modifiers do not silently match. Starter buttons prefill with visible help and require confirmation. Preserve provenance and deterministic replay.
+
+Implementation/release packet: PC-09 supplement on current production base d766b394958dd6518d664b04e5f41cd00a2bca9f, preserving existing PC-03/05/06 runtime and migrations. Human owners Kahhow (UX) and Lance (backend/shared files); implementer Codex; independent review required. Allowed files: creator/auth routes, generation funding/resolver, starter UI, appended schema migration, focused tests, this guidance and mini PRD. No new GitHub issue/PR verified. Existing source dependencies remain; Agents runner is optional/disabled fallback. Run QUALITY.md gates and real Worker tests before release. Timebox: this deployment session; cut is public saved play plus protected Responses generation, with Agents disabled. Roll back Site version without dropping stored data.

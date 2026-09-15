@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { RoomAccess } from './room-access';
+import { PixelSprite } from './pixel-sprite.tsx';
 import { useRoom } from '../../lib/party-forge/client/use-room.ts';
 import { nextAddition } from '../../lib/party-forge/client/demo-path.ts';
 import { CARDS } from '../../lib/party-forge/cards.ts';
@@ -10,11 +11,14 @@ import {
   CAT_AVATARS,
   type RoomStatusParticipant,
 } from './room-status.tsx';
-import { CardPicker } from './card-picker.tsx';
+import { CardPicker, InstructionEditor } from './card-picker.tsx';
+import { GameViewport } from './game-viewport.tsx';
+import { useTrialController } from './use-trial-controller.ts';
+import { RoundResults } from './round-results.tsx';
 import { RecipeSummary } from './recipe-summary.tsx';
 import styles from './party-room.module.css';
 
-export function Lobby({ roomId }: { roomId?: string }) {
+export function Lobby({ roomId, initialNickname = '', initialStartRoom = false }: { roomId?: string; initialNickname?: string; initialStartRoom?: boolean }) {
   const {
     client,
     room,
@@ -22,53 +26,23 @@ export function Lobby({ roomId }: { roomId?: string }) {
     pending,
     uncertain,
     connected,
+    storageUnavailable,
     terminal,
     error,
   } = useRoom(roomId);
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState(initialNickname);
+  const [startingRoom, setStartingRoom] = useState(initialStartRoom);
   const [onboarding, setOnboarding] = useState(true);
-  const [swatted, setSwatted] = useState(false);
-  const [loadingBuild, setLoadingBuild] = useState(false);
-  const [buildError, setBuildError] = useState<string | null>(null);
-  const runtime = useRef<unknown>(null);
-  async function acknowledgeBuild() {
-    if (!room || room.build.status !== 'playable' || !room.round) return;
-    const build = room.build.manifest;
-    setLoadingBuild(true);
-    setBuildError(null);
-    try {
-      const { createPartyRuntime } =
-        await import('../../lib/party-forge/runtimes/kitchen-chaos-v1/adapter.ts');
-      const loaded = await createPartyRuntime(build, room.round.seed);
-      const current = client.snapshot().room;
-      if (
-        current?.phase !== 'ready' ||
-        current.build.status !== 'playable' ||
-        current.build.manifest.contentHash !== build.contentHash
-      )
-        throw new Error('The build changed. Review it again.');
-      runtime.current = loaded;
-      await client.command({
-        type: 'acknowledge-build',
-        buildId: build.buildId,
-        buildHash: build.contentHash,
-      });
-    } catch (failure) {
-      setBuildError(
-        failure instanceof Error
-          ? failure.message
-          : 'Could not load the executable.',
-      );
-    } finally {
-      setLoadingBuild(false);
-    }
-  }
+
+  const { controller, view } = useTrialController(client);
   const help = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (access && !roomId) window.location.replace(`/party/${access.roomId}`);
   }, [access, roomId]);
   const disabled = pending || uncertain || !connected;
   const me = access?.participantId;
+  const pixelRoom = !room?.contributions.some(c => c.kind === 'initial' && c.choice.slot !== 'instruction');
+  const minimumPlayers = pixelRoom ? 2 : 3;
   const editor = room?.editSlots.find((s) => s.resolution.status === 'pending');
   const addition = room ? nextAddition(room) : null;
   const players: RoomStatusParticipant[] =
@@ -102,47 +76,26 @@ export function Lobby({ roomId }: { roomId?: string }) {
   return (
     <main className={styles.root}>
       <header>
-        <Link href="/party" className={styles.wordmark}>
+        <Link href="/" className={styles.wordmark}>
           CHAOTIC
           <br />
           FORGE /
         </Link>
-        <span>AUTHORED DEMO</span>
+        <span>PIXEL PLAYGROUND / 01</span>
         <button type="button" ref={help} onClick={() => setOnboarding(true)}>
           How to play
         </button>
       </header>
-      <div className={styles.hero} data-swatted={swatted}>
-        <Image
-          src="/party-forge/world.svg"
-          width={760}
-          height={430}
-          alt="An illustrated floating world where different ideas meet"
-          unoptimized
-        />
-        {swatted ? (
-          <button type="button" onClick={() => setSwatted(false)}>
-            Restore the world
-          </button>
-        ) : null}
-      </div>
-      {onboarding ? (
+      {!roomId && !access ? <div className={styles.hero}>
+        <small>2–3 PLAYERS / ONE RULE EACH / 1 GAME</small>
+        <h1>Your rules.<br/>Our game.</h1>
+        <p>Each person writes one instruction. Forge turns them into a little pixel game. Play together. Change it together.</p>
+        <div className={styles.heroIcons}><PixelSprite kind="snake" size={32}/><PixelSprite kind="alien" size={32}/><PixelSprite kind="bounce" size={32}/></div>
+      </div> : null}
+      {onboarding && !['ready','playing'].includes(room?.phase ?? '') ? (
         <aside className={styles.onboarding} aria-label="How to play">
-          <h1>Strange ideas. One shared game.</h1>
-          <p>
-            Invite two friends. Each person contributes one card, then confirms
-            readiness for the same build. After a round, the winner and loser
-            take turns adding the next twist.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              setOnboarding(false);
-              help.current?.focus();
-            }}
-          >
-            Got it
-          </button>
+          <div><h1>One card from each of you.</h1><p>Write a rule, or edit a starter. Start with two players, or invite a third. Confirm everyone’s cards, generate your game, then start the same 60-second challenge in your own arenas.</p></div>
+          <button type="button" onClick={()=>{setOnboarding(false);help.current?.focus();}}>Got it</button>
         </aside>
       ) : null}
       {error ? (
@@ -166,11 +119,12 @@ export function Lobby({ roomId }: { roomId?: string }) {
       ) : null}
       {!access ? (
         <section>
-          <h2>{roomId ? 'Join your friends' : 'Make a little chaos'}</h2>
-          <form
+          <h2>{roomId ? 'Join your friends' : 'Bring a friend.'}</h2>
+          {startingRoom && !roomId ? <RoomAccess nickname={nickname} disabled={pending || uncertain || storageUnavailable} onContinue={() => void client.enroll(nickname)} onCancel={() => setStartingRoom(false)} /> : <form
             onSubmit={(event) => {
               event.preventDefault();
-              void client.enroll(nickname);
+              if (roomId) void client.enroll(nickname);
+              else setStartingRoom(true);
             }}
           >
             <label>
@@ -186,17 +140,17 @@ export function Lobby({ roomId }: { roomId?: string }) {
             </label>
             <button
               className={styles.primary}
-              disabled={pending || uncertain || !nickname.trim()}
+              disabled={pending || uncertain || storageUnavailable || !nickname.trim()}
             >
               {pending ? 'Connecting…' : roomId ? 'Join room' : 'Create room'}
             </button>
-          </form>
+          </form>}
         </section>
       ) : null}
       {room && access ? (
         <>
           <section className={styles.invite}>
-            <span>Invite two friends</span>
+            <span>Invite a friend · third player optional</span>
             <Link href={`/party/${room.roomId}`}>Room {room.roomId}</Link>
             <output aria-live="polite">
               {connected
@@ -207,25 +161,14 @@ export function Lobby({ roomId }: { roomId?: string }) {
           {['lobby', 'additions'].includes(room.phase) ? (
             <RoomStatus
               participants={players}
-            expectedContributions={room.phase === 'lobby' ? 3 : 2}
+              expectedContributions={room.phase === 'lobby' ? Math.max(minimumPlayers, room.participants.length) : 2}
               localParticipantId={me}
               roundNumber={room.round?.number ?? 1}
               phase={room.phase === 'additions' ? 'additions' : 'initial'}
               connection={connected ? 'connected' : 'reconnecting'}
-              avatarAction={
-                players[1]
-                  ? {
-                      participantId: players[1].id,
-                      label: swatted
-                        ? 'Restore the world'
-                        : 'Swat the illustrated world',
-                      onActivate: () => setSwatted((value) => !value),
-                    }
-                  : undefined
-              }
             />
           ) : null}
-          {room.phase === 'lobby' ? (
+          {(room.phase === 'lobby' && room.build.status !== 'playable') || (room.phase === 'forging' && !room.lastCompleted && room.build.status !== 'forging') ? (
             <CardPicker
               room={room}
               participantId={access.participantId}
@@ -236,11 +179,14 @@ export function Lobby({ roomId }: { roomId?: string }) {
             />
           ) : null}
           <RecipeSummary room={room} />
+          {room.phase === 'lobby' && room.build.status === 'empty' && room.participants.length >= minimumPlayers && room.contributions.length === room.participants.length ? <section>
+            {room.hostId === me ? <button className={styles.primary} disabled={disabled} onClick={()=>void client.command({type:'retry-forge'})}>{pending ? 'Preparing your game…' : 'Build game'}</button> : <p>Everyone’s cards are in. The host can generate your game.</p>}
+          </section> : null}
           {room.phase === 'forging' ? (
             <section>
               <h2>
                 {room.build.status === 'forging'
-                  ? 'Preparing your demo…'
+                  ? 'Meshing your instructions…'
                   : 'The build needs attention'}
               </h2>
               {'reason' in room.build ? <p>{room.build.reason}</p> : null}
@@ -250,7 +196,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
                     disabled={disabled || room.build.status === 'forging'}
                     onClick={() => void client.command({ type: 'retry-forge' })}
                   >
-                    Retry build
+                    Retrieve / retry generation
                   </button>
                   <button
                     disabled={disabled}
@@ -258,7 +204,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
                       void client.command({ type: 'cancel-forge' })
                     }
                   >
-                    Cancel build
+                    Keep cards for later
                   </button>
                 </>
               ) : (
@@ -266,34 +212,71 @@ export function Lobby({ roomId }: { roomId?: string }) {
               )}
             </section>
           ) : null}
+          {room.phase === 'lobby' &&
+          room.build.status === 'playable' &&
+          room.hostId === me ? (
+            <button
+              disabled={disabled || room.participants.length < minimumPlayers}
+              onClick={() => void client.command({ type: 'start-round' })}
+            >
+              Prepare a new round after interruption
+            </button>
+          ) : null}
+          {['ready', 'playing'].includes(room.phase) ? (
+            <GameViewport controller={controller} view={view} />
+          ) : null}
           {room.phase === 'ready' && room.build.status === 'playable' ? (
             <section>
               <h2>Your game is ready</h2>
               <p>
-                {room.acknowledgments.length}/3 players ready for this build.
+                {room.acknowledgments.length}/{room.participants.length} players ready for this build.
               </p>
               <button
-                disabled={disabled || loadingBuild}
-                onClick={() => void acknowledgeBuild()}
+                disabled={disabled || view.status !== 'ready'}
+                onClick={() => void controller.ready()}
               >
-                {loadingBuild
-                  ? 'Validating executable…'
-                  : 'Load and confirm build'}
+                Ready to play
               </button>
-              {buildError ? <p role="alert">{buildError}</p> : null}
+              {view.status === 'error' ? (
+                <button
+                  disabled={disabled}
+                  onClick={() => controller.reloadBuild()}
+                >
+                  Retry executable loading
+                </button>
+              ) : null}
+              {room.hostId === me ? (
+                <button
+                  className={styles.primary}
+                  disabled={
+                    disabled ||
+                    view.status !== 'ready' ||
+                    room.acknowledgments.length !== room.participants.length || room.participants.length < minimumPlayers ||
+                    room.participants.some((p) => p.presence !== 'present')
+                  }
+                  onClick={() => void client.command({ type: 'start-round' })}
+                >
+                  Start round
+                </button>
+              ) : (
+                <p>The host starts when everyone in the room is ready.</p>
+              )}
               <p>
-                The playable viewport connects here in PC-05. Starting a timed
-                trial is unavailable until that player is integrated.
+                Readiness expires after 30 seconds. Confirm again if the host
+                cannot start.
               </p>
             </section>
           ) : null}
           {room.phase === 'playing' ? (
             <section>
-              <h2>Round {room.round?.number} is running</h2>
-              <p>
-                Results come from the retained runtime and submitted input. This
-                room interface does not submit simulated play.
-              </p>
+              {view.status === 'complete' ? (
+                <button
+                  disabled={disabled}
+                  onClick={() => void controller.submit()}
+                >
+                  Submit captured attempt
+                </button>
+              ) : null}
               {room.hostId === me ? (
                 <button
                   disabled={disabled}
@@ -306,7 +289,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
           ) : null}
           {room.lastCompleted &&
           ['results', 'end-vote', 'additions', 'ended'].includes(room.phase) ? (
-            <section>
+            pixelRoom ? <RoundResults key={room.lastCompleted.round.roundId} room={room} me={me} disabled={disabled} onReplay={()=>void client.command({type:'replay-round'})} /> : <section>
               <h2>Round results</h2>
               <ol>
                 {room.lastCompleted.results.map((result) => (
@@ -316,8 +299,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
                         (p) => p.id === result.participantId,
                       )?.nickname
                     }
-                    : {result.completedOrders} orders · {result.failedOrders}{' '}
-                    failed · rank {result.rank}
+                    : {result.points ?? result.completedOrders} {result.points === undefined ? 'orders' : 'points'} · {result.hits ?? result.failedOrders} {result.hits === undefined ? 'failed' : 'hits'} · rank {result.rank}
                   </li>
                 ))}
               </ol>
@@ -343,7 +325,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
                 Vote to end
               </button>
               <p>
-                {room.votes.filter((v) => v.vote === 'end').length}/3 votes to
+                {room.votes.filter((v) => v.vote === 'end').length}/{room.participants.length} votes to
                 end. Everyone must agree to end.
               </p>
             </section>
@@ -358,7 +340,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
                 }{' '}
                 chooses next · {editor?.role}
               </p>
-              {addition ? (
+              {addition === 'instruction' ? <InstructionEditor key={`${room.lastCompleted?.round.roundId}-${editor?.participantId}`} label="Add one new instruction" disabled={disabled || editor?.participantId !== me} onConfirm={text=>void client.command({type:'add-mechanic',cardId:'instruction',text})}/> : addition ? (
                 <article className={styles.card}>
                   <h3>{CARDS[addition].title}</h3>
                   <p>{CARDS[addition].interpretation}</p>
@@ -384,9 +366,7 @@ export function Lobby({ roomId }: { roomId?: string }) {
               )}
             </section>
           ) : null}
-          {room.phase === 'ended' ? (
-            <h2>That’s our game. Thanks for playing.</h2>
-          ) : null}
+          {room.phase === 'ended' ? <section><h2>That’s our game.</h2><button disabled={disabled} onClick={()=>void client.command({type:'save-game'})}>Save this game</button><p>Keep this room link to return to the final game.</p></section> : null}
         </>
       ) : null}
     </main>

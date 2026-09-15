@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { pixelRecipeSchema } from './runtimes/pixel-arcade-v1/rules.ts';
 
 /** Wire contract v1. Fixtures are not runtime qualification or external evidence. */
 export const PROTOCOL_VERSION = 'party-forge/1' as const;
@@ -19,15 +20,17 @@ export const DEMO_POLICY = Object.freeze({
 const version = z.literal(PROTOCOL_VERSION);
 const id = z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,95}$/);
 const text = z.string().trim().min(1).max(1000);
+const instructionText = z.string().trim().min(1).max(240);
 const integer = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const hash = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 const unique = <T>(values: T[]) => new Set(values).size === values.length;
 const rosterSchema = z
   .array(id)
-  .length(3)
+  .min(2).max(3)
   .refine(unique, 'Roster members must be distinct');
 
 export const initialCardSchema = z.discriminatedUnion('slot', [
+  z.strictObject({ slot: z.literal('instruction'), cardId: z.literal('instruction'), text: instructionText }),
   z.strictObject({
     slot: z.literal('fps'),
     cardId: z.enum(['knockback', 'counter-ricochet']),
@@ -45,9 +48,15 @@ export const additionCardSchema = z.enum([
   'dinner-bell',
   'hot-potato',
   'zombie-pantry',
+  'instruction',
 ]);
 export type InitialCard = z.infer<typeof initialCardSchema>;
 export type AdditionCard = z.infer<typeof additionCardSchema>;
+export function isPixelChoice(choice: InitialCard): boolean { return choice.slot === 'instruction'; }
+export function isPixelHistory(history: { kind: string; choice?: InitialCard }[]): boolean {
+  return history.some(c => c.kind === 'initial' && c.choice?.slot === 'instruction');
+}
+const scoringVersionSchema = z.enum(['orders-then-failures/1', 'points-then-hits/1']);
 
 export const provenanceSchema = z.strictObject({
   source: z.strictObject({
@@ -74,6 +83,7 @@ export const contributionSchema = z
       ...contributionBase,
       kind: z.literal('addition'),
       cardId: additionCardSchema,
+      text: instructionText.optional(),
       afterRoundId: id,
       editorRole: z.enum(['winner', 'loser']),
     }),
@@ -81,27 +91,37 @@ export const contributionSchema = z
   .refine(
     (c) => c.participantId === c.provenance.userDecision.participantId,
     'Decision attribution must match contributor',
-  );
+  )
+  .superRefine((c, ctx) => {
+    const instruction = c.kind === 'initial' ? c.choice.slot === 'instruction' : c.cardId === 'instruction';
+    const value = c.kind === 'initial' ? (c.choice.slot === 'instruction' ? c.choice.text : undefined) : c.text;
+    if ((instruction && (value === undefined || c.provenance.source.kind !== 'user-concept' || c.provenance.source.reference !== value)) ||
+        (!instruction && value !== undefined)) {
+      ctx.addIssue({ code: 'custom', message: 'Instruction contributions retain their exact submitted text as user-concept provenance' });
+    }
+  });
 export const contributionHistorySchema = z
   .array(contributionSchema)
-  .min(3)
+  .min(2)
   .max(6)
   .superRefine((history, ctx) => {
     const initial = history.filter((c) => c.kind === 'initial');
     const additions = history.filter((c) => c.kind === 'addition');
     if (
-      initial.length !== 3 ||
-      !unique(initial.map((c) => c.choice.slot)) ||
+      (isPixelHistory(initial) ? initial.length < 2 || initial.length > 3 : initial.length !== 3) ||
+      (isPixelHistory(initial) && (initial.some(c => !isPixelChoice(c.choice)) || history.length > 5)) ||
+      additions.some(c => (c.cardId === 'instruction') !== isPixelHistory(initial)) ||
+      (!isPixelHistory(initial) && !unique(initial.map((c) => c.choice.slot))) ||
       !unique(initial.map((c) => c.participantId)) ||
       !unique(history.map((c) => c.id)) ||
-      !unique(additions.map((c) => c.cardId)) ||
+      !unique(additions.filter(c => c.cardId !== 'instruction').map((c) => c.cardId)) ||
       history.some((c, i) => c.ordinal !== i) ||
-      history.slice(0, 3).some((c) => c.kind !== 'initial')
+      history.slice(0, initial.length).some((c) => c.kind !== 'initial')
     ) {
       ctx.addIssue({
         code: 'custom',
         message:
-          'Expected three distinct initial slots/contributors followed by ordered singleton additions',
+          'Expected two or three instruction contributors, or three legacy slots, followed by ordered additions',
       });
     }
   });
@@ -127,7 +147,7 @@ export const buildManifestSchema = z
     buildId: id,
     contentHash: hash,
     parent: z.strictObject({ buildId: id, contentHash: hash }).nullable(),
-    catalogVersion: z.literal('kitchen-chaos/1'),
+    catalogVersion: z.enum(['kitchen-chaos/1', 'pixel-arcade/1', 'dino-runner/2']),
     resolverVersion: id,
     origin: z.discriminatedUnion('kind', [
       z.strictObject({ kind: z.literal('preset'), presetVersion: id }),
@@ -137,6 +157,12 @@ export const buildManifestSchema = z
         service: text,
         model: text,
         modelVersion: text,
+        reuse: z.strictObject({
+          kind: z.literal('cached-demo'),
+          version: id,
+          sourceBuildId: id,
+          sourceBuildHash: hash,
+        }).optional(),
       }),
     ]),
     runtime: retainedResourceSchema,
@@ -151,24 +177,35 @@ export const buildManifestSchema = z
           explanation: text,
         }),
       )
-      .min(3)
+      .min(2)
       .max(24),
     objective: text,
-    controls: z.literal('desktop-keyboard-mouse/1'),
-    scoringVersion: z.literal('orders-then-failures/1'),
+    pixelRules: pixelRecipeSchema.optional(),
+    runnerRules: z.strictObject({ stompBonus: z.number().int().min(0).max(100), meatBonus: z.number().int().min(0).max(50), finishBonus: z.number().int().min(0).max(250) }).optional(),
+    controls: z.enum(['desktop-keyboard-mouse/1', 'direction-pad/1']),
+    scoringVersion: scoringVersionSchema,
     adaptation: z.literal('off'),
     validation: z.strictObject({
-      status: z.literal('accepted'),
+      status: z.enum(['accepted', 'bounded-rules']),
       validatorVersion: id,
       completingTraceHash: hash,
       witnesses: z
         .array(z.strictObject({ contributionId: id, traceHash: hash }))
-        .min(3)
+        .min(2)
         .max(6),
       limitations: z.array(text).min(1).max(16),
     }),
   })
   .superRefine((build, ctx) => {
+    const pixel = isPixelHistory(build.contributions);
+    const runner = build.catalogVersion === 'dino-runner/2';
+    if ((build.catalogVersion === 'pixel-arcade/1' || runner) !== pixel ||
+        (build.controls === 'direction-pad/1') !== pixel ||
+        (build.scoringVersion === 'points-then-hits/1') !== pixel ||
+        (build.pixelRules !== undefined) !== (pixel && !runner) ||
+        (build.runnerRules !== undefined) !== runner) {
+      ctx.addIssue({ code: 'custom', message: 'Catalog, controls, scoring, rules and all contributions must use one runtime family' });
+    }
     const ids = build.contributions.map((c) => c.id);
     const effectIds = build.effects.map((e) => e.contributionId);
     const witnessIds = build.validation.witnesses.map((w) => w.contributionId);
@@ -180,7 +217,7 @@ export const buildManifestSchema = z
       !unique([build.runtime, ...build.assets].map((a) => a.key)) ||
       build.runtime.mediaType !== 'text/javascript' ||
       build.parent?.buildId === build.buildId ||
-      (build.contributions.length > 3 && !build.parent)
+      (build.contributions.some(c => c.kind === 'addition') && !build.parent)
     ) {
       ctx.addIssue({
         code: 'custom',
@@ -215,7 +252,7 @@ export const forkSetupSchema = z
     sourceArchiveId: id,
     sourceBuildId: id,
     sourceBuildHash: hash,
-    decisions: z.array(forkDecisionSchema).length(3),
+    decisions: z.array(forkDecisionSchema).min(2).max(3),
   })
   .refine(
     (setup) =>
@@ -255,6 +292,7 @@ export function parseForkSetup(source: BuildManifest, value: unknown) {
     setup.sourceBuildHash !== parent.contentHash
   )
     throw new Error('Fork source mismatch');
+  if (setup.decisions.length !== parent.contributions.filter(c => c.kind === 'initial').length) throw new Error('Each inherited initial contribution must be claimed once');
   const choices = setup.decisions.map((decision) => {
     const inherited = parent.contributions.find(
       (c) => c.id === decision.selection.inheritedContributionId,
@@ -337,7 +375,7 @@ export const roundSchema = z
     buildHash: hash,
     roster: rosterSchema,
     seed: integer.max(0xffffffff),
-    scoringVersion: z.literal('orders-then-failures/1'),
+    scoringVersion: scoringVersionSchema,
     ticks: z.literal(DEMO_POLICY.trialTicks),
     ticksPerSecond: z.literal(DEMO_POLICY.ticksPerSecond),
     startsAt: integer,
@@ -351,7 +389,8 @@ export const roundSchema = z
       r.transportDeadline ===
         r.submissionDeadline + DEMO_POLICY.transportGraceMs,
     'Transport grace cannot extend simulation time',
-  );
+  )
+  .refine(r => (r.scoringVersion === 'points-then-hits/1' || r.roster.length === 3) && r.tieCursor < r.roster.length, 'The frozen roster and tie cursor must match the scoring family');
 export type FrozenRound = z.infer<typeof roundSchema>;
 
 // Full control state at every tick; held controls clear on focus/pointer-lock loss.
@@ -373,15 +412,22 @@ export const trialInputSchema = z
     buildHash: hash,
     attemptId: id,
     seed: integer.max(0xffffffff),
-    frames: z.array(inputFrameSchema).length(DEMO_POLICY.trialTicks),
+    frames: z.array(inputFrameSchema).min(1).max(DEMO_POLICY.trialTicks),
+    endedEarly: z.literal(true).optional(),
   })
   .refine(
-    (t) => t.frames.every((frame, i) => frame.tick === i),
+    (t) => (t.frames.length === DEMO_POLICY.trialTicks || t.endedEarly === true) && t.frames.every((frame, i) => frame.tick === i),
     'Every tick must appear exactly once in order',
   );
 export type TrialInput = z.infer<typeof trialInputSchema>;
 export type RuntimeInput = z.infer<typeof inputFrameSchema>;
-export interface RuntimeSnapshot {
+export interface RuntimeScore {
+  completedOrders: number;
+  failedOrders: number;
+  points?: number;
+  hits?: number;
+}
+export interface RuntimeSnapshot extends RuntimeScore {
   tick: number;
   completed: boolean;
   completedOrders: number;
@@ -399,7 +445,7 @@ export interface PartyRuntime {
   validateScore(
     manifest: BuildManifest,
     trial: TrialInput,
-  ): { completedOrders: number; failedOrders: number };
+  ): RuntimeScore;
 }
 export function parseTrialForRound(
   value: unknown,
@@ -422,9 +468,12 @@ const scoreSchema = z.strictObject({
   participantId: id,
   completedOrders: integer.max(3600),
   failedOrders: integer.max(3600),
+  points: integer.max(1_000_000).optional(),
+  hits: integer.max(3600).optional(),
 });
 export const completedResultSchema = z
   .strictObject({
+    completedAt: integer.optional(),
     protocolVersion: version,
     round: roundSchema,
     results: z
@@ -435,7 +484,7 @@ export const completedResultSchema = z
           rank: integer.min(1).max(3),
         }),
       )
-      .length(3),
+      .min(2).max(3),
     editors: z.strictObject({
       winner: id,
       loser: id,
@@ -444,8 +493,11 @@ export const completedResultSchema = z
     nextTieCursor: integer.max(2),
   })
   .superRefine((result, ctx) => {
+    if (result.completedAt !== undefined && (result.completedAt < result.round.startsAt || result.completedAt > result.round.transportDeadline)) {
+      ctx.addIssue({ code: 'custom', message: 'Completion time must fall within the frozen round' });
+    }
     if (
-      result.results.length !== 3 ||
+      result.results.length !== result.round.roster.length ||
       !unique(result.results.map((s) => s.participantId)) ||
       result.results.some((s) => !result.round.roster.includes(s.participantId))
     ) {
@@ -453,6 +505,13 @@ export const completedResultSchema = z
         code: 'custom',
         message: 'Exactly one result is required for every frozen participant',
       });
+      return;
+    }
+    const pixel = result.round.scoringVersion === 'points-then-hits/1';
+    if (result.results.some(s => pixel
+      ? s.points === undefined || s.hits === undefined || s.completedOrders !== 0 || s.failedOrders !== 0
+      : s.points !== undefined || s.hits !== undefined)) {
+      ctx.addIssue({ code: 'custom', message: 'Result score fields must match the frozen scoring version' });
       return;
     }
     const expected = rankResults(result.round, result.results);
@@ -478,10 +537,15 @@ export function rankResults(
   round: FrozenRound,
   scores: z.infer<typeof scoreSchema>[],
 ) {
+  const pixel = round.scoringVersion === 'points-then-hits/1';
+  if (scores.some(s => pixel ? s.points === undefined || s.hits === undefined : s.points !== undefined || s.hits !== undefined)) {
+    throw new Error('Scores must match the frozen scoring version');
+  }
   const compare = (
     a: z.infer<typeof scoreSchema>,
     b: z.infer<typeof scoreSchema>,
-  ) => b.completedOrders - a.completedOrders || a.failedOrders - b.failedOrders;
+  ) => pixel ? (b.points! - a.points! || a.hits! - b.hits!)
+    : b.completedOrders - a.completedOrders || a.failedOrders - b.failedOrders;
   const sorted = [...scores].sort(compare);
   const rotation = [
     ...round.roster.slice(round.tieCursor),
@@ -509,7 +573,7 @@ export function rankResults(
       loser,
       order: round.number % 2 ? [winner, loser] : [loser, winner],
     },
-    nextTieCursor: (round.tieCursor + 1) % 3,
+    nextTieCursor: (round.tieCursor + 1) % round.roster.length,
   };
 }
 
@@ -575,6 +639,7 @@ export const roomCommandSchema = z.discriminatedUnion('type', [
     ...commandBase,
     type: z.literal('add-mechanic'),
     cardId: additionCardSchema,
+    text: instructionText.optional(),
   }),
   z.strictObject({
     ...commandBase,
@@ -583,6 +648,7 @@ export const roomCommandSchema = z.discriminatedUnion('type', [
       'retry-forge',
       'cancel-forge',
       'start-round',
+      'replay-round',
       'abort-round',
       'abort-evolution',
       'leave',
@@ -594,7 +660,11 @@ export const roomCommandSchema = z.discriminatedUnion('type', [
     type: z.literal('remove-unavailable'),
     participantId: id,
   }),
-]);
+ ]).superRefine((command, ctx) => {
+  if (command.type === 'add-mechanic' && ((command.cardId === 'instruction') !== (command.text !== undefined))) {
+    ctx.addIssue({ code: 'custom', message: 'An instruction addition requires text; legacy cards do not accept custom text' });
+  }
+});
 export type RoomCommand = z.infer<typeof roomCommandSchema>;
 export const joinRequestSchema = z.strictObject({
   protocolVersion: version,
@@ -628,12 +698,16 @@ const editSlotSchema = z.strictObject({
   role: z.enum(['winner', 'loser']),
   resolution: z.discriminatedUnion('status', [
     z.strictObject({ status: z.literal('pending') }),
-    z.strictObject({ status: z.literal('chosen'), cardId: additionCardSchema }),
+    z.strictObject({ status: z.literal('chosen'), cardId: additionCardSchema, text: instructionText.optional() }),
     z.strictObject({
       status: z.literal('passed'),
       reason: z.literal('no-legal-addition'),
     }),
   ]),
+}).superRefine((slot, ctx) => {
+  if (slot.resolution.status === 'chosen' && ((slot.resolution.cardId === 'instruction') !== (slot.resolution.text !== undefined))) {
+    ctx.addIssue({ code: 'custom', message: 'Chosen instruction additions require their submitted text' });
+  }
 });
 export const roomSnapshotSchema = z
   .strictObject({
@@ -747,13 +821,15 @@ export const roomSnapshotSchema = z
         ) ||
         (['ready', 'playing'].includes(room.phase) &&
           (room.round?.buildId !== manifest.buildId ||
-            room.round?.buildHash !== manifest.contentHash)) ||
+            room.round?.buildHash !== manifest.contentHash ||
+            room.round?.scoringVersion !== manifest.scoringVersion)) ||
         (room.phase === 'playing' &&
-          (room.acknowledgments.length !== 3 ||
+          (room.acknowledgments.length !== room.round?.roster.length ||
             room.round?.roster.some((p) => !members.includes(p)))) ||
         (['results', 'end-vote', 'additions', 'ended'].includes(room.phase) &&
           (room.lastCompleted?.round.buildId !== manifest.buildId ||
-            room.lastCompleted?.round.buildHash !== manifest.contentHash))
+            room.lastCompleted?.round.buildHash !== manifest.contentHash ||
+            room.lastCompleted?.round.scoringVersion !== manifest.scoringVersion))
       ) {
         ctx.addIssue({
           code: 'custom',
@@ -770,13 +846,15 @@ export const roomSnapshotSchema = z
         s.resolution.status === 'chosen' ? [s.resolution.cardId] : [],
       );
       const remaining = legalAdditions(room.contributions);
+      const pixel = isPixelHistory(room.contributions);
       if (
-        !unique(chosen) ||
+        (!pixel && !unique(chosen)) ||
+        (pixel && room.contributions.length + chosen.length > 5) ||
         chosen.some((card) => !remaining.includes(card)) ||
         room.editSlots.some(
           (slot, i) =>
             slot.resolution.status === 'passed' &&
-            remaining.some(
+            (pixel ? room.contributions.length + room.editSlots.slice(0, i).filter(s => s.resolution.status === 'chosen').length < 5 : remaining.some(
               (card) =>
                 !room.editSlots
                   .slice(0, i)
@@ -785,7 +863,7 @@ export const roomSnapshotSchema = z
                       earlier.resolution.status === 'chosen' &&
                       earlier.resolution.cardId === card,
                   ),
-            ),
+            )),
         ) ||
         (room.editSlots[0]?.resolution.status === 'pending' &&
           room.editSlots[1]?.resolution.status !== 'pending')
@@ -900,9 +978,9 @@ export type GameArchive = z.infer<typeof archiveSchema>;
 export function legalAdditions(
   history: z.infer<typeof contributionSchema>[],
 ): AdditionCard[] {
-  return additionCardSchema.options.filter(
-    (card) => !history.some((c) => c.kind === 'addition' && c.cardId === card),
-  );
+  if (isPixelHistory(history)) return history.length < 5 ? ['instruction'] : [];
+  return additionCardSchema.options.filter(card => card !== 'instruction' &&
+    !history.some(c => c.kind === 'addition' && c.cardId === card));
 }
 export function endVoteOutcome(
   active: string[],

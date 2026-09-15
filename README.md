@@ -2,7 +2,7 @@
 
 Forge's revised direction is a competitive game-creation party: friends choose concept cards, Forge creates a playable mashup, and everyone competes. After each round, both the winner and loser add one mechanic. The group repeats until it ends, then saves the entire game for replay or remix.
 
-**Product direction is documented; the party game is not implemented yet.** The current application remains the earlier mechanic-design lab with the G1–G4 Returnal dash journey. The imported ModeShift project is reference material, not the current application or a generic game generator.
+**The current application now ships the bounded party product.** The homepage is the party lobby, the repository includes authenticated Forge creation for the retained pixel runtime, durable rooms and saved archives, and the preserved G1–G4 Returnal dash journey. The imported ModeShift project remains reference material, not the current application or a generic game generator.
 
 ## Current planning
 
@@ -11,15 +11,15 @@ Forge's revised direction is a competitive game-creation party: friends choose c
 - [OpenAI capability review](./docs/openai-capability-fit.md): Agents API for construction, GPT-Image-2.5 for assets, GPT-Live 1 for optional voice.
 - [Quality gates](./QUALITY.md): required implementation checks and independent review.
 
-The proposed first demo uses an explicitly authored FPS + zombies + cooking mashup. Actual on-the-fly generation remains a required later stage of the target product. The hand-sign AR jump quest and adaptive difficulty are preserved in separate packets.
+The current demo uses the retained Snake/Invaders/Bounce runtime with public saved play, deterministic preset reuse, and protected paid generation. Broader open-ended on-the-fly mashup generation remains a required later PC-09 stage of the target product. The hand-sign AR jump quest and adaptive difficulty are preserved in separate packets.
 
 Superseded plans, research, the earlier MFH backlog, and the complete ModeShift ZIP/import now live in the [dated archive](./archive/2026-09-13-mechanic-lab/README.md). The archive preserves their bytes and provenance; it is historical reference, not the active delivery queue. Old milestone/test notes are not a current verification pass.
 
 ## Repository today
 
-The Next.js/React application contains the reference library, Returnal breakdown, one-rule Forge adaptation, deterministic creator microplay, and a disclosed local tester/report walkthrough. Domain code is in `lib/mechanics/`; golden-flow checks are in `tests/mechanics.test.mjs` and `tests/browser/explore.spec.ts`.
+The Next.js/React application now includes the party lobby, room lifecycle, protected Forge creation flow, authoritative room/archive services, retained pixel runtime variants, saved replay/remix flows, and the preserved mechanic-lab reference pages. Party domain code lives in `lib/party-forge/`; the retained mechanic-lab code remains in `lib/mechanics/`. Behavioral coverage includes the party/unit suites in `tests/party-*.test.mjs`, `tests/pixel-*.test.mjs`, `tests/forge-*.test.mjs`, and browser coverage in `tests/browser/`.
 
-The hosting configuration uses Sites with Vinext/Cloudflare, but currently declares no database or object-storage binding. Existing development/build/browser-test scripts use Next. Archived reference source is excluded from application TypeScript and lint checks. PC-01 must reconcile the host build/test path before the party stacks depend on it.
+The hosting configuration uses Sites with Vinext/Cloudflare and now declares the logical `DB` D1 and `FORGE_ARTIFACTS` R2 bindings used by the party and creation flows. Local scripts include the built-host and database gates in `package.json`, including `npm run build:worker`, `npm run db:migrate:local`, and `npm run test:party`. Archived reference source remains excluded from active application TypeScript and lint checks.
 
 ## Local development
 

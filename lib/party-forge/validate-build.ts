@@ -63,7 +63,9 @@ export async function qualifyBuild(recipe: KitchenRecipe, contributions: Contrib
       'quick-orders': 'completedOrders', 'batch-orders': 'completedOrders',
       'dinner-bell': 'bellAttractionTicks', 'hot-potato': 'timerSpoiledDishes', 'zombie-pantry': 'pantryPickups',
     } as const;
-    if (result.metrics[metric[cardIdFor(contribution)]] < 1) {
+    const card = cardIdFor(contribution);
+    if (!(card in metric)) throw new Error('Instructions require pixel qualification');
+    if (result.metrics[metric[card as keyof typeof metric]] < 1) {
       throw new Error(`Witness did not exercise ${cardIdFor(contribution)} (${contribution.id})`);
     }
     witnesses.push({ contributionId: contribution.id, traceHash: await hashValue({ seed: qualification.seed, frames }) });

@@ -192,7 +192,8 @@ void test('avatar choices are controlled, optional, and accessible', () => {
   const html = render({ onAvatarChange() {} });
   assert.match(html, /aria-label="Use Marmalade cat" aria-pressed="true"/);
   assert.equal((html.match(/aria-label="Use .*? cat"/g) || []).length, 6);
-  assert.match(html, /\/party-forge\/avatars\/midnight.svg/);
+  assert.match(html, /aria-label="Use Midnight cat"/);
+  assert.match(html, /shape-rendering="crispEdges"/);
 });
 
 void test('one confirmed participant does not complete a three-player room', () => {

@@ -1,0 +1,28 @@
+# Site server secrets/configuration. Never use NEXT_PUBLIC_ or VITE_ prefixes.
+FORGE_ORIGIN=https://mechanic-forge.leekahhow.chatgpt.site
+FORGE_CODE_HASH=<SHA-256 digest from scripts/forge/setup-code.mjs>
+FORGE_RUNNER_SECRET=<random 32-byte secret shared only with the operator runner>
+FORGE_ENABLED=false
+FORGE_DAILY_JOBS=5
+
+# Runner only: keep the OpenAI key outside the Site, browser and generated sandbox.
+OPENAI_API_KEY=<application key with agents read/write and responses write>
+FORGE_BUDGET_ACK=configured
+# FORGE_BUDGET_ACK asserts operator project spending controls are configured.
+# It is not itself a billing enforcement mechanism.
+
+# Deployment default: Sites dispatch authenticates ChatGPT users. Legacy code mode
+# is opt-in via FORGE_AUTH_MODE=legacy-code for old demos/tests only.
+FORGE_AUTH_MODE=chatgpt
+FORGE_KEY_ENCRYPTION_SECRET=<64 lowercase hex characters, server secret>
+FORGE_ADMIN_USER_IDS=<comma-separated site-specific IDs shown after sign-in>
+# Enable only after the operator runner has its sponsored key and project controls.
+FORGE_TRIAL_ENABLED=false
+# BYOK jobs use the user's encrypted job-specific key. OPENAI_API_KEY is optional
+# on the runner unless sponsored trials are enabled.
+
+# Current production policy supersedes trial setup above.
+FORGE_ADMIN_EMAILS=kahhow@string.sg,leekahhow@gmail.com,lancetyw@gmail.com
+# Remove FORGE_ADMIN_USER_IDS; FORGE_TRIAL_ENABLED remains false.
+# FORGE_ENABLED controls the separate Agents creator only.
+# Existing party Responses generation uses paid-access.ts and the site OPENAI_API_KEY.

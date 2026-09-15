@@ -1,3 +1,4 @@
+import { createDinoBuild } from './runtimes/dino-runner-v2/manifest.ts';
 import {
   archiveSchema,
   contributionHistorySchema,
@@ -44,6 +45,7 @@ export async function resolveArchiveFork(sourceBuild: unknown, value: unknown): 
   requireArchive(setup.decisions.every((decision) => !inheritedActors.has(decision.participantId)),
     'A saved match requires fresh participant identities');
   if (kind === 'play-again') return freezeJson({ kind, manifest: source, setup });
+  requireArchive(source.catalogVersion !== 'pixel-arcade/1', 'Replacing saved instructions requires a new generated game. Play again preserves the exact retained game.');
   const contributions = await Promise.all(source.contributions.map(async (contribution) => {
     if (contribution.kind === 'addition') return contribution;
     const decision = setup.decisions.find((entry) => entry.selection.inheritedContributionId === contribution.id)!;
@@ -52,7 +54,8 @@ export async function resolveArchiveFork(sourceBuild: unknown, value: unknown): 
       participantId: decision.participantId, choice: decision.selection.choice,
       provenance: decision.provenance };
   }));
-  const manifest = await createArchiveBuild(contributions, { buildId: source.buildId, contentHash: source.contentHash });
+  const manifest = source.catalogVersion === 'dino-runner/2' ? await createDinoBuild(contributions, { buildId: source.buildId, contentHash: source.contentHash }) : await createArchiveBuild(contributions, { buildId: source.buildId, contentHash: source.contentHash });
+  requireArchive(manifest, 'Dino replay requires the same supported source cards and modifiers.');
   return freezeJson({ kind, manifest, setup });
 }
 
@@ -75,7 +78,9 @@ export async function resolveArchiveEvolution(request: {
       contributions.length <= previous.contributions.length + 2 &&
       canonicalJson(contributions.slice(0, previous.contributions.length)) === canonicalJson(previous.contributions),
     'Evolution must retain every prior contribution unchanged and append at most two legal additions');
-    const manifest = await createArchiveBuild(contributions, { buildId: previous.buildId, contentHash: previous.contentHash });
+    requireArchive(previous.catalogVersion !== 'pixel-arcade/1', 'New instructions require the configured generation service; the saved recipe was not silently reused.');
+    const manifest = previous.catalogVersion === 'dino-runner/2' ? await createDinoBuild(contributions, { buildId: previous.buildId, contentHash: previous.contentHash }) : await createArchiveBuild(contributions, { buildId: previous.buildId, contentHash: previous.contentHash });
+    requireArchive(manifest, 'Use one unused Dino modifier: Double stomp points, Double meat points, or Finish bonus.');
     return { status: 'playable', manifest: parseEvolution(previous, manifest) };
   } catch (error) {
     return { status: 'incompatible', previous, reason: error instanceof Error ? error.message : 'Saved evolution validation failed' };
@@ -92,6 +97,7 @@ async function validateForkRoot(archive: GameArchive, first: BuildManifest) {
   const setup = archive.forkSetup;
   // Direct Play again keeps the source manifest exactly, without a changed setup.
   if (!setup) return;
+  requireArchive(setup.decisions.length === first.contributions.filter(c => c.kind === 'initial').length, 'A fork must claim every inherited initial contribution');
   const allKept = setup.decisions.every((decision) => decision.selection.kind === 'keep');
   requireArchive(allKept
     ? first.buildId === setup.sourceBuildId && first.contentHash === setup.sourceBuildHash
@@ -145,7 +151,7 @@ export async function validateArchive(value: unknown, options: { allowUnavailabl
     }
     const round = entry.status === 'completed' ? entry.result.round : entry.round;
     requireArchive(round.number === (previous?.round.number ?? 0) + 1 &&
-      round.tieCursor === (previous?.nextTieCursor ?? 0),
+      round.tieCursor === (previous?.nextTieCursor ?? 0) % round.roster.length,
     'Round numbering and tie rotation must follow completed history');
     requireArchive(round.startsAt >= lastEventAt, 'Historical rounds must follow every prior completion or abort');
     const manifest = builds.get(round.buildId);
@@ -158,8 +164,9 @@ export async function validateArchive(value: unknown, options: { allowUnavailabl
       continue; // Unplayed candidates are deliberately absent from retained builds.
     }
     requireArchive(manifest, 'A completed round is missing its immutable manifest');
-    requireArchive(round.submissionDeadline <= archive.savedAt &&
-      (!previous || round.startsAt >= previous.round.submissionDeadline),
+    const completedAt = entry.result.completedAt ?? round.submissionDeadline;
+    requireArchive(completedAt <= archive.savedAt &&
+      (!previous || round.startsAt >= (previous.completedAt ?? previous.round.submissionDeadline)),
     'Completed rounds must be chronological and precede saving');
     if (!previousBuild) {
       await validateForkRoot(archive, manifest);
@@ -176,7 +183,7 @@ export async function validateArchive(value: unknown, options: { allowUnavailabl
     played.add(manifest.buildId);
     previousBuild = manifest;
     previous = entry.result;
-    lastEventAt = round.submissionDeadline;
+    lastEventAt = completedAt;
   }
   return freezeJson(archive);
 }
