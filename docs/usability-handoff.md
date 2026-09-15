@@ -43,3 +43,5 @@ Real local Worker/D1 integration gate (`npm run test:party`) passed all 7 tests 
 ## User release decision
 
 The user explicitly instructed “No, just deploy first” on 15 September 2026. Independent review and post-review gates are deferred by that decision. The tested release is authorized for production deployment with the existing public audience and data preserved.
+
+Final integration preserves production 5b8557e053267a13ec6e684fc956d08eb842def1 (random hazards, meteor waves and skeleton deaths). Fresh lint/build, all 221 unit checks and 28 targeted Dino/usability desktop/mobile browser checks passed after the clean merge. Earlier complete browser and Worker/D1 gates above remain the validation for unchanged room/backend flows. The first unit retry lacked sandbox loopback permission; its replay test passed when rerun with the required local-server access.
