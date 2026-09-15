@@ -5,6 +5,7 @@ import {
   stepDinoMarioGame,
   dinoSpeed,
   dinoDistance,
+  hoverAltitude,
 } from '../lib/party-forge/demos/dino-mario-progressive.ts';
 
 void test('speed rises throughout the course; ground distance equals actual scroll', () => {
@@ -12,6 +13,7 @@ void test('speed rises throughout the course; ground distance equals actual scro
     ...createDinoMarioGame(),
     status: 'playing',
     protection: 100000,
+    nextMeteorScore: Infinity,
     encounters: [{ id: 99, kind: 'block', x: 100000 }],
   };
   let previousSpeed = 0;
@@ -34,26 +36,23 @@ void test('speed rises throughout the course; ground distance equals actual scro
   assert.equal(dinoSpeed(createDinoMarioGame().tick), 3);
 });
 
-void test('first pattern completes without damage and the next pattern is queued', () => {
-  const play = () => {
-    let game = { ...createDinoMarioGame(), status: 'playing' };
-    const presses = new Set([133, 276, 471, 580, 788, 889, 1058]);
-    while (game.status === 'playing' && game.tick < 1181)
-      game = stepDinoMarioGame(game, presses.has(game.tick));
-    return game;
+void test('seeded layouts replay exactly, vary by seed and do not force bird-spike pairs', () => {
+  const layout = seed => {
+    let game = { ...createDinoMarioGame(seed), status: 'playing', protection: 100000, nextMeteorScore: Infinity, beamFired: true };
+    const seen = new Map();
+    for (let tick = 0; tick < 3600; tick++) {
+      game = stepDinoMarioGame(game);
+      for (const e of game.encounters) if (!seen.has(e.id)) seen.set(e.id, { id: e.id, kind: e.kind, x: e.x, motion: e.motion });
+    }
+    return [...seen.values()];
   };
-  const result = play();
-  assert.equal(result.status, 'playing');
-  assert.ok(result.encounters.length > 0);
-  assert.ok(result.encounters.every((e) => e.id >= 14));
-  assert.equal(stepDinoMarioGame(result).tick, 1182);
-  assert.equal(result.hits, 0);
-  assert.equal(result.stomps, 4);
-  assert.equal(result.meat, 3);
-  assert.deepEqual(result, play());
-  let idle = { ...createDinoMarioGame(), status: 'playing' };
-  while (idle.status === 'playing') idle = stepDinoMarioGame(idle);
-  assert.equal(idle.status, 'lost');
+  const a = layout(1);
+  assert.deepEqual(a, layout(1));
+  assert.notDeepEqual(a, layout(2));
+  const types = a.map(e => e.kind);
+  assert.ok(types.some((k, i) => k === 'block' && types[i + 1] === 'block'));
+  assert.ok(types.some((k, i) => k === 'walker' && types[i + 1] === 'walker'));
+  assert.ok(a.some(e => e.motion === 'fly') && a.some(e => e.motion === 'crawl'));
 });
 
 void test('later segments keep spawning, remain bounded and preserve terminal inactivity', () => {
@@ -61,6 +60,7 @@ void test('later segments keep spawning, remain bounded and preserve terminal in
     ...createDinoMarioGame(),
     status: 'playing',
     protection: 100000,
+    nextMeteorScore: Infinity,
   };
   for (let tick = 0; tick < 18000; tick++) {
     game = stepDinoMarioGame(game);
@@ -82,6 +82,7 @@ void test('spikes cross the player more frequently as acceleration continues', (
     ...createDinoMarioGame(),
     status: 'playing',
     protection: 100000,
+    nextMeteorScore: Infinity,
   };
   const counts = [0, 0, 0];
   for (let tick = 0; tick < 5400; tick++) {
@@ -140,7 +141,7 @@ void test('retained party renderer still draws meat without loading demo sprites
 });
 
 void test('1,000 points fires once for exactly 120 fixed ticks and clears only its forward path', () => {
-  let game = { ...createDinoMarioGame(), status: 'playing', tick: 5999, encounters: [
+  let game = { ...createDinoMarioGame(), status: 'playing', nextEncounterDistance: Infinity, tick: 5999, encounters: [
     { id: 90, kind: 'block', x: 300 }, { id: 91, kind: 'walker', x: 500 },
     { id: 92, kind: 'meat', x: 600 }, { id: 93, kind: 'block', x: 50 },
     { id: 94, kind: 'block', x: 5000 },
@@ -188,8 +189,7 @@ void test('final-growth legs move independently while grounded and hold still ai
 
 void test('pterodactyls approach in both modes and flight contacts use their raised body', () => {
   const base = createDinoMarioGame();
-  const enemies = base.encounters.filter(e => e.kind === 'walker');
-  assert.deepEqual(enemies.map(e => e.motion), ['crawl', 'fly', 'crawl', 'fly']);
+
   for (const motion of ['crawl', 'fly']) {
     const altitude = motion === 'fly' ? 24 : 0;
     const game = { ...base, status: 'playing', feet: 258 - altitude - 28 - 1, vy: 4,
@@ -218,4 +218,75 @@ void test('pterodactyl flight and crawl select distinct animation rows and four 
   assert.deepEqual(calls.map(c => c[2]), [0, 0, 0, 0, 256, 256, 256, 256]);
   assert.ok(calls.every(c => c[5] === 88));
   assert.deepEqual(calls.map(c => c[6]), [182, 182, 182, 182, 188, 188, 188, 188]);
+});
+
+void test('flight sweeps a grid square above and below its lane while continuing left', () => {
+  assert.equal(hoverAltitude(0, 0), 64);
+  assert.equal(hoverAltitude(60, 0), 104);
+  assert.equal(hoverAltitude(180, 0), 24);
+  let game = { ...createDinoMarioGame(), status: 'playing', protection: 100000, nextEncounterDistance: Infinity,
+    encounters: [{ id: 90, kind: 'walker', x: 2000, motion: 'fly', altitude: 64, hoverPhase: 0 }] };
+  for (let tick = 1; tick <= 240; tick++) {
+    game = stepDinoMarioGame(game);
+    assert.ok(Math.abs(game.encounters[0].altitude - hoverAltitude(tick, 0)) < 1e-9);
+    assert.ok(Math.abs(game.encounters[0].x - (2000 - dinoDistance(tick))) < 1e-8);
+  }
+});
+
+void test('meteor waves trigger once at 1500, 2500, 3500 and have seeded random positions', () => {
+  const base = { ...createDinoMarioGame(42), status: 'playing', nextEncounterDistance: Infinity, beamFired: true, encounters: [] };
+  let game = stepDinoMarioGame({ ...base, tick: 8998 });
+  assert.equal(game.meteorWaves, 0);
+  game = stepDinoMarioGame(game);
+  assert.equal(game.meteorWaves, 1); assert.equal(game.nextMeteorScore, 2500);
+  assert.ok(game.encounters.length >= 2 && game.encounters.length <= 4);
+  assert.ok(game.encounters.every(e => e.kind === 'meteor' && e.warningTicks >= 60));
+  assert.ok(new Set(game.encounters.map(e => e.x)).size > 1);
+  assert.deepEqual(game, stepDinoMarioGame(stepDinoMarioGame({ ...base, tick: 8998 })));
+  assert.equal(stepDinoMarioGame(game).meteorWaves, 1);
+  const second = stepDinoMarioGame({ ...game, tick: 14999, encounters: [] });
+  assert.equal(second.meteorWaves, 2); assert.equal(second.nextMeteorScore, 3500);
+  const third = stepDinoMarioGame({ ...second, tick: 20999, encounters: [] });
+  assert.equal(third.meteorWaves, 3); assert.equal(third.nextMeteorScore, 4500);
+  const restart = createDinoMarioGame(43);
+  assert.equal(restart.meteorWaves, 0); assert.equal(restart.nextMeteorScore, 1500);
+});
+
+void test('meteor swept contact instantly kills every size through protection; all deaths preserve fatal-hit size', () => {
+  for (const growth of [0, 1, 2]) {
+    const base = { ...createDinoMarioGame(), status: 'playing', growth, big: growth > 0,
+      lives: 4, protection: 90, nextEncounterDistance: Infinity };
+    const meteor = { id: 80, kind: 'meteor', x: 130, altitude: 300, verticalSpeed: 400, warningTicks: 0 };
+    const dead = stepDinoMarioGame({ ...base, encounters: [meteor] });
+    assert.equal(dead.status, 'lost'); assert.equal(dead.lives, 0);
+    assert.equal(dead.deathCause, 'meteor'); assert.equal(dead.deathGrowth, growth);
+    assert.equal(stepDinoMarioGame(dead, true), dead);
+    const warned = stepDinoMarioGame({ ...base, encounters: [{ ...meteor, warningTicks: 20 }] });
+    assert.equal(warned.status, 'playing'); assert.equal(warned.encounters[0].altitude, 300);
+    for (const kind of ['block', 'walker']) {
+      const hit = stepDinoMarioGame({ ...base, protection: 0, lives: 1, encounters: [{ id: 88, kind, x: 130 }] });
+      assert.equal(hit.status, 'lost'); assert.equal(hit.deathGrowth, growth); assert.equal(hit.deathCause, 'collision');
+    }
+  }
+});
+
+void test('beam preserves hovering enemies above its actual visible path', () => {
+  const game = { ...createDinoMarioGame(), status: 'playing', beamTicks: 20, beamFired: true,
+    encounters: [{ id: 80, kind: 'walker', motion: 'fly', x: 300, altitude: 100 }] };
+  assert.equal(stepDinoMarioGame(game).encounters.length, 1);
+});
+
+void test('three skeleton sprites have distinct size-appropriate silhouettes', async () => {
+  const { drawDinoSkeleton, drawDinoPlayer } = await import('../lib/party-forge/presentation/dino-view.ts');
+  const frames = [];
+  for (const growth of [0, 1, 2]) {
+    const bones = []; const ctx = { save() {}, restore() {}, fillRect(...args) { bones.push(args); } };
+    drawDinoSkeleton(ctx, growth, 112, 258);
+    const height = 258 - Math.min(...bones.map(b => b[1]));
+    assert.equal(height, [40, 56, 64][growth]);
+    frames.push([...bones]); bones.length = 0;
+    drawDinoPlayer(ctx, { ...createDinoMarioGame(), status: 'lost', growth: 0, deathGrowth: growth }, 112, 258);
+    assert.deepEqual(bones, frames[growth], 'fatal-hit size selects the skeleton even after shrinking');
+  }
+  assert.notDeepEqual(frames[0], frames[1]); assert.notDeepEqual(frames[1], frames[2]);
 });

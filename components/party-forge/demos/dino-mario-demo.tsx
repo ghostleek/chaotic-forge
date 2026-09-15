@@ -35,7 +35,7 @@ export function DinoMarioDemo() {
   }
   function start() {
     input.current = { held: false, pulse: false };
-    setGame({ ...createDinoMarioGame(), status: 'playing' });
+    setGame({ ...createDinoMarioGame(crypto.getRandomValues(new Uint32Array(1))[0]), status: 'playing' });
     setPaused(false);
     canvas.current?.focus();
   }
@@ -100,10 +100,10 @@ export function DinoMarioDemo() {
       : game.status === 'won'
         ? 'Course complete! Same jump, two uses.'
         : game.status === 'lost'
-          ? 'No lives left. Restart for another run.'
+          ? game.deathCause === 'meteor' ? 'Meteor strike! Instant death. Restart for a new course.' : 'No lives left. Restart for a new course.'
           : paused
             ? 'Paused. Resume when you are ready.'
-            : (game.beamTicks ?? 0) > 0 ? `ATOMIC BEAM! ${(game.beamTicks! / 60).toFixed(1)}s · ${game.beamDestroyed} objects cleared.` : game.protection > 0 ? 'Ouch! One life lost. Keep running.' : game.growth === 2 ? 'Fully grown! Spiny giant, maximum size.' : game.big ? 'First growth! Eat again to become a spiny giant.' : 'Jump over spikes. Stomp pterodactyls. Eat meat to grow.';
+            : (game.beamTicks ?? 0) > 0 ? `ATOMIC BEAM! ${(game.beamTicks! / 60).toFixed(1)}s · ${game.beamDestroyed} objects cleared.` : game.encounters.some(e => e.kind === 'meteor' && (e.warningTicks ?? 0) > 0) ? 'Meteor shower incoming! A hit is fatal.' : game.protection > 0 ? 'Ouch! One life lost. Keep running.' : game.growth === 2 ? 'Fully grown! Spiny giant, maximum size.' : game.big ? 'First growth! Eat again to become a spiny giant.' : 'Jump over spikes. Stomp pterodactyls. Eat meat to grow.';
 
   return (
     <main className={styles.page}>
@@ -152,6 +152,8 @@ export function DinoMarioDemo() {
             data-beam-ticks={game.beamTicks}
             data-beam-destroyed={game.beamDestroyed}
             data-lives={game.lives}
+            data-death-growth={game.deathGrowth}
+            data-meteor-waves={game.meteorWaves}
             aria-label="Dino Mario course. Space jumps. Escape pauses. A Jump button is available below."
             onKeyDown={(event) => {
               if (event.code === 'Space') {
@@ -238,7 +240,7 @@ export function DinoMarioDemo() {
           <div className={styles.rule}>
             <canvas ref={spikeLegend} className={styles.spikeSymbol} width={28} height={38} aria-label="Red spike trap" />
             <p>
-              <b>Dino / Dodge the spikes</b>Keep running: speed increases continuously, with no cap, and spikes arrive more often. Time your jump to pass
+              <b>Dino / Dodge the spikes</b>Each run shuffles spikes and pterodactyls. Speed rises without a cap, and random gaps tighten over time. Time your jump to pass
               over the red spike traps.
             </p>
           </div>
@@ -246,7 +248,7 @@ export function DinoMarioDemo() {
             <canvas ref={enemyLegend} width={56} height={56} aria-label="Pixel pterodactyl enemy" />
             <p>
               <b>Mario / Stomp &amp; bounce</b>Pterodactyls crawl or fly toward you. Land on their backs while falling.
-              It disappears; you bounce over the next spike trap.
+              They hover one grid square up and down. Stomp them to bounce; watch for independently placed spikes.
             </p>
           </div>
           <p className={styles.disclosure}>
@@ -255,7 +257,7 @@ export function DinoMarioDemo() {
           <p className={styles.disclosure}>
             This prepared game does not call AI or generate a new game.
           </p>
-          <p className={styles.disclosure}>At 1,000 points, automatically fire a two-second beam once per run. It destroys visible spikes, pterodactyls and meat ahead without awarding pickup or stomp points. Endless demo score: 10 points per second, 100 per stomp and 50 per meat. Survive as long as you can; the run ends when no lives remain.</p>
+          <p className={styles.disclosure}>At 1,000 points, automatically fire a two-second beam once per run. It destroys visible objects within its visible path without awarding pickup or stomp points. At 1,500 points and every 1,000 points after that, a random meteor wave arrives. Watch for the warning marks: a meteor hit is instant death, even with extra lives or damage protection. Endless demo score: 10 points per second, 100 per stomp and 50 per meat. Survive as long as you can; the run ends when no lives remain.</p>
 <p className={styles.disclosure}>For online competition, open a room and choose the Chrome Dino and Mario starters. Each player confirms a card before the shared round.</p>
           <DemoProvenance />
         </aside>

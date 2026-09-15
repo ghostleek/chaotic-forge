@@ -1,4 +1,16 @@
 import { test, expect } from '@playwright/test';
+import { drawDinoSkeleton } from '../../lib/party-forge/presentation/dino-view';
+
+// Fix only the demo's one-word seed request; keep all other browser crypto real.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = crypto.getRandomValues.bind(crypto);
+    Object.defineProperty(crypto, 'getRandomValues', { value: (array: Uint32Array) => {
+      if (array instanceof Uint32Array && array.length === 1) { array[0] = 1; return array; }
+      return original(array);
+    } });
+  });
+});
 
 test('first-visit introduction is dismissible, session-scoped and reopenable', async ({
   page,
@@ -136,10 +148,10 @@ test('the browser continues beyond 30 seconds and 2x, then restart resets speed'
   await expect(page.getByTestId('speed')).toHaveText('1.00×');
   await expect(page.getByLabel('Red spike trap', { exact: true })).toBeVisible();
   let tick = 0;
-  for (const press of [133, 276, 471, 580, 788, 889, 1058, 1385, 1459, 1612, 1671, 1831]) {
-    if (press === 1612) {
-      await page.clock.runFor(((1581 - tick) * 1000) / 60 + 0.05);
-      tick = 1581;
+  for (const press of [139, 281, 412, 649, 795, 868, 951, 1040, 1285, 1744, 1844, 1910]) {
+    if (press === 1744) {
+      await page.clock.runFor(((1500 - tick) * 1000) / 60 + 0.05);
+      tick = 1500;
       await expect(canvas).toHaveAttribute('data-beam-ticks', '120');
       await page.getByRole('button', { name: 'Pause', exact: true }).click();
       await page.clock.runFor(500);
@@ -149,23 +161,23 @@ test('the browser continues beyond 30 seconds and 2x, then restart resets speed'
     }
     await page.clock.runFor(((press - tick) * 1000) / 60 + 0.05);
     await expect(canvas).toHaveAttribute('data-tick', String(press));
-    if (press === 276 || press === 580) await canvas.screenshot({ path: `outputs/dino-pterodactyl/mode-${press}.png` });
+    if (press === 281 || press === 649) await canvas.screenshot({ path: `outputs/dino-pterodactyl/mode-${press}.png` });
     await page.keyboard.down('Space');
     await page.clock.runFor(1000 / 60 + 0.05);
     await page.keyboard.up('Space');
     tick = press + 1;
   }
-  await page.clock.runFor(((1860 - tick) * 1000) / 60 + 0.05);
+  await page.clock.runFor(((1920 - tick) * 1000) / 60 + 0.05);
   await expect(canvas).toHaveAttribute('data-status', 'playing');
-  await expect(page.getByTestId('stomps')).toHaveText('5');
+  await expect(page.getByTestId('stomps')).toHaveText('6');
   await expect(canvas).toHaveAttribute('data-growth', '2');
   await expect(canvas).toHaveAttribute('data-beam-ticks', '0');
   expect(Number(await canvas.getAttribute('data-beam-destroyed'))).toBeGreaterThan(0);
-  await expect(page.getByTestId('speed')).toHaveText('2.03×');
+  await expect(page.getByTestId('speed')).toHaveText('2.07×');
   await page.screenshot({ path: 'outputs/dino-growth/final-stage.png' });
   await page.clock.runFor(1000);
-  await expect(canvas).toHaveAttribute('data-tick', '1920');
-  await expect(page.getByTestId('speed')).toHaveText('2.07×');
+  await expect(canvas).toHaveAttribute('data-tick', '1980');
+  await expect(page.getByTestId('speed')).toHaveText('2.10×');
   await page.getByRole('button', { name: 'Restart', exact: true }).click();
   await expect(canvas).toHaveAttribute('data-tick', '0');
   await expect(canvas).toHaveAttribute('data-growth', '0');
@@ -240,12 +252,12 @@ test('grown Dino alternates its visible legs while its body remains stable', asy
   await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
   await page.getByRole('button', { name: 'Start', exact: true }).click();
   let tick = 0;
-  for (const press of [133, 276]) {
+  for (const press of [133]) {
     await page.clock.runFor((press - tick) * 1000 / 60 + 0.05);
     await page.keyboard.down('Space'); await page.clock.runFor(1000 / 60 + 0.05);
     await page.keyboard.up('Space'); tick = press + 1;
   }
-  await page.clock.runFor((471 - tick) * 1000 / 60 + 0.05);
+  await page.clock.runFor((243 - tick) * 1000 / 60 + 0.05);
   const canvas = page.getByLabel('Dino Mario course.', { exact: false });
   await expect(canvas).toHaveAttribute('data-growth', '2');
   await expect(canvas).toHaveAttribute('data-feet', '258.00');
@@ -291,4 +303,43 @@ test('visible focus changes keep running, while a hidden tab pauses without adva
   await page.getByRole('button', { name: 'Resume', exact: true }).click();
   await page.clock.runFor(1000);
   expect(Number(await canvas.getAttribute('data-tick'))).toBeGreaterThan(beforeHidden + 50);
+});
+
+
+test('random meteor wave appears after crossing 1500 and the terminal game shows bones', async ({ page }, testInfo) => {
+  await page.goto('/play/dino-mario');
+  await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  const canvas = page.getByLabel('Dino Mario course.', { exact: false });
+  let tick = 0;
+  for (const press of [139,281,412,649,795,868,951,1040,1285,1744,1844,1910,2057,2305,2350,2458,2501,2537,2613,2649]) {
+    await page.clock.runFor((press - tick) * 1000 / 60 + 0.05);
+    await page.keyboard.down('Space');
+    await page.clock.runFor(1000 / 60 + 0.05);
+    await page.keyboard.up('Space');
+    tick = press + 1;
+  }
+  await expect(canvas).toHaveAttribute('data-meteor-waves', '1');
+  await expect(canvas).toHaveAttribute('data-status', 'playing');
+  await expect(page.getByRole('status')).toContainText('Meteor shower');
+  await canvas.screenshot({ path: `outputs/dino-random/meteors-${testInfo.project.name}.png` });
+  await page.clock.runFor(30000);
+  await expect(canvas).toHaveAttribute('data-status', 'lost');
+  await expect(canvas).toHaveAttribute('data-death-growth', /^[012]$/);
+  await canvas.screenshot({ path: `outputs/dino-random/death-${testInfo.project.name}.png` });
+});
+
+test('all three flat skeleton sizes are visible', async ({ page }, testInfo) => {
+  await page.goto('/play/dino-mario');
+  await page.evaluate(source => {
+    const draw = (0, eval)('(' + source + ')');
+    const preview = document.createElement('canvas');
+    preview.width = 400; preview.height = 100; preview.id = 'skeleton-preview';
+    document.body.appendChild(preview);
+    const ctx = preview.getContext('2d')!;
+    ctx.fillStyle = '#f7f4e9'; ctx.fillRect(0, 0, 400, 100);
+    for (let growth = 0; growth < 3; growth++) draw(ctx, growth, 45 + growth * 130, 85);
+  }, drawDinoSkeleton.toString());
+  await page.locator('#skeleton-preview').screenshot({ path: `outputs/dino-random/skeletons-${testInfo.project.name}.png` });
 });
