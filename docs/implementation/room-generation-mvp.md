@@ -53,4 +53,10 @@ Early failures were a missing `cardId` in a new unit fixture, a test clicking be
 
 Required live API execution, generated-game semantic quality, latency/cost and deployed multiplayer acceptance remain unverified. No deployment or merge performed.
 
-Worktree: `/private/tmp/chaotic-forge-room-generation-mvp`, branch `codex/room-generation-mvp`, uncommitted implementation on exact production base `f151999`. A complete recovery patch and this handoff are saved under the original workspace's ignored `outputs/room-generation-mvp/` directory. Apply the patch only to that exact base in a separate checkout. The original dirty working tree was preserved.
+Worktree: `/private/tmp/chaotic-forge-room-generation-mvp`, branch `codex/room-generation-mvp`, implementation commit `8995de2` on exact production base `f151999`. A complete recovery patch and this handoff are saved under the original workspace's ignored `outputs/room-generation-mvp/` directory. Apply the patch only to that exact base in a separate checkout. The original dirty working tree was preserved.
+
+## GitHub PR integration
+
+The PR branch incorporates GitHub `main` at `e48bc37` alongside the deployed version-23 history. This retains GitHub's stale pixel-job recovery, current README, sign-in wording and archived assets. The billing conflict keeps the explicit three-email sponsorship policy; configurable IDs or additional configured emails do not grant paid generation. The PR also carries deployed UI/Dino improvements whose commits were not yet on GitHub main. No Site deployment is part of this PR operation.
+
+Post-integration checks: lint and production build passed; 16 focused generation/access/recovery tests passed; all three focused Worker/D1 funding, creator recovery and shared room-generation tests passed (41.9 seconds). Independent integration review found no new merge-specific blockers and separately passed 10 focused tests. Full desktop/mobile and long-running integration suites above are pre-integration evidence; rerun all QUALITY.md gates before merge. PR remains draft pending live qualification.

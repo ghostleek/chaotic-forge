@@ -5,6 +5,7 @@ import { encryptKey, isAdmin } from '../lib/party-forge/generation/billing.ts';
 const emails = 'kahhow@string.sg,leekahhow@gmail.com,lancetyw@gmail.com';
 void test('only authenticated exact admin emails use the site key; all others need their own', async () => {
   const env = {
+    FORGE_ADMIN_USER_IDS: 'legacy-admin',
     FORGE_ADMIN_EMAILS: emails,
     OPENAI_API_KEY: 'sk-fixture-site',
     FORGE_KEY_ENCRYPTION_SECRET: 'ab'.repeat(32),
@@ -33,6 +34,10 @@ void test('only authenticated exact admin emails use the site key; all others ne
       paidAccess(env, { userId: 'user', email }),
       (e) => e.status === 402,
     );
+  await assert.rejects(
+    paidAccess(env, { userId: 'legacy-admin', email: 'stranger@gmail.com' }),
+    (e) => e.status === 402,
+  );
   assert.equal(
     isAdmin(env, { userId: 'user', email: 'KAHHOW@STRING.SG' }),
     true,
