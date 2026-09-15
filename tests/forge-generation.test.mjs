@@ -1,3 +1,4 @@
+import { brief } from './fixtures/forge/brief.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -135,6 +136,12 @@ await test('runner downloads the completed turn and retains validated executable
           artifacts: {
             async *list() {
               yield {
+                id: 'brief',
+                turn_id: 'turn',
+                path: '/workspace/outputs/brief.json',
+                size_bytes: JSON.stringify(brief).length,
+              };
+              yield {
                 id: 'old',
                 turn_id: 'wrong',
                 path: '/workspace/outputs/game.js',
@@ -147,6 +154,7 @@ await test('runner downloads the completed turn and retains validated executable
               };
             },
             content: async (id) => {
+              if (id === 'brief') return new Response(JSON.stringify(brief));
               assert.equal(id, 'artifact');
               return new Response(html);
             },

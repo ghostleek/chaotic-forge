@@ -277,3 +277,78 @@
 
 .outlineButton { display: inline-flex; align-items: center; justify-content: center; border: 2px solid #192226; border-radius: 0; padding: 10px 16px; min-height: 44px; margin: 6px 8px 6px 0; background: transparent; color: #192226; font-weight: 700; text-decoration: none; }
 .outlineButton:focus-visible { outline: 3px solid #658443; outline-offset: 4px; }
+
+.progressPanel {
+  margin: 16px 0;
+  padding: 20px;
+  background: #f0f3e8;
+  border: 1px solid #cbd4bb;
+  border-radius: 10px;
+}
+.progressHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.activityDot,
+.completeDot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #657f36;
+  flex-shrink: 0;
+}
+.activityDot {
+  box-shadow: 0 0 0 5px #dfe8ce;
+}
+.progressPanel summary {
+  cursor: pointer;
+  padding: 10px 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+.activityLog {
+  padding: 0;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.activityLog li {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 13px;
+}
+.activityLog time {
+  color: #62704e;
+  font-size: 11px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.brief {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #cbd4bb;
+  overflow-wrap: anywhere;
+}
+.brief h3 {
+  margin: 8px 0;
+  font-size: 23px;
+}
+.brief dl {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.brief dt {
+  font-weight: 700;
+}
+.brief dd {
+  margin: 0;
+}
+.brief a {
+  color: #3c581d;
+}

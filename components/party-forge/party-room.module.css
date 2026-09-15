@@ -24,3 +24,6 @@
 .invite { align-items: flex-start; }
 .invite output { flex-basis: 100%; }
 @media(max-width:650px) { .onboarding { flex-wrap: wrap; } .onboarding button { min-height:44px; font-size:14px; } .root .hero h1 { font-size:44px; } }
+
+.generatedPlaytest { width: 100%; max-width: 640px; height: 760px; border: 1px solid currentColor; border-radius: 12px; }
+@media (max-width: 600px) { .generatedPlaytest { height: 540px; } }

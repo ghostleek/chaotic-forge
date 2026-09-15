@@ -61,18 +61,14 @@ export async function decryptKey(
   );
   return new TextDecoder().decode(bytes);
 }
-export function isAdmin(env: BillingEnv, identity: Identity) {
-  return (
-    (env.FORGE_ADMIN_USER_IDS ?? '')
-      .split(',')
-      .map((v) => v.trim())
-      .filter(Boolean)
-      .includes(identity.userId) ||
-    (env.FORGE_ADMIN_EMAILS ?? '')
-      .split(',')
-      .map((v) => v.trim().toLowerCase())
-      .filter(Boolean)
-      .includes(identity.email.trim().toLowerCase())
+export const SPONSORED_EMAILS = [
+  'kahhow@string.sg',
+  'leekahhow@gmail.com',
+  'lancetyw@gmail.com',
+] as const;
+export function isAdmin(_env: BillingEnv, identity: Identity) {
+  return SPONSORED_EMAILS.some(
+    (email) => email === identity.email?.trim().toLowerCase(),
   );
 }
 export function requireAdmin(env: BillingEnv, identity: Identity) {

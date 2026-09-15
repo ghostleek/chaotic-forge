@@ -23,7 +23,7 @@ test('local trusted identity boundary isolates BYOK and restricts sponsorship to
       FORGE_ENABLED: 'true',
       FORGE_DAILY_JOBS: '10',
       FORGE_KEY_ENCRYPTION_SECRET: 'ab'.repeat(32),
-      FORGE_ADMIN_EMAILS: 'owner@fixture.test',
+      FORGE_ADMIN_EMAILS: 'leekahhow@gmail.com',
       FORGE_TRIAL_ENABLED: 'true',
     },
   });
@@ -38,7 +38,8 @@ test('local trusted identity boundary isolates BYOK and restricts sponsorship to
         ...(id
           ? {
               'oai-authenticated-user-id': id,
-              'oai-authenticated-user-email': `${id}@fixture.test`,
+              'oai-authenticated-user-email':
+                id === 'owner' ? 'leekahhow@gmail.com' : `${id}@fixture.test`,
             }
           : {}),
       },

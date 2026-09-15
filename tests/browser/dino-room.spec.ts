@@ -24,7 +24,8 @@ test('two own-browser players build the authored remix, compete and contribute t
       await player.getByRole('button', { name: 'Confirm instruction', exact: true }).click();
       for (const observer of [page, guest]) await expect(observer.locator('p').filter({ hasText: new RegExp(`^${instruction}$`) })).toBeVisible();
     }
-    await page.getByRole('button', { name: 'Build game', exact: true }).click();
+    await page.getByText('Use the existing game builder', { exact: true }).click();
+    await page.getByRole('button', { name: 'Build with current pixel engine', exact: true }).click();
     let readyCount = 0;
     for (const player of [page, guest]) {
       await expect(player.getByRole('button', { name: 'Ready to play' })).toBeEnabled({ timeout: 20_000 });

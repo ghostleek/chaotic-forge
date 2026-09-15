@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ForgeHeader } from './forge-header';
 import { RoomInvite } from './room-invite';
 import { RoomAccess } from './room-access';
+import { RoomGeneration } from './room-generation';
 import { PixelSprite } from './pixel-sprite.tsx';
 import { useRoom } from '../../lib/party-forge/client/use-room.ts';
 import { nextAddition } from '../../lib/party-forge/client/demo-path.ts';
@@ -173,9 +174,11 @@ export function Lobby({ roomId, initialNickname = '', initialStartRoom = false }
             />
           ) : null}
           <RecipeSummary room={room} />
-          {room.phase === 'lobby' && room.build.status === 'empty' && room.participants.length >= minimumPlayers && room.contributions.length === room.participants.length ? <section>
-            {room.hostId === me ? <button className={styles.primary} disabled={disabled} onClick={()=>void client.command({type:'retry-forge'})}>{pending ? 'Preparing your game…' : 'Build game'}</button> : <p>Everyone’s cards are in. The host can generate your game.</p>}
-          </section> : null}
+          {room.phase === 'lobby' && room.build.status === 'empty' && (pixelRoom || (room.participants.length >= minimumPlayers && room.contributions.length === room.participants.length)) ? (
+            pixelRoom ? <RoomGeneration room={room} access={access} disabled={disabled} onExistingBuilder={() => void client.command({type:'retry-forge'})} /> : <section>
+              {room.hostId === me ? <button className={styles.primary} disabled={disabled} onClick={()=>void client.command({type:'retry-forge'})}>Build game</button> : <p>The host can build your game.</p>}
+            </section>
+          ) : null}
           {room.phase === 'forging' ? (
             <section>
               <h2>
