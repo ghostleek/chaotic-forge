@@ -8,22 +8,24 @@ test('two own-browser players build the authored remix, compete and contribute t
     // Local UI funding fixture; the retained authored game makes no model call.
     await page.route('**/api/forge/access', route => route.fulfill({ json: { csrf: 'local-test', billing: { admin: true, hasKey: false, trial: false, remaining: 0, email: 'fixture@example.com', userId: 'fixture' } } }));
     await page.goto('/');
-    await page.getByRole('button', { name: 'Skip introduction' }).click();
     await page.getByRole('textbox', { name: 'Your name' }).fill('Dino player');
     await page.getByRole('button', { name: 'Create room', exact: true }).click();
     await page.getByRole('button', { name: 'Create live room', exact: true }).click();
-    const invite = page.getByRole('link', { name: /^Room / });
+    await page.getByRole('button', { name: 'QR code', exact: true }).click();
+    const invite = page.getByRole('textbox', { name: 'Room invite link' });
     await expect(invite).toBeVisible();
-    await guest.goto(new URL((await invite.getAttribute('href'))!, page.url()).href);
+    await guest.goto(await invite.inputValue());
+    await page.getByRole('button', { name: 'Close', exact: true }).click();
     await guest.getByRole('textbox', { name: 'Your name' }).fill('Mario player');
     await guest.getByRole('button', { name: 'Join room', exact: true }).click();
-    for (const player of [page, guest]) await expect(player.getByText('2/3 players · lobby', { exact: true })).toBeVisible();
+    for (const player of [page, guest]) await expect(player.getByText('2 players joined · Enough players to start', { exact: true })).toBeVisible();
     for (const [player, instruction] of [[page, 'Chrome offline Dino run'], [guest, 'Mario']] as const) {
       await player.getByRole('textbox', { name: 'Your instruction', exact: true }).fill(instruction);
       await player.getByRole('button', { name: 'Confirm instruction', exact: true }).click();
       for (const observer of [page, guest]) await expect(observer.locator('p').filter({ hasText: new RegExp(`^${instruction}$`) })).toBeVisible();
     }
-    await page.getByRole('button', { name: 'Build game', exact: true }).click();
+    await page.getByText('Use the existing game builder', { exact: true }).click();
+    await page.getByRole('button', { name: 'Build with current pixel engine', exact: true }).click();
     let readyCount = 0;
     for (const player of [page, guest]) {
       await expect(player.getByRole('button', { name: 'Ready to play' })).toBeEnabled({ timeout: 20_000 });
@@ -42,7 +44,10 @@ test('two own-browser players build the authored remix, compete and contribute t
         return false;
       }).toBe(true);
       const player = await page.getByRole('textbox', { name: 'Add one new instruction' }).isEnabled().catch(() => false) ? page : guest;
-      await player.getByRole('textbox', { name: 'Add one new instruction' }).fill(text);
+      await player.getByText('Need an idea? Pick a starter.', { exact: true }).click();
+      await expect(player.getByRole('button', { name: /^Chrome Dino/ })).toHaveCount(0);
+      await player.getByRole('button', { name: new RegExp(`^${text} Dino remix`) }).click();
+      await expect(player.getByRole('textbox', { name: 'Add one new instruction' })).toHaveValue(text);
       await player.getByRole('button', { name: 'Confirm instruction', exact: true }).click();
     }
     for (const player of [page, guest]) await expect(player.getByRole('button', { name: 'Ready to play' })).toBeEnabled({ timeout: 20_000 });

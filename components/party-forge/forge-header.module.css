@@ -1,0 +1,62 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 0 20px;
+  margin: 0 0 24px;
+  border-bottom: 2px solid #192226;
+  color: #192226;
+  font:
+    700 14px/1.4 'Courier New',
+    monospace;
+}
+.header .wordmark {
+  flex-shrink: 0;
+  color: inherit;
+  font:
+    900 20px/1 'Courier New',
+    monospace;
+  letter-spacing: -0.06em;
+  text-decoration: none;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+.actions > button,
+.actions > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 2px solid #192226;
+  border-radius: 0;
+  background: #faf9f1;
+  color: #192226;
+  box-shadow: 3px 3px 0 #192226;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.header :is(a, button):focus-visible {
+  outline: 3px solid #658443;
+  outline-offset: 4px;
+}
+@media (max-width: 480px) {
+  .header {
+    gap: 12px;
+  }
+  .actions {
+    gap: 8px;
+  }
+  .actions > button,
+  .actions > a {
+    padding: 8px;
+  }
+}

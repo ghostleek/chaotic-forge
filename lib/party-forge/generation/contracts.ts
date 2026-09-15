@@ -25,22 +25,23 @@ export const CONCEPTS = [
     rule: 'A cooldown-limited dash changes movement and must have visible feedback.',
   },
 ] as const;
-export const selectionSchema = z
+export const roomSelectionSchema = z
   .strictObject({
     requestKey: z.uuid(),
-    cards: z
-      .array(z.enum(['snake', 'invaders', 'shield', 'dash']))
-      .min(2)
-      .max(4),
+    cards: z.array(z.string().trim().min(1).max(300)).min(2).max(5),
     parent: z.uuid().optional(),
-  })
-  .refine(
-    (v) => new Set(v.cards).size === v.cards.length,
+  });
+export const selectionSchema = roomSelectionSchema.refine(
+    (v) =>
+      new Set(v.cards.map((card) => card.toLowerCase())).size ===
+      v.cards.length,
     'Duplicate concepts',
   );
 export type Job = {
   id: string;
   owner: string;
+  room_id?: string | null;
+  room_digest?: string | null;
   request_key: string;
   digest: string;
   cards: string;

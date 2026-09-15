@@ -24,5 +24,6 @@ FORGE_TRIAL_ENABLED=false
 # Current production policy supersedes trial setup above.
 FORGE_ADMIN_EMAILS=kahhow@string.sg,leekahhow@gmail.com,lancetyw@gmail.com
 # Remove FORGE_ADMIN_USER_IDS; FORGE_TRIAL_ENABLED remains false.
-# FORGE_ENABLED controls the separate Agents creator only.
+# FORGE_ENABLED controls Agents generation, including the experimental room bridge.
+# Keep false until a supervised runner and real API execution are qualified.
 # Existing party Responses generation uses paid-access.ts and the site OPENAI_API_KEY.

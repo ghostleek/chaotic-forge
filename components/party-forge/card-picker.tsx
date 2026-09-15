@@ -15,12 +15,14 @@ export function InstructionEditor({
   onConfirm,
   label = 'Your instruction',
   confirmed = false,
+  stage = 'initial',
 }: {
   initial?: string;
   disabled: boolean;
   onConfirm: (text: string) => void;
   label?: string;
   confirmed?: boolean;
+  stage?: 'initial' | 'addition';
 }) {
   const [text, setText] = useState(initial);
   const unsupported = unsupportedInstructionReason([text]);
@@ -68,7 +70,7 @@ export function InstructionEditor({
       <details>
         <summary>Need an idea? Pick a starter.</summary>
         <div className={styles.starters}>
-          {INSTRUCTION_STARTERS.map(
+          {INSTRUCTION_STARTERS.filter((starter) => starter.stage === stage).map(
             ({ title, text: instruction, sprite, hint }) => (
               <button
                 type="button"
@@ -78,8 +80,7 @@ export function InstructionEditor({
                 disabled={disabled}
               >
                 <PixelSprite kind={sprite} size={24} />
-                <span>{title}</span>
-                <small>{hint}</small>
+                <span className={styles.starterCopy}><strong>{title}</strong><small>{hint}</small></span>
               </button>
             ),
           )}
@@ -119,7 +120,7 @@ export function CardPicker(props: {
       <div className={styles.sectionHeading}>
         <h2 id="hand-title">One person. One rule.</h2>
         <span>
-          {room.contributions.length}/{Math.max(2, room.participants.length)} IN
+          {room.contributions.filter(c => c.kind === 'initial').length} of {room.participants.length} instructions confirmed
         </span>
       </div>
       <InstructionEditor

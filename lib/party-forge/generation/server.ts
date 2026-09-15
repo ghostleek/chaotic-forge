@@ -1,4 +1,10 @@
 import {
+  gameBriefSchema,
+  progressSchema,
+  publicProgress,
+  mergeProgress,
+} from './progress.ts';
+import {
   billingStatus,
   decryptKey,
   encryptKey,
@@ -12,6 +18,7 @@ import {
   MAX_ARTIFACT_BYTES,
   NO_CACHE,
   selectionSchema,
+  roomSelectionSchema,
   type Job,
 } from './contracts.ts';
 import {
@@ -102,7 +109,7 @@ async function session(request: Request, env: ForgeEnv, mutation: boolean) {
 function cookie(value: string, origin: string, age = 30 * 86400) {
   return `${cookieName}=${value}; HttpOnly; SameSite=Strict; Path=/api/forge; Max-Age=${age}${origin.startsWith('https:') ? '; Secure' : ''}`;
 }
-function publicJob(job: Job) {
+export function publicJob(job: Job) {
   return {
     id: job.id,
     cards: JSON.parse(job.cards),
@@ -112,6 +119,8 @@ function publicJob(job: Job) {
     error: job.error,
     model: job.model,
     artifactHash: job.artifact_hash,
+    ...publicProgress(job.evidence),
+    updated: job.updated,
     evidence:
       ['ready', 'preview'].includes(job.status) && job.evidence
         ? JSON.parse(job.evidence)
@@ -127,7 +136,7 @@ async function owned(env: ForgeEnv, id: string, owner: string) {
   if (!job) throw new ForgeError(404, 'Game not found.');
   return job;
 }
-async function available(env: ForgeEnv) {
+export async function available(env: ForgeEnv) {
   const cap = Number(env.FORGE_DAILY_JOBS);
   if (
     env.FORGE_ENABLED !== 'true' ||
@@ -146,6 +155,7 @@ export async function forgeRequest(
   request: Request,
   env: ForgeEnv,
   identity: Identity | null = null,
+  roomBinding?: { roomId: string; digest: string; snapshot: string },
 ): Promise<Response> {
   try {
     const path = new URL(request.url).pathname
@@ -263,7 +273,7 @@ export async function forgeRequest(
       return json({ jobs: rows.results.map(publicJob) });
     }
     if (!path[1] && request.method === 'POST') {
-      const body = selectionSchema.parse(await readJson(request));
+      const body = (roomBinding ? roomSelectionSchema : selectionSchema).parse(await readJson(request));
       const digest = await hash(
         JSON.stringify({ cards: body.cards, parent: body.parent ?? null }),
       );
@@ -273,7 +283,7 @@ export async function forgeRequest(
         .bind(actor.id, body.requestKey)
         .first<Job>();
       if (existing) {
-        if (existing.digest !== digest)
+        if (existing.digest !== digest || (existing.room_id ?? null) !== (roomBinding?.roomId ?? null) || (existing.room_digest ?? null) !== (roomBinding?.digest ?? null))
           throw new ForgeError(
             409,
             'This request was already used for different choices.',
@@ -321,18 +331,20 @@ export async function forgeRequest(
           if (!keyCiphertext)
             throw new ForgeError(
               402,
-              'Add your own API key, or ask the owner for trial access.',
+              'Add your own API key to generate a new game.',
             );
         }
       }
       const id = crypto.randomUUID();
       // One atomic INSERT owns quota reservation; no read/check/write race.
-      await env.DB.prepare(`INSERT INTO forge_jobs (id,owner,request_key,digest,cards,parent,status,created,updated,billing,key_ciphertext)
-        SELECT ?,?,?,?,?,?,'queued',?,?,?,? WHERE
+      await env.DB.prepare(`INSERT INTO forge_jobs (id,owner,request_key,digest,cards,parent,status,created,updated,billing,key_ciphertext,room_id,room_digest)
+        SELECT ?,?,?,?,?,?,'queued',?,?,?,?,?,? WHERE
         (SELECT count(*) FROM forge_jobs WHERE status IN (${activeSql})) < 2 AND
         (SELECT count(*) FROM forge_jobs WHERE owner=? AND status IN (${activeSql})) = 0 AND
         (SELECT count(*) FROM forge_jobs WHERE owner=? AND created>?) < 3 AND
         (SELECT count(*) FROM forge_jobs WHERE created>=?) < ?
+        AND (? IS NULL OR (SELECT count(*) FROM forge_jobs WHERE room_id=? AND status IN (${activeSql})) = 0)
+        AND (? IS NULL OR EXISTS(SELECT 1 FROM party_rooms WHERE id=? AND snapshot=?))
         AND (? != 'trial' OR EXISTS(SELECT 1 FROM forge_trials WHERE user_id=? AND expires>? AND max_jobs>?))
         AND (? != 'trial' OR (SELECT count(*) FROM forge_jobs WHERE owner=? AND billing='trial') < (SELECT max_jobs FROM forge_trials WHERE user_id=? AND expires>?))
         AND (? != 'byok' OR EXISTS(SELECT 1 FROM forge_keys WHERE owner=? AND ciphertext=?))
@@ -348,11 +360,18 @@ export async function forgeRequest(
           now,
           billing,
           keyCiphertext,
+          roomBinding?.roomId ?? null,
+          roomBinding?.digest ?? null,
           actor.id,
           actor.id,
           now - 3600_000,
           Math.floor(now / 86400_000) * 86400_000,
           Number(env.FORGE_DAILY_JOBS),
+          roomBinding?.roomId ?? null,
+          roomBinding?.roomId ?? null,
+          roomBinding?.roomId ?? null,
+          roomBinding?.roomId ?? null,
+          roomBinding?.snapshot ?? null,
           billing,
           actor.id,
           now,
@@ -376,7 +395,7 @@ export async function forgeRequest(
           429,
           'Creation capacity reached. Try again later; the demo is available.',
         );
-      if (job.digest !== digest) throw new ForgeError(409, 'Request conflict.');
+      if (job.digest !== digest || (job.room_id ?? null) !== (roomBinding?.roomId ?? null) || (job.room_digest ?? null) !== (roomBinding?.digest ?? null)) throw new ForgeError(409, 'Request conflict.');
       return json(publicJob(job), 202);
     }
     const job = await owned(env, path[1], actor.id);
@@ -404,7 +423,7 @@ export async function forgeRequest(
       const approval = z
         .strictObject({
           completedRun: z.literal(true),
-          checkedConcepts: z.array(z.string()).max(4),
+          checkedConcepts: z.array(z.string()).max(5),
         })
         .parse(await readJson(request));
       const concepts = JSON.parse(job.cards) as string[];
@@ -490,6 +509,8 @@ async function runnerRequest(request: Request, env: ForgeEnv, now: number) {
       turnId: z.string().max(200).optional(),
       model: z.string().max(100).optional(),
       code: z.string().max(MAX_ARTIFACT_BYTES).optional(),
+      progress: progressSchema.optional(),
+      brief: gameBriefSchema.optional(),
       evidence: z.record(z.string(), z.unknown()).optional(),
     })
     .parse(await readJson(request, MAX_ARTIFACT_BYTES + 20_000));
@@ -557,8 +578,10 @@ async function runnerRequest(request: Request, env: ForgeEnv, now: number) {
       }
     }
     let parentHtml: string | null = null;
+    let parentBrief = null;
     if (job.parent) {
       const parent = await owned(env, job.parent, job.owner);
+      parentBrief = publicProgress(parent.evidence).brief;
       parentHtml =
         (await (
           await env.FORGE_ARTIFACTS?.get(
@@ -577,6 +600,7 @@ async function runnerRequest(request: Request, env: ForgeEnv, now: number) {
           job.evidence === JSON.stringify({ dispatchLease: lease }),
       },
       parentHtml,
+      parentBrief,
       apiKey,
     });
   }
@@ -615,6 +639,20 @@ async function runnerRequest(request: Request, env: ForgeEnv, now: number) {
       { httpMetadata: { contentType: 'application/javascript' } },
     );
   }
+  const oldEvidence = JSON.parse(job.evidence ?? '{}');
+  const mergedEvidence = {
+    ...oldEvidence,
+    ...body.evidence,
+    ...(body.progress || oldEvidence.progress
+      ? {
+          progress: mergeProgress(
+            publicProgress(job.evidence).progress,
+            body.progress ?? [],
+          ),
+        }
+      : {}),
+    ...(body.brief ? { brief: body.brief } : {}),
+  };
   const result = await env.DB.prepare(
     `UPDATE forge_jobs SET key_ciphertext=CASE WHEN ? IN ('preview','failed','canceled') THEN NULL ELSE key_ciphertext END,status=?,session_id=COALESCE(session_id,?),turn_id=COALESCE(?,turn_id),model=COALESCE(?,model),artifact_hash=?,evidence=COALESCE(?,evidence),updated=?,lease_until=?,error=? WHERE id=? AND lease=? AND status=? AND lease_until>?`,
   )
@@ -625,7 +663,7 @@ async function runnerRequest(request: Request, env: ForgeEnv, now: number) {
       body.turnId ?? null,
       body.model ?? null,
       artifactHash,
-      body.evidence ? JSON.stringify(body.evidence) : null,
+      JSON.stringify(mergedEvidence),
       now,
       now + 60_000,
       status === 'failed'

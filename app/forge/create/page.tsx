@@ -1,5 +1,6 @@
 import { Creator } from '@/components/party-forge/creation/creator';
 import Link from 'next/link';
+import { ForgeHeader } from '@/components/party-forge/forge-header';
 import { getChatGPTUser, chatGPTSignInPath } from '@/app/chatgpt-auth';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Create a game · Forge' };
@@ -14,6 +15,7 @@ export default async function Page() {
   if (!user)
     return (
       <main style={{ padding: '80px 24px', maxWidth: 720, margin: 'auto' }}>
+        <ForgeHeader />
         <h1>Create a game with Forge</h1>
         <p>
           Sign in with ChatGPT to use your own OpenAI API key. Saved demos are

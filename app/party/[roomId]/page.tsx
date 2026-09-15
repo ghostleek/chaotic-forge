@@ -1,4 +1,5 @@
 import { Lobby } from '../../../components/party-forge/lobby';
+export const metadata = { title: 'Room · Chaotic Forge', description: 'Join your friends, contribute one rule each, and play your remix.' };
 export default async function RoomPage({
   params,
 }: {

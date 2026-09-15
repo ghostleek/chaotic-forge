@@ -69,7 +69,7 @@ const confirmDisabled = (html) =>
 
 void test('selection and pending requests never become confirmed contributions', () => {
   const selected = render();
-  assert.match(selected, /1 \/ 3 chosen/);
+  assert.match(selected, /1 \/ 3 instructions confirmed/);
   assert.equal(confirmDisabled(selected), false);
   const pending = render({
     selection: {
@@ -78,7 +78,7 @@ void test('selection and pending requests never become confirmed contributions',
       onConfirm() {},
     },
   });
-  assert.match(pending, /1 \/ 3 chosen/);
+  assert.match(pending, /1 \/ 3 instructions confirmed/);
   assert.match(pending, /Sending your choice/);
   assert.equal(confirmDisabled(pending), true);
   assert.doesNotMatch(pending, /Ready to play/);
@@ -90,7 +90,7 @@ void test('a disconnected accepted choice is retained and counted', () => {
       p.id === 'c' ? { ...p, contribution: 'chosen' } : p,
     ),
   });
-  assert.match(html, /2 \/ 3 chosen/);
+  assert.match(html, /2 \/ 3 instructions confirmed/);
   assert.match(html, /Reconnecting/);
   assert.match(html, /Choice saved/);
   assert.match(html, /Waiting for Kahhow</);
@@ -126,7 +126,7 @@ void test('viewer disconnection labels stale state and blocks confirmation witho
     participants: roster.map((p) => ({ ...p, presence: 'present' })),
   });
   assert.match(html, /Room updates paused/);
-  assert.match(html, /1 \/ 3 chosen · last known/);
+  assert.match(html, /1 \/ 3 instructions confirmed · last known/);
   assert.equal(confirmDisabled(html), true);
   assert.doesNotMatch(html, /data-status="reconnecting"/);
 });
@@ -140,7 +140,7 @@ void test('error, empty roster, privacy and six-player display remain honest', (
       onConfirm() {},
     },
   });
-  assert.match(failed, /1 \/ 3 chosen/);
+  assert.match(failed, /1 \/ 3 instructions confirmed/);
   assert.match(failed, /role="alert"/);
   assert.equal(confirmDisabled(failed), false);
   const rosterMarkup = failed.match(/<ul[\s\S]*?<\/ul>/)[0];
@@ -156,7 +156,7 @@ void test('error, empty roster, privacy and six-player display remain honest', (
     ...roster,
     ...roster.map((p) => ({ ...p, id: `${p.id}-2` })),
   ].map((p) => ({ ...p, contribution: 'chosen' }));
-  assert.match(render({ participants: six }), /6 \/ 6 chosen/);
+  assert.match(render({ participants: six }), /6 \/ 6 instructions confirmed/);
   assert.equal(
     (render({ participants: six }).match(/data-player-id=/g) || []).length,
     6,
@@ -198,7 +198,7 @@ void test('avatar choices are controlled, optional, and accessible', () => {
 
 void test('one confirmed participant does not complete a three-player room', () => {
   const html = render({ participants: [{ ...roster[0], contribution: 'chosen' }], expectedContributions: 3 });
-  assert.match(html, /1 \/ 3 chosen/);
+  assert.match(html, /1 \/ 3 instructions confirmed/);
   assert.match(html, /Waiting for more players to join/);
   assert.doesNotMatch(html, /Everyone’s idea is in|Next comes forging/);
 });

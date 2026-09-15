@@ -30,6 +30,7 @@ export type RoomStatusProps = {
   localParticipantId?: string;
   roundNumber: number;
   expectedContributions?: number;
+  minimumPlayers?: number;
   phase?: 'initial' | 'additions';
   connection?: 'connected' | 'reconnecting';
   indicator?: 'badge' | 'ring';
@@ -82,6 +83,7 @@ export function RoomStatus({
   localParticipantId,
   roundNumber,
   expectedContributions,
+  minimumPlayers = 0,
   phase = 'initial',
   connection = 'connected',
   indicator = 'badge',
@@ -106,7 +108,8 @@ export function RoomStatus({
   const waiting = required.filter((player) => player.contribution !== 'chosen');
   const paused = connection === 'reconnecting';
   const expected = Math.max(expectedContributions ?? required.length, required.length);
-  const complete = expected > 0 && confirmed === expected;
+  const missingPlayers = Math.max(0, minimumPlayers - participants.length);
+  const complete = expected > 0 && confirmed === expected && missingPlayers === 0;
   const sending = !!selection?.submitting && local?.contribution === 'deciding';
   const showSelection =
     !!selection && !!local && local.contribution !== 'watching';
@@ -116,9 +119,11 @@ export function RoomStatus({
     local.presence === 'present' &&
     !paused &&
     !sending;
-  const count = `${confirmed} / ${expected} ${phase === 'additions' ? 'additions confirmed' : 'chosen'}${paused ? ' · last known' : ''}`;
+  const count = `${confirmed} / ${expected} ${phase === 'additions' ? 'additions confirmed' : 'instructions confirmed'}${paused ? ' · last known' : ''}`;
   const waitText = paused
     ? 'Checking room connection'
+    : missingPlayers > 0
+      ? `Invite ${missingPlayers} more ${missingPlayers === 1 ? 'player' : 'players'} to start`
     : required.length === 0
       ? participants.length === 0
         ? 'No participants yet'

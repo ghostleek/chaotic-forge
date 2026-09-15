@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState, type FocusEvent } from 'react';
 import Link from 'next/link';
+import { ForgeHeader } from '../forge-header';
 import type { BuildManifest } from '@/lib/party-forge/contracts';
 import { createPixelRuntime } from '@/lib/party-forge/runtimes/pixel-arcade-v2/retained/engine.js';
 import { renderPixel } from '@/lib/party-forge/presentation/pixel-view';
@@ -106,10 +107,7 @@ export function SnakeDemo({ build }: { build: BuildManifest }) {
           : 'Eat 10. Blast 25. Auto-fire follows your direction.';
   return (
     <main className={styles.page}>
-      <nav className={styles.nav}>
-        <Link href="/">FORGE /</Link>
-        <Link href="/">Play with friends →</Link>
-      </nav>
+      <ForgeHeader><Link href="/">Play with friends</Link></ForgeHeader>
       <div className={styles.heading}>
         <p className={styles.eyebrow}>SAVED REMIX</p>
         <h1>{build.pixelRules!.title}</h1>

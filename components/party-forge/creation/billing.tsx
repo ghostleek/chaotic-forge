@@ -46,69 +46,78 @@ export function Billing({
       setBusy(false);
     }
   }
+  const funded = status.admin || status.hasKey;
+  const settings = (
+    <>
+      {!status.admin && (
+        <>
+          <p className={styles.muted}>
+            Your key is encrypted on the server and never sent to the game.
+            Removing it prevents future use; requests already sent may finish.
+          </p>
+          <label htmlFor="openai-key">
+            OpenAI application API key {status.hasKey ? '(saved)' : ''}
+          </label>
+          <input
+            id="openai-key"
+            type="password"
+            autoComplete="off"
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            maxLength={256}
+          />
+          <div className={styles.actions}>
+            <button
+              disabled={busy || key.length < 20}
+              onClick={() => update('billing', { key })}
+            >
+              Save key
+            </button>
+            {status.hasKey && (
+              <button
+                disabled={busy}
+                onClick={() => update('billing', null, 'DELETE')}
+              >
+                Remove key
+              </button>
+            )}
+          </div>
+        </>
+      )}
+      <p className={styles.muted}>Your creator ID: {status.userId}</p>
+      <a
+        className={styles.outlineButton}
+        href={`/signout-with-chatgpt?return_to=${encodeURIComponent(returnTo)}`}
+        target="_top"
+      >
+        Sign out
+      </a>
+    </>
+  );
   return (
     <section className={styles.card}>
-      <h2>
-        {status.admin
-          ? 'Admin API access'
-          : status.trial && status.remaining > 0
-            ? 'Verified trial access'
-            : 'Bring your own API key'}
-      </h2>
+      <h2>{funded ? 'You’re ready to create' : 'Add your API key'}</h2>
       <p>
         Signed in as {status.email}.{' '}
         {status.admin
-          ? 'You can create games using the site API key.'
-          : status.trial && status.remaining > 0
-            ? `${status.remaining} sponsored creations remaining.`
-            : 'Your OpenAI API usage is billed to your own API project. ChatGPT sign-in does not provide API credits.'}
+          ? 'Your admin access covers game creation.'
+          : status.hasKey
+            ? 'Your saved API key is ready. Generation is billed to your OpenAI API project.'
+            : 'Game generation is billed to your OpenAI API project. ChatGPT sign-in does not include API credits.'}
       </p>
-      <p className={styles.muted}>
-        Your key is encrypted on the server and used by the generation service.
-        It is never sent to the generated game. Removing it prevents future use.
-        A pixel-game request already sent to OpenAI may finish; queued Agents
-        builds are canceled and active Agents builds receive a cancellation
-        request.
-      </p>
-      {!roomSetup && <p>
-        <Link href="/">Create or join a pixel game →</Link>
-      </p>}
-      <label htmlFor="openai-key">
-        OpenAI application API key {status.hasKey ? '(saved)' : ''}
-      </label>
-      <input
-        id="openai-key"
-        type="password"
-        autoComplete="off"
-        value={key}
-        onChange={(e) => setKey(e.target.value)}
-        maxLength={256}
-      />
-      <div className={styles.actions}>
-        <button
-          disabled={busy || key.length < 20}
-          onClick={() => update('billing', { key })}
-        >
-          Save key
-        </button>
-        {status.hasKey && (
-          <button
-            disabled={busy}
-            onClick={() => update('billing', null, 'DELETE')}
-          >
-            Remove key
-          </button>
-        )}
-        {/* Dispatch owns sign-out; it requires a top-level navigation. */}
-        {/* eslint-disable-next-line nextjs/no-html-link-for-pages */}
-        <a
-          href={`/signout-with-chatgpt?return_to=${encodeURIComponent(returnTo)}`}
-          target="_top"
-        >
-          Sign out
-        </a>
-      </div>
-      <p className={styles.muted}>Your creator ID: {status.userId}</p>
+      {funded ? (
+        <details>
+          <summary>Account and API settings</summary>
+          {settings}
+        </details>
+      ) : (
+        settings
+      )}
+      {!roomSetup && (
+        <p>
+          <Link href="/">Create or join a pixel game →</Link>
+        </p>
+      )}
       {notice && <output>{notice}</output>}
     </section>
   );

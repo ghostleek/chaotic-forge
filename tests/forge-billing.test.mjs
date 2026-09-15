@@ -23,9 +23,18 @@ void test('BYOK ciphertext binds to owner, hides plaintext and uses fresh nonces
   );
   await assert.rejects(encryptKey({}, 'alice', value));
 });
-void test('whitelist administration requires the exact configured owner identity', () => {
-  const env = { FORGE_ADMIN_USER_IDS: 'owner, second-owner' };
-  requireAdmin(env, { userId: 'owner' });
-  assert.throws(() => requireAdmin(env, { userId: 'owne' }));
-  assert.throws(() => requireAdmin({}, { userId: 'owner' }));
+void test('only the three authenticated emails receive sponsored access', () => {
+  requireAdmin({}, { userId: 'owner', email: 'LEEKAHHOW@gmail.com' });
+  assert.throws(() =>
+    requireAdmin(
+      { FORGE_ADMIN_USER_IDS: 'owner' },
+      { userId: 'owner', email: 'other@example.com' },
+    ),
+  );
+  assert.throws(() =>
+    requireAdmin(
+      { FORGE_ADMIN_EMAILS: 'other@example.com' },
+      { userId: 'other', email: 'other@example.com' },
+    ),
+  );
 });

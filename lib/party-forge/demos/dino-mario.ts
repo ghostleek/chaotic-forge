@@ -26,7 +26,7 @@ export const DINO_MARIO_PROVENANCE = Object.freeze({
   origin: 'Simulated demo · fixed authored example',
 });
 
-export type Encounter = { id: number; kind: 'block' | 'walker' | 'meat'; x: number };
+export type Encounter = { id: number; kind: 'block' | 'walker' | 'meat' | 'meteor'; x: number; motion?: 'crawl' | 'fly'; altitude?: number; verticalSpeed?: number; hoverPhase?: number; warningTicks?: number };
 export type DinoMarioState = {
   status: 'ready' | 'playing' | 'won' | 'lost';
   tick: number;
@@ -36,6 +36,18 @@ export type DinoMarioState = {
   stomps: number;
   lives: number;
   big: boolean;
+  /** Defined only by the evolving demo; absent on retained v2 games. */
+  growth?: 0 | 1 | 2;
+  rng?: number;
+  nextEncounterDistance?: number;
+  nextEncounterId?: number;
+  nextMeteorScore?: number;
+  meteorWaves?: number;
+  deathGrowth?: 0 | 1 | 2;
+  deathCause?: 'meteor' | 'collision';
+  beamTicks?: number;
+  beamFired?: boolean;
+  beamDestroyed?: number;
   protection: number;
   hits: number;
   meat: number;
@@ -61,6 +73,7 @@ const COURSE = [
 ] as const;
 
 export function encounterSize(kind: Encounter['kind']) {
+  if (kind === 'meteor') return { width: 24, height: 24 };
   if (kind === 'meat') return { width: 24, height: 24 };
   return kind === 'block'
     ? { width: 28, height: 38 }
@@ -85,6 +98,7 @@ export function createDinoMarioGame(): DinoMarioState {
 }
 
 export function dinoPlayerSize(game: DinoMarioState) {
+  if (game.growth === 2) return { width: 64, height: 64 };
   const scale = game.big ? 1.4 : 1;
   return { width: DINO_MARIO.playerWidth * scale, height: DINO_MARIO.playerHeight * scale };
 }
@@ -114,6 +128,8 @@ function axisTimes(
 export function stepDinoMarioGame(
   previous: DinoMarioState,
   jumpDown = false,
+  scrollSpeed: number = DINO_MARIO.speed,
+  finishTick: number = DINO_MARIO.finishTick,
 ): DinoMarioState {
   if (previous.status !== 'playing') return previous;
   const c = DINO_MARIO;
@@ -132,14 +148,17 @@ export function stepDinoMarioGame(
   // Each stomp removes an entity, so this loop is bounded by the fixed course size + 1.
   let remaining = 1;
   while (remaining > 0) {
-    const dx = c.speed * remaining;
     const dy = game.vy * remaining;
     let contact: { entity: Encounter; time: number; top: boolean } | undefined;
     const player = dinoPlayerSize(game);
     for (const entity of game.encounters) {
-      if (game.protection > 0 && entity.kind !== 'meat') continue;
+      if ((entity.warningTicks ?? 0) > 0) continue;
+      if (game.protection > 0 && entity.kind !== 'meat' && entity.kind !== 'meteor') continue;
+      const dx = (entity.kind === 'meteor' ? 3 : scrollSpeed) * remaining;
+      const relativeY = dy - (entity.verticalSpeed ?? 0) * remaining;
       const size = encounterSize(entity.kind);
-      const top = c.ground - size.height;
+      const bottom = c.ground - (entity.altitude ?? 0);
+      const top = bottom - size.height;
       const x = axisTimes(
         c.playerX,
         c.playerX + player.width,
@@ -151,8 +170,8 @@ export function stepDinoMarioGame(
         game.feet - player.height,
         game.feet,
         top,
-        c.ground,
-        dy,
+        bottom,
+        relativeY,
       );
       if (!x || !y) continue;
       const time = Math.max(0, x[0], y[0]);
@@ -162,29 +181,41 @@ export function stepDinoMarioGame(
         contact = {
           entity,
           time,
-          top: dy > 0 && game.feet <= top && y[0] > x[0],
+          top: relativeY > 0 && game.feet <= top && y[0] > x[0],
         };
       }
     }
     const time = contact?.time ?? 1;
     game.feet += dy * time;
-    for (const entity of game.encounters) entity.x -= dx * time;
+    for (const entity of game.encounters) {
+      if ((entity.warningTicks ?? 0) > 0) continue;
+      entity.x -= (entity.kind === 'meteor' ? 3 : scrollSpeed) * remaining * time;
+      if (entity.verticalSpeed !== undefined)
+        entity.altitude = (entity.altitude ?? 0) - entity.verticalSpeed * remaining * time;
+    }
     if (!contact) break;
     game.encounters = game.encounters.filter((e) => e.id !== contact.entity.id);
     if (contact.entity.kind === 'meat') {
       game.meat++;
+      if (game.growth !== undefined) game.growth = Math.min(2, game.growth + 1) as 0 | 1 | 2;
       game.big = true;
       game.lives = Math.min(c.maxLives, game.lives + 1);
     } else if (contact.entity.kind === 'walker' && contact.top) {
       game.stomps++;
-      game.vy = c.bounce;
+      game.vy = game.growth === 2 ? c.bounce - 2 : c.bounce;
     } else {
       game.hits++;
-      game.lives--;
-      game.big = false;
+      const deathGrowth = game.growth;
+      game.lives = contact.entity.kind === 'meteor' ? 0 : game.lives - 1;
+      if (game.growth !== undefined) game.growth = Math.max(0, game.growth - 1) as 0 | 1 | 2;
+      game.big = game.growth !== undefined && game.growth > 0;
       game.protection = c.protectionTicks;
       if (game.lives === 0) {
         game.status = 'lost';
+        if (deathGrowth !== undefined) {
+          game.deathGrowth = deathGrowth;
+          game.deathCause = contact.entity.kind === 'meteor' ? 'meteor' : 'collision';
+        }
         break;
       }
     }
@@ -195,10 +226,10 @@ export function stepDinoMarioGame(
     game.vy = 0;
   }
   game.encounters = game.encounters.filter(
-    (e) => e.x + encounterSize(e.kind).width >= 0,
+    (e) => e.x + encounterSize(e.kind).width >= 0 && (e.kind !== 'meteor' || (e.altitude ?? 0) >= -24),
   );
   // Resolve contact before finish: losing the last life on this tick still loses.
-  if (game.status === 'playing' && game.tick >= c.finishTick)
+  if (game.status === 'playing' && game.tick >= finishTick)
     game.status = 'won';
   return game;
 }

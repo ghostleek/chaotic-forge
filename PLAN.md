@@ -1,5 +1,10 @@
 # Competitive Forge delivery plan
 
+## 15 September 2026 — experimental generation in existing rooms
+
+The user requested an MVP on the deployed Chaotic Forge multiplayer UI: dynamically attempt generation for authenticated admin/BYOK hosts, research unclear mechanics, scope rules and winner criteria, and show shared live activity. The local PC-09 supplement starts from production `f151999`; see [scope, limits and qualification](docs/implementation/room-generation-mvp.md). Generated output is currently an isolated shared playtest with local scores. Live API qualification and authoritative generated-game rounds remain incomplete; the existing competitive builder stays available explicitly.
+
+
 ## Latest user decision — pixel instruction demo (13 September 2026)
 
 This decision supersedes the fixed Kitchen demo and exactly-three-player defaults below for new pixel rooms. Two players can create and start; a third is optional, with a hard cap of three. Each connected player confirms one custom instruction card, optionally filled from a starter. The host explicitly asks Forge to mesh them into a single bounded pixel game. The model returns executable rule configuration for the retained Snake/Invaders/Bounce engine, including scoring weights and an interpretation for each card. It does not generate arbitrary JavaScript or satisfy all of PC-09.

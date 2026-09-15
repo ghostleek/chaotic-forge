@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   check,
+  index,
   integer,
   primaryKey,
   sqliteTable,
@@ -178,6 +179,8 @@ export const forgeJobs = sqliteTable(
   {
     id: text('id').primaryKey(),
     owner: text('owner').notNull(),
+    roomId: text('room_id'),
+    roomDigest: text('room_digest'),
     requestKey: text('request_key').notNull(),
     digest: text('digest').notNull(),
     cards: text('cards').notNull(),
@@ -199,6 +202,7 @@ export const forgeJobs = sqliteTable(
   (table) => [
     check('forge_jobs_cards_json', sql`json_valid(${table.cards})`),
     uniqueIndex('forge_job_request').on(table.owner, table.requestKey),
+    index('forge_jobs_room').on(table.roomId, table.created),
   ],
 );
 

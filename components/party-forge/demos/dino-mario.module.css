@@ -86,6 +86,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   border-bottom: 1px solid #bbc1ad;
   font:
@@ -200,15 +201,16 @@
   margin-bottom: 5px;
   font-size: 13px;
 }
-.blockSymbol,
+.spikeSymbol,
 .walkerSymbol {
   flex: 0 0 22px;
   height: 25px;
   margin-top: 4px;
 }
-.blockSymbol {
-  background: #ba7841;
-  border: 4px double #f7f4e9;
+.spikeSymbol {
+  width: 28px;
+  height: 38px;
+  flex-basis: 28px;
 }
 .walkerSymbol {
   background: #79648b;
@@ -469,3 +471,5 @@
   .contributionCards p { font-size: 14px; }
   .introduction .actions { flex-wrap: wrap; }
 }
+
+.keyboardHelp { margin: 10px 0; color: #424d43; font: 14px/1.5 Arial, sans-serif; }
