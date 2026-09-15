@@ -14,7 +14,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
     <>
       <aside className={styles.homeEntry} aria-label="Simulated demo introduction">
         <Link href="/play/dino-mario">Try Dino × Mario <span>· simulated demo</span></Link>
-        <DemoIntroduction autoOpen />
+        <DemoIntroduction />
       </aside>
       <Lobby initialStartRoom={params.startRoom === '1'} initialNickname={typeof params.nickname === 'string' ? params.nickname.slice(0, 32) : ''} />
     </>

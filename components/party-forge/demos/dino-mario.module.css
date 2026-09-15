@@ -471,3 +471,5 @@
   .contributionCards p { font-size: 14px; }
   .introduction .actions { flex-wrap: wrap; }
 }
+
+.keyboardHelp { margin: 10px 0; color: #424d43; font: 14px/1.5 Arial, sans-serif; }

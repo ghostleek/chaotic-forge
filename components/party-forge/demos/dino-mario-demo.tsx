@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { ForgeHeader } from '../forge-header';
 import { drawDino, drawDinoSpike, drawPterodactyl } from '@/lib/party-forge/presentation/dino-view';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -107,12 +108,7 @@ export function DinoMarioDemo() {
 
   return (
     <main className={styles.page}>
-      <nav className={styles.nav}>
-        <Link href="/">
-          FORGE <span aria-hidden="true">/</span>
-        </Link>
-        <DemoIntroduction inGame onOpen={pause} />
-      </nav>
+      <ForgeHeader><DemoIntroduction inGame onOpen={pause} /></ForgeHeader>
       <header className={styles.heading}>
         <p className={styles.eyebrow}>THE SMALLEST PLAYABLE REMIX / 001</p>
         <h1>
@@ -179,6 +175,7 @@ export function DinoMarioDemo() {
           />
           <div className={styles.gameFooter}>
             <output className={styles.status}>{message}</output>
+            <p className={styles.keyboardHelp}>Space to jump · Esc to pause · or use the buttons below.</p>
             <div className={styles.actions}>
               <button type="button" className={styles.primary} disabled={!sprites} onClick={start} onBlur={leaveControl}>
                 {game.status === 'ready' ? 'Start' : 'Restart'}

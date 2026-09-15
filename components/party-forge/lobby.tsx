@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import { ForgeHeader } from './forge-header';
+import { RoomInvite } from './room-invite';
 import { RoomAccess } from './room-access';
 import { PixelSprite } from './pixel-sprite.tsx';
 import { useRoom } from '../../lib/party-forge/client/use-room.ts';
@@ -32,7 +33,7 @@ export function Lobby({ roomId, initialNickname = '', initialStartRoom = false }
   } = useRoom(roomId);
   const [nickname, setNickname] = useState(initialNickname);
   const [startingRoom, setStartingRoom] = useState(initialStartRoom);
-  const [onboarding, setOnboarding] = useState(true);
+  const [onboarding, setOnboarding] = useState(false);
 
   const { controller, view } = useTrialController(client);
   const help = useRef<HTMLButtonElement>(null);
@@ -75,17 +76,9 @@ export function Lobby({ roomId, initialNickname = '', initialStartRoom = false }
     })) ?? [];
   return (
     <main className={styles.root}>
-      <header>
-        <Link href="/" className={styles.wordmark}>
-          CHAOTIC
-          <br />
-          FORGE /
-        </Link>
-        <span>PIXEL PLAYGROUND / 01</span>
-        <button type="button" ref={help} onClick={() => setOnboarding(true)}>
-          How to play
-        </button>
-      </header>
+      <ForgeHeader>
+        <button type="button" ref={help} onClick={() => setOnboarding(true)}>How to play</button>
+      </ForgeHeader>
       {!roomId && !access ? <div className={styles.hero}>
         <small>2–3 PLAYERS / ONE RULE EACH / 1 GAME</small>
         <h1>Your rules.<br/>Our game.</h1>
@@ -94,7 +87,7 @@ export function Lobby({ roomId, initialNickname = '', initialStartRoom = false }
       </div> : null}
       {onboarding && !['ready','playing'].includes(room?.phase ?? '') ? (
         <aside className={styles.onboarding} aria-label="How to play">
-          <div><h1>One card from each of you.</h1><p>Write a rule, or edit a starter. Start with two players, or invite a third. Confirm everyone’s cards, generate your game, then start the same 60-second challenge in your own arenas.</p></div>
+          <div><h2>One card from each of you.</h2><p>Write a rule, or edit a starter. Start with two players, or invite a third. Confirm everyone’s cards, build your game, then play matching challenges in your own arenas. Your game explains its controls and duration before you start.</p></div>
           <button type="button" onClick={()=>{setOnboarding(false);help.current?.focus();}}>Got it</button>
         </aside>
       ) : null}
@@ -150,18 +143,19 @@ export function Lobby({ roomId, initialNickname = '', initialStartRoom = false }
       {room && access ? (
         <>
           <section className={styles.invite}>
-            <span>Invite a friend · third player optional</span>
-            <Link href={`/party/${room.roomId}`}>Room {room.roomId}</Link>
+            <strong>{minimumPlayers === 2 ? 'Invite a friend · third player optional' : 'Invite two friends'}</strong>
+            <RoomInvite roomId={room.roomId} />
             <output aria-live="polite">
               {connected
-                ? `${room.participants.length}/3 players · ${room.phase}`
+                ? `${room.participants.length} ${room.participants.length === 1 ? 'player' : 'players'} joined · ${room.phase === 'lobby' ? room.participants.length < minimumPlayers ? `${minimumPlayers - room.participants.length} more needed to start` : 'Enough players to start' : room.phase}`
                 : 'Reconnecting · last known room'}
             </output>
           </section>
           {['lobby', 'additions'].includes(room.phase) ? (
             <RoomStatus
               participants={players}
-              expectedContributions={room.phase === 'lobby' ? Math.max(minimumPlayers, room.participants.length) : 2}
+              minimumPlayers={room.phase === 'lobby' ? minimumPlayers : 0}
+              expectedContributions={room.phase === 'lobby' ? room.participants.length : 2}
               localParticipantId={me}
               roundNumber={room.round?.number ?? 1}
               phase={room.phase === 'additions' ? 'additions' : 'initial'}
@@ -340,7 +334,7 @@ export function Lobby({ roomId, initialNickname = '', initialStartRoom = false }
                 }{' '}
                 chooses next · {editor?.role}
               </p>
-              {addition === 'instruction' ? <InstructionEditor key={`${room.lastCompleted?.round.roundId}-${editor?.participantId}`} label="Add one new instruction" disabled={disabled || editor?.participantId !== me} onConfirm={text=>void client.command({type:'add-mechanic',cardId:'instruction',text})}/> : addition ? (
+              {addition === 'instruction' ? <InstructionEditor stage="addition" key={`${room.lastCompleted?.round.roundId}-${editor?.participantId}`} label="Add one new instruction" disabled={disabled || editor?.participantId !== me} onConfirm={text=>void client.command({type:'add-mechanic',cardId:'instruction',text})}/> : addition ? (
                 <article className={styles.card}>
                   <h3>{CARDS[addition].title}</h3>
                   <p>{CARDS[addition].interpretation}</p>

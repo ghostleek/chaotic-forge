@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
+import styles from './party-room.module.css';
 import { Billing } from './creation/billing';
 
 const sessionSchema = z.object({
@@ -48,7 +49,7 @@ export function RoomAccess({ nickname, disabled, onContinue, onCancel }: {
     {state === 'loading' && <p>Checking your access…</p>}
     {state === 'signin' && <>
       <p>Sign in to set up API access for your room. Friends can join without signing in.</p>
-      <a href={`/signin-with-chatgpt?return_to=${encodeURIComponent(returnTo)}`} target="_top">Sign in with ChatGPT</a>
+      <a className={`${styles.actionLink} ${styles.primary}`} href={`/signin-with-chatgpt?return_to=${encodeURIComponent(returnTo)}`} target="_top">Sign in with ChatGPT</a>
     </>}
     {state === 'error' && <>
       <p role="alert">Could not check your access. Please try again.</p>

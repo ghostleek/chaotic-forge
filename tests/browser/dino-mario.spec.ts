@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
 
-test('first-visit introduction is dismissible, session-scoped and reopenable', async ({
+test('introduction opens on request and remains dismissed on reload', async ({
   page,
 }) => {
   await page.goto('/');
   const intro = page.getByRole('dialog');
+  await expect(intro).not.toBeVisible();
+  await page.getByRole('button', { name: 'How this remix works' }).click();
   await expect(intro).toBeVisible();
   await expect(
     intro.getByText('Simulated demo · fixed authored example'),
@@ -47,6 +49,7 @@ test('denied session storage still permits skip and reopen', async ({
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
+  await page.getByRole('button', { name: 'How this remix works' }).click();
   await page.getByRole('button', { name: 'Skip introduction' }).click();
   await page.getByRole('button', { name: 'How this remix works' }).click();
   await page.getByRole('button', { name: 'Close introduction' }).click();
@@ -68,6 +71,7 @@ test('public demo waits for Start, jumps with its button, pauses and preserves s
   });
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
+  await page.getByRole('button', { name: 'How this remix works' }).click();
   await expect(page.getByText('Chrome offline', { exact: false })).toBeVisible();
   await page.getByRole('button', { name: 'See the remix', exact: false }).click();
   await page.getByRole('link', { name: 'Try simulated demo' }).click();
@@ -182,6 +186,7 @@ test('introduction and controls fit a narrow reduced-motion viewport', async ({
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
+  await page.getByRole('button', { name: 'How this remix works' }).click();
   const intro = page.getByRole('dialog');
   await expect(intro).toBeVisible();
   await page.screenshot({
@@ -210,6 +215,7 @@ test('introduction and controls fit a narrow reduced-motion viewport', async ({
 
 test('contributions precede the output and both steps work with keyboard focus', async ({ page }, testInfo) => {
   await page.goto('/');
+  await page.getByRole('button', { name: 'How this remix works' }).click();
   const intro = page.getByRole('dialog');
   await expect(intro.getByRole('heading', { name: 'Two players. One remix.' })).toBeVisible();
   await expect(intro.getByText('PLAYER 1', { exact: true })).toBeVisible();

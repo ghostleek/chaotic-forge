@@ -4,7 +4,6 @@ test('room creation requests access only after intent; banner is absent', async 
   let checks = 0;
   await page.route('**/api/forge/access', async route => { checks++; await route.fulfill({ status: 401, json: { error: 'Sign in' } }); });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Skip introduction' }).click();
   await expect(page.getByRole('navigation', { name: 'Creator access' })).toHaveCount(0);
   await expect(page.locator('a[href="/explore"]')).toHaveCount(0);
   expect(checks).toBe(0);
@@ -19,8 +18,7 @@ test('room creation requests access only after intent; banner is absent', async 
 test('sign-in return restores setup and requires API funding', async ({ page }) => {
   await page.route('**/api/forge/access', route => route.fulfill({ json: { csrf: 'test', billing: { admin: false, hasKey: false, trial: false, remaining: 0, email: 'test@example.com', userId: 'test' } } }));
   await page.goto('/?startRoom=1&nickname=Host');
-  await page.getByRole('button', { name: 'Skip introduction' }).click();
-  await expect(page.getByRole('heading', { name: 'Bring your own API key' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Add your API key' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Create live room', exact: true })).toBeDisabled();
 });
 
@@ -33,9 +31,14 @@ for (const admin of [false, true]) {
       await route.fulfill({ status: 503, json: { error: 'Test stops before creating a room' } });
     });
     await page.goto('/?startRoom=1&nickname=Host');
-  await page.getByRole('button', { name: 'Skip introduction' }).click();
     const create = page.getByRole('button', { name: 'Create live room', exact: true });
     await expect(create).toBeEnabled();
+    await expect(page.getByLabel('OpenAI application API key', { exact: false })).toHaveCount(admin ? 0 : 1);
+    await expect(page.getByRole('button', { name: 'Save key', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('heading', { name: 'You’re ready to create' })).toBeVisible();
+    await expect(page.getByText('Your creator ID:', { exact: false })).not.toBeVisible();
+    await page.getByText('Account and API settings', { exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Save key', exact: true })).toHaveCount(admin ? 0 : 1);
     expect(creations).toBe(0);
     await create.click();
     await expect.poll(() => creations).toBe(1);

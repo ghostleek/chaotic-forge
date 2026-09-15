@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ForgeHeader } from '../forge-header';
 import { Billing, type BillingStatus } from './billing';
 import { z } from 'zod';
 import { CONCEPTS } from '@/lib/party-forge/generation/contracts';
@@ -165,10 +166,7 @@ export function Creator({ signedIn = false }: { signedIn?: boolean }) {
   }
   return (
     <main className={styles.page}>
-      <nav className={styles.nav}>
-        <Link href="/">FORGE /</Link>
-        <Link href="/play/snake-space-invaders">Play the public demo ↗</Link>
-      </nav>
+      <ForgeHeader><Link href="/play/snake-space-invaders">Play the public demo</Link></ForgeHeader>
       <div className={styles.heading}>
         <p className={styles.eyebrow}>THE GAME IS YOURS TO MAKE</p>
         <h1>
