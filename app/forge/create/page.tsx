@@ -16,8 +16,8 @@ export default async function Page() {
       <main style={{ padding: '80px 24px', maxWidth: 720, margin: 'auto' }}>
         <h1>Create a game with Forge</h1>
         <p>
-          Sign in with ChatGPT to use your own OpenAI API key or access an
-          approved trial.
+          Sign in with ChatGPT to use your own OpenAI API key. Saved demos are
+          free to play; only approved administrators can use the site key.
         </p>
         <a href={chatGPTSignInPath('/forge/create')} target="_top">
           Sign in with ChatGPT →
