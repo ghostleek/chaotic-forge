@@ -93,7 +93,10 @@ test('public demo waits for Start, jumps with its button, pauses and preserves s
     .toBeGreaterThan(Number(tick));
   await page.keyboard.down('Space');
   await page.evaluate(() => window.dispatchEvent(new Event('blur')));
-  await expect(page.getByRole('status')).toContainText('Paused');
+  await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
+  const beforeBlur = Number(await canvas.getAttribute('data-tick'));
+  await canvas.evaluate(el => (el as HTMLCanvasElement).blur());
+  await expect.poll(async () => Number(await canvas.getAttribute('data-tick'))).toBeGreaterThan(beforeBlur);
   await page.keyboard.up('Space');
   await page.getByRole('button', { name: 'Restart', exact: true }).click();
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
@@ -134,8 +137,19 @@ test('the browser continues beyond 30 seconds and 2x, then restart resets speed'
   await expect(page.getByLabel('Red spike trap', { exact: true })).toBeVisible();
   let tick = 0;
   for (const press of [133, 276, 471, 580, 788, 889, 1058, 1385, 1459, 1612, 1671, 1831]) {
+    if (press === 1612) {
+      await page.clock.runFor(((1581 - tick) * 1000) / 60 + 0.05);
+      tick = 1581;
+      await expect(canvas).toHaveAttribute('data-beam-ticks', '120');
+      await page.getByRole('button', { name: 'Pause', exact: true }).click();
+      await page.clock.runFor(500);
+      await expect(canvas).toHaveAttribute('data-beam-ticks', '120');
+      await page.screenshot({ path: 'outputs/dino-beam/beam.png' });
+      await page.getByRole('button', { name: 'Resume', exact: true }).click();
+    }
     await page.clock.runFor(((press - tick) * 1000) / 60 + 0.05);
     await expect(canvas).toHaveAttribute('data-tick', String(press));
+    if (press === 276 || press === 580) await canvas.screenshot({ path: `outputs/dino-pterodactyl/mode-${press}.png` });
     await page.keyboard.down('Space');
     await page.clock.runFor(1000 / 60 + 0.05);
     await page.keyboard.up('Space');
@@ -143,8 +157,10 @@ test('the browser continues beyond 30 seconds and 2x, then restart resets speed'
   }
   await page.clock.runFor(((1860 - tick) * 1000) / 60 + 0.05);
   await expect(canvas).toHaveAttribute('data-status', 'playing');
-  await expect(page.getByTestId('stomps')).toHaveText('6');
+  await expect(page.getByTestId('stomps')).toHaveText('5');
   await expect(canvas).toHaveAttribute('data-growth', '2');
+  await expect(canvas).toHaveAttribute('data-beam-ticks', '0');
+  expect(Number(await canvas.getAttribute('data-beam-destroyed'))).toBeGreaterThan(0);
   await expect(page.getByTestId('speed')).toHaveText('2.03×');
   await page.screenshot({ path: 'outputs/dino-growth/final-stage.png' });
   await page.clock.runFor(1000);
@@ -153,6 +169,8 @@ test('the browser continues beyond 30 seconds and 2x, then restart resets speed'
   await page.getByRole('button', { name: 'Restart', exact: true }).click();
   await expect(canvas).toHaveAttribute('data-tick', '0');
   await expect(canvas).toHaveAttribute('data-growth', '0');
+  await expect(canvas).toHaveAttribute('data-beam-ticks', '0');
+  await expect(canvas).toHaveAttribute('data-beam-destroyed', '0');
   await expect(page.getByTestId('speed')).toHaveText('1.00×');
   await expect(page.getByTestId('stomps')).toHaveText('0');
   await page.clock.runFor(30000);
@@ -208,9 +226,69 @@ test('contributions precede the output and both steps work with keyboard focus',
 
 
 test('missing sprite assets prevent invisible gameplay and show a retry instruction', async ({ page }) => {
-  await page.route('**/party-forge/dino/evolved-v1.png', route => route.abort());
+  await page.route('**/party-forge/dino/pterodactyl-v1.png', route => route.abort());
   await page.goto('/play/dino-mario');
   await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeDisabled();
   await expect(page.getByRole('status')).toContainText('Sprites could not load');
   await expect(page.getByLabel('Dino Mario course.', { exact: false })).toHaveAttribute('data-tick', '0');
+});
+
+test('grown Dino alternates its visible legs while its body remains stable', async ({ page }, testInfo) => {
+  await page.goto('/play/dino-mario');
+  await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeEnabled();
+  await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  let tick = 0;
+  for (const press of [133, 276]) {
+    await page.clock.runFor((press - tick) * 1000 / 60 + 0.05);
+    await page.keyboard.down('Space'); await page.clock.runFor(1000 / 60 + 0.05);
+    await page.keyboard.up('Space'); tick = press + 1;
+  }
+  await page.clock.runFor((471 - tick) * 1000 / 60 + 0.05);
+  const canvas = page.getByLabel('Dino Mario course.', { exact: false });
+  await expect(canvas).toHaveAttribute('data-growth', '2');
+  await expect(canvas).toHaveAttribute('data-feet', '258.00');
+  const pixels = () => canvas.evaluate((el: HTMLCanvasElement) => {
+    const ctx = el.getContext('2d')!;
+    return { body: Array.from(ctx.getImageData(80, 194, 96, 43).data),
+      legs: Array.from(ctx.getImageData(80, 241, 96, 17).data) };
+  });
+  const first = await pixels();
+  await canvas.screenshot({ path: `outputs/dino-beam/stride-a-${testInfo.project.name}.png` });
+  await page.clock.runFor(100 + 0.05);
+  const second = await pixels();
+  // Browser canvas readback can vary a channel by one level around translucent pixels.
+  const difference = (a: number[], b: number[]) => a.reduce((sum, value, i) => sum + Math.abs(value - b[i]), 0) / a.length;
+  // Compare against the stationary body as a control for GPU/readback variation.
+  expect(difference(second.legs, first.legs)).toBeGreaterThan(difference(second.body, first.body) * 1.5);
+  await canvas.screenshot({ path: `outputs/dino-beam/stride-b-${testInfo.project.name}.png` });
+});
+
+test('visible focus changes keep running, while a hidden tab pauses without advancing', async ({ page }) => {
+  await page.goto('/play/dino-mario');
+  await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-01-01T00:00:01Z'));
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  const canvas = page.getByLabel('Dino Mario course.', { exact: false });
+  await page.getByRole('heading', { name: 'Run. Eat.' , exact: false }).click();
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  await page.clock.runFor(1000);
+  const beforeHidden = Number(await canvas.getAttribute('data-tick'));
+  expect(beforeHidden).toBeGreaterThan(50);
+  await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(page.getByRole('button', { name: 'Resume', exact: true })).toBeVisible();
+  await page.clock.runFor(1000);
+  await expect(canvas).toHaveAttribute('data-tick', String(beforeHidden));
+  await page.evaluate(() => {
+    delete (document as unknown as { hidden?: boolean }).hidden;
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await page.getByRole('button', { name: 'Resume', exact: true }).click();
+  await page.clock.runFor(1000);
+  expect(Number(await canvas.getAttribute('data-tick'))).toBeGreaterThan(beforeHidden + 50);
 });

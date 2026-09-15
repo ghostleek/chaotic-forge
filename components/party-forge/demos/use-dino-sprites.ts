@@ -15,9 +15,9 @@ export function useDinoSprites() {
         image.onerror = reject;
         image.src = src;
       });
-    Promise.all([load(DINO_SPRITE_PATHS.meat), load(DINO_SPRITE_PATHS.evolved)])
-      .then(([meat, evolved]) => {
-        if (active) setSprites({ meat, evolved });
+    Promise.all([load(DINO_SPRITE_PATHS.meat), load(DINO_SPRITE_PATHS.pterodactyl)])
+      .then(([meat, pterodactyl]) => {
+        if (active) setSprites({ meat, pterodactyl });
       })
       .catch(() => {
         if (active) setFailed(true);

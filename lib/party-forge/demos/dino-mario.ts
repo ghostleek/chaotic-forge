@@ -26,7 +26,7 @@ export const DINO_MARIO_PROVENANCE = Object.freeze({
   origin: 'Simulated demo · fixed authored example',
 });
 
-export type Encounter = { id: number; kind: 'block' | 'walker' | 'meat'; x: number };
+export type Encounter = { id: number; kind: 'block' | 'walker' | 'meat'; x: number; motion?: 'crawl' | 'fly'; altitude?: number };
 export type DinoMarioState = {
   status: 'ready' | 'playing' | 'won' | 'lost';
   tick: number;
@@ -38,6 +38,9 @@ export type DinoMarioState = {
   big: boolean;
   /** Defined only by the evolving demo; absent on retained v2 games. */
   growth?: 0 | 1 | 2;
+  beamTicks?: number;
+  beamFired?: boolean;
+  beamDestroyed?: number;
   protection: number;
   hits: number;
   meat: number;
@@ -144,7 +147,8 @@ export function stepDinoMarioGame(
     for (const entity of game.encounters) {
       if (game.protection > 0 && entity.kind !== 'meat') continue;
       const size = encounterSize(entity.kind);
-      const top = c.ground - size.height;
+      const bottom = c.ground - (entity.altitude ?? 0);
+      const top = bottom - size.height;
       const x = axisTimes(
         c.playerX,
         c.playerX + player.width,
@@ -156,7 +160,7 @@ export function stepDinoMarioGame(
         game.feet - player.height,
         game.feet,
         top,
-        c.ground,
+        bottom,
         dy,
       );
       if (!x || !y) continue;

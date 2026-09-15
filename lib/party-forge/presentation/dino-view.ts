@@ -6,10 +6,10 @@ import {
   createDinoMarioGame,
 } from '../demos/dino-mario.ts';
 
-export type DinoSprites = { meat: HTMLImageElement; evolved: HTMLImageElement };
+export type DinoSprites = { meat: HTMLImageElement; pterodactyl: HTMLImageElement };
 export const DINO_SPRITE_PATHS = {
   meat: '/party-forge/dino/meat-v1.png',
-  evolved: '/party-forge/dino/evolved-v1.png',
+  pterodactyl: '/party-forge/dino/pterodactyl-v1.png',
 };
 
 export function drawDino(
@@ -48,12 +48,14 @@ export function drawDino(
     ctx.fillRect(x, C.ground + 13, 18, 2);
   for (const e of game.encounters) {
     const size = encounterSize(e.kind),
-      y = C.ground - size.height;
+      y = C.ground - (e.altitude ?? 0) - size.height;
     if (e.x > C.width) continue;
     if (e.kind === 'block') {
       drawDinoSpike(ctx, e.x, y);
     } else if (e.kind === 'meat') {
       drawDinoMeat(ctx, e.x, y, sprites);
+    } else if (e.motion && sprites) {
+      drawPterodactyl(ctx, e.x, y, e.motion, game.tick, sprites);
     } else {
       ctx.fillStyle = '#79648b';
       ctx.fillRect(e.x + 5, y, 20, 5);
@@ -65,6 +67,7 @@ export function drawDino(
       ctx.fillRect(e.x + 19, y + 9, 4, 4);
     }
   }
+  if ((game.beamTicks ?? 0) > 0) drawDinoBeam(ctx, game);
   drawDinoPlayer(ctx, game, C.playerX, game.feet, sprites);
   const finishX = C.playerX + finishDistance - distance;
   if (finishX < C.width) {
@@ -100,7 +103,7 @@ export function drawDinoPlayer(
   game: DinoMarioState,
   x: number,
   feet: number,
-  sprites?: DinoSprites,
+  _sprites?: DinoSprites,
 ) {
   const size = dinoPlayerSize(game);
   const y = feet - size.height;
@@ -108,14 +111,36 @@ export function drawDinoPlayer(
     game.status === 'playing' && game.feet >= C.ground
       ? Math.sin((game.tick * Math.PI) / 6)
       : 0;
-  if (game.growth === 2 && sprites) {
+  if (game.growth === 2) {
+    // Native block geometry matches the original Dino's flat arcade style.
+    const rows = [
+      '                 #######',
+      '                 #######',
+      '             #  ########',
+      '           # ###########',
+      '          ############',
+      '        # ##############',
+      '       #################',
+      '     # #############',
+      '#   ##################',
+      '## #################',
+      ' ##################',
+      '   ###############',
+    ];
+    const left = x - 32;
     ctx.save();
-    ctx.imageSmoothingEnabled = false;
-    ctx.globalAlpha =
-      game.protection > 0 && Math.floor(game.tick / 5) % 2 ? 0.4 : 1;
-    // The tail extends behind the body, as it does on the small Dino.
-    const width = size.height * sprites.evolved.naturalWidth / sprites.evolved.naturalHeight;
-    ctx.drawImage(sprites.evolved, x + size.width - width, y - Math.abs(stride), width, size.height);
+    ctx.globalAlpha = game.protection > 0 && Math.floor(game.tick / 5) % 2 ? 0.4 : 1;
+    ctx.fillStyle = game.status === 'lost' ? '#a14c3b' : '#315d3d';
+    rows.forEach((row, r) => {
+      for (let col = 0; col < row.length; col++)
+        if (row[col] === '#') ctx.fillRect(left + col * 4, y + r * 4, 4, 4);
+    });
+    ctx.fillRect(left + 40 + stride * 4, y + 48, 12, 12 - Math.max(0, stride) * 4);
+    ctx.fillRect(left + 40 + stride * 6, y + 60 - Math.max(0, stride) * 4, 16, 4);
+    ctx.fillRect(left + 64 - stride * 4, y + 48, 12, 12 - Math.max(0, -stride) * 4);
+    ctx.fillRect(left + 64 - stride * 6, y + 60 - Math.max(0, -stride) * 4, 16, 4);
+    ctx.fillStyle = '#f7f4e9';
+    ctx.fillRect(left + 84, y + 4, 4, 4);
     ctx.restore();
     return;
   }
@@ -178,6 +203,7 @@ export function drawDinoGrowthPreview(
   drawDinoMeat(ctx, 153, 108, sprites);
   drawDinoMeat(ctx, 369, 108, sprites);
   drawDinoSpike(ctx, 563, 107);
+  drawPterodactyl(ctx, 310, 38, 'fly', 0, sprites);
   ctx.fillStyle = '#384c3f';
   ctx.font = '12px monospace';
   ctx.fillText('START', 40, 170);
@@ -185,4 +211,45 @@ export function drawDinoGrowthPreview(
   ctx.fillText('GROW TWICE', 450, 170);
   ctx.fillText('→', 190, 120);
   ctx.fillText('→', 405, 120);
+}
+
+/** Broad forward blast matches the ground corridor cleared by the simulation. */
+function drawDinoBeam(ctx: CanvasRenderingContext2D, game: DinoMarioState) {
+  const size = dinoPlayerSize(game);
+  const x = C.playerX + size.width;
+  const top = Math.min(C.ground - 52, game.feet - size.height + 12);
+  const pulse = Math.sin(game.tick / 10) * 3;
+  ctx.save();
+  ctx.fillStyle = 'rgba(5, 25, 38, 0.15)'; ctx.fillRect(0, 0, C.width, C.height);
+  ctx.shadowColor = '#22d3ee'; ctx.shadowBlur = 22;
+  ctx.fillStyle = 'rgba(34, 211, 238, 0.65)';
+  ctx.fillRect(x, top - 7, C.width - x, C.ground - top + 7);
+  ctx.shadowBlur = 0; ctx.fillStyle = '#baf8ff';
+  ctx.beginPath(); ctx.moveTo(x, top + 10); ctx.lineTo(C.width, top + pulse);
+  ctx.lineTo(C.width, C.ground); ctx.lineTo(x, C.ground - 5); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#fffde5'; ctx.fillRect(x, top + 14, C.width - x, Math.max(10, C.ground - top - 24));
+  ctx.strokeStyle = '#53d3eb'; ctx.lineWidth = 2;
+  for (let i = 0; i < 4; i++) {
+    const y = top + 10 + i * (C.ground - top - 12) / 4;
+    ctx.beginPath(); ctx.moveTo(x + 12, y); ctx.lineTo(C.width, y + pulse); ctx.stroke();
+  }
+  ctx.fillStyle = '#123b48'; ctx.font = 'bold 16px monospace';
+  ctx.fillText('ATOMIC BEAM', x + 22, Math.max(24, top - 18));
+  ctx.restore();
+}
+
+/** Shared left-facing sprite cycle for live enemies and the instruction legend. */
+export function drawPterodactyl(
+  ctx: CanvasRenderingContext2D, x: number, y: number,
+  motion: 'crawl' | 'fly', tick: number, sprites: DinoSprites,
+) {
+  const image = sprites.pterodactyl;
+  const cellWidth = image.naturalWidth / 4;
+  const cellHeight = image.naturalHeight / 2;
+  const frame = Math.floor(tick / (motion === 'fly' ? 7 : 6)) % 4;
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(image, frame * cellWidth, motion === 'fly' ? 0 : cellHeight,
+    cellWidth, cellHeight, x - 12, y - (motion === 'crawl' ? 12 : 18), 56, 56);
+  ctx.restore();
 }

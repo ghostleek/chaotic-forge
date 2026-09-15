@@ -169,12 +169,12 @@ export function DemoIntroduction({
               <b>01 / CLEAR</b> Jump over red spike traps.
             </p>
             <p>
-              <b>02 / BOUNCE</b> Land on walkers to bounce ahead.
+              <b>02 / BOUNCE</b> Stomp crawling or flying pterodactyls to bounce ahead.
             </p>
           </div>
           <p id={`${id}-description`} className={styles.disclosure}>
             This prepared example runs locally. Playing it does not generate a
-            game or call AI. Start with three lives; eat meat to grow twice and gain a life (up to four). The second growth becomes a spiny giant. A hit shrinks you one stage. Speed and spike frequency increase as you survive. Space or Jump is all you need.
+            game or call AI. Start with three lives; eat meat to grow twice and gain a life (up to four). The second growth becomes a spiny giant. A hit shrinks you one stage. Speed and spike frequency increase as you survive. At 1,000 points, a two-second beam automatically clears everything ahead once per run. Space or Jump is all you need.
           </p>
           </>}
           <DemoProvenance />

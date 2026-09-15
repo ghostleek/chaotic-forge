@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { drawDino, drawDinoSpike } from '@/lib/party-forge/presentation/dino-view';
-import { useEffect, useRef, useState, type FocusEvent } from 'react';
+import { drawDino, drawDinoSpike, drawPterodactyl } from '@/lib/party-forge/presentation/dino-view';
+import { useEffect, useRef, useState } from 'react';
 import {
   createDinoMarioGame,
   stepDinoMarioGame,
@@ -21,6 +21,7 @@ export function DinoMarioDemo() {
   const [paused, setPaused] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
   const spikeLegend = useRef<HTMLCanvasElement>(null);
+  const enemyLegend = useRef<HTMLCanvasElement>(null);
   const input = useRef({ held: false, pulse: false });
   const running = game.status === 'playing' && !paused;
 
@@ -28,9 +29,9 @@ export function DinoMarioDemo() {
     input.current = { held: false, pulse: false };
     setPaused(true);
   }
-  function leaveControl(event: FocusEvent<HTMLElement>) {
-    input.current.held = false;
-    if (!event.currentTarget.closest('section')?.contains(event.relatedTarget)) pause();
+  function leaveControl() {
+    // Focus moves on taps and browser chrome interactions; it is not a pause command.
+    input.current = { held: false, pulse: false };
   }
   function start() {
     input.current = { held: false, pulse: false };
@@ -65,10 +66,9 @@ export function DinoMarioDemo() {
   useEffect(() => {
     const blur = () => {
       input.current = { held: false, pulse: false };
-      setPaused(true);
     };
     const hidden = () => {
-      if (document.hidden) blur();
+      if (document.hidden) { blur(); setPaused(true); }
     };
     window.addEventListener('blur', blur);
     document.addEventListener('visibilitychange', hidden);
@@ -86,6 +86,14 @@ export function DinoMarioDemo() {
     if (ctx) { ctx.clearRect(0, 0, 28, 38); drawDinoSpike(ctx, 0, 0); }
   }, []);
 
+  useEffect(() => {
+    const ctx = enemyLegend.current?.getContext('2d');
+    if (ctx && sprites) {
+      ctx.clearRect(0, 0, 56, 56);
+      drawPterodactyl(ctx, 12, 16, 'fly', 0, sprites);
+    }
+  }, [sprites]);
+
   const message =
     game.status === 'ready'
       ? spritesFailed ? 'Sprites could not load. Reload to try again.' : !sprites ? 'Loading sprites…' : 'Ready when you are. Start the course, then jump.'
@@ -95,7 +103,7 @@ export function DinoMarioDemo() {
           ? 'No lives left. Restart for another run.'
           : paused
             ? 'Paused. Resume when you are ready.'
-            : game.protection > 0 ? 'Ouch! One life lost. Keep running.' : game.growth === 2 ? 'Fully grown! Spiny giant, maximum size.' : game.big ? 'First growth! Eat again to become a spiny giant.' : 'Jump over spikes. Stomp walkers. Eat meat to grow.';
+            : (game.beamTicks ?? 0) > 0 ? `ATOMIC BEAM! ${(game.beamTicks! / 60).toFixed(1)}s · ${game.beamDestroyed} objects cleared.` : game.protection > 0 ? 'Ouch! One life lost. Keep running.' : game.growth === 2 ? 'Fully grown! Spiny giant, maximum size.' : game.big ? 'First growth! Eat again to become a spiny giant.' : 'Jump over spikes. Stomp pterodactyls. Eat meat to grow.';
 
   return (
     <main className={styles.page}>
@@ -141,6 +149,8 @@ export function DinoMarioDemo() {
             data-status={game.status}
             data-big={game.big}
             data-growth={game.growth}
+            data-beam-ticks={game.beamTicks}
+            data-beam-destroyed={game.beamDestroyed}
             data-lives={game.lives}
             aria-label="Dino Mario course. Space jumps. Escape pauses. A Jump button is available below."
             onKeyDown={(event) => {
@@ -192,8 +202,8 @@ export function DinoMarioDemo() {
                 onPointerDown={(e) => {
                   e.preventDefault();
                   e.currentTarget.setPointerCapture(e.pointerId);
-                  input.current = { held: true, pulse: true };
                   canvas.current?.focus();
+                  input.current = { held: true, pulse: true };
                 }}
                 onPointerUp={() => {
                   input.current.held = false;
@@ -206,8 +216,8 @@ export function DinoMarioDemo() {
                 }}
                 onClick={(e) => {
                   if (e.detail === 0) {
-                    input.current.pulse = true;
                     canvas.current?.focus();
+                    input.current.pulse = true;
                   }
                 }}
               >
@@ -233,9 +243,9 @@ export function DinoMarioDemo() {
             </p>
           </div>
           <div className={styles.rule}>
-            <span className={styles.walkerSymbol} aria-hidden="true" />
+            <canvas ref={enemyLegend} width={56} height={56} aria-label="Pixel pterodactyl enemy" />
             <p>
-              <b>Mario / Stomp &amp; bounce</b>Land on a walker while falling.
+              <b>Mario / Stomp &amp; bounce</b>Pterodactyls crawl or fly toward you. Land on their backs while falling.
               It disappears; you bounce over the next spike trap.
             </p>
           </div>
@@ -245,7 +255,7 @@ export function DinoMarioDemo() {
           <p className={styles.disclosure}>
             This prepared game does not call AI or generate a new game.
           </p>
-          <p className={styles.disclosure}>Endless demo score: 10 points per second, 100 per stomp and 50 per meat. Survive as long as you can; the run ends when no lives remain.</p>
+          <p className={styles.disclosure}>At 1,000 points, automatically fire a two-second beam once per run. It destroys visible spikes, pterodactyls and meat ahead without awarding pickup or stomp points. Endless demo score: 10 points per second, 100 per stomp and 50 per meat. Survive as long as you can; the run ends when no lives remain.</p>
 <p className={styles.disclosure}>For online competition, open a room and choose the Chrome Dino and Mario starters. Each player confirms a card before the shared round.</p>
           <DemoProvenance />
         </aside>
