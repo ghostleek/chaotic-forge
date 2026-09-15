@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { performance } from 'node:perf_hooks';
 import { cachedInstructionDemo } from '../lib/party-forge/server/cached-instruction-demo.ts';
-import { resolveInstructionRequest } from '../lib/party-forge/server/pixel-generation.ts';
+import {
+  PIXEL_JOB_LEASE_MS,
+  claimPixelJob,
+  resolveInstructionRequest,
+} from '../lib/party-forge/server/pixel-generation.ts';
 import { createRetainedRuntime } from '../lib/party-forge/runtime-registry.ts';
 import { contributionHistorySchema } from '../lib/party-forge/contracts.ts';
 function cards(titles) {
@@ -21,6 +25,59 @@ function cards(titles) {
       },
     },
   }));
+}
+function createPixelJobDb(jobs) {
+  return {
+    jobs: new Map(jobs.map((job) => [`${job.roomId}:${job.recipeKey}`, job])),
+    prepare(sql) {
+      return {
+        bind: (...args) => ({
+          async first() {
+            if (sql.startsWith('SELECT status,result,created_at AS createdAt'))
+              return this.jobs?.get(`${args[0]}:${args[1]}`) ?? null;
+            throw new Error(`Unexpected first SQL: ${sql}`);
+          },
+          async run() {
+            if (sql.startsWith('INSERT OR IGNORE INTO party_pixel_jobs')) {
+              const [roomId, recipeKey, createdAt] = args;
+              const key = `${roomId}:${recipeKey}`;
+              if (this.jobs?.has(key))
+                return { meta: { changes: 0 } };
+              const roomJobs = [...this.jobs.values()].filter(
+                (job) => job.roomId === roomId,
+              );
+              if (roomJobs.length >= 3)
+                return { meta: { changes: 0 } };
+              this.jobs?.set(key, {
+                roomId,
+                recipeKey,
+                status: 'running',
+                result: null,
+                createdAt,
+              });
+              return { meta: { changes: 1 } };
+            }
+            if (sql.startsWith('UPDATE party_pixel_jobs SET created_at=')) {
+              const [createdAt, roomId, recipeKey, expiresAt] = args;
+              const key = `${roomId}:${recipeKey}`;
+              const job = this.jobs?.get(key);
+              if (
+                !job ||
+                job.status !== 'running' ||
+                job.createdAt > expiresAt
+              )
+                return { meta: { changes: 0 } };
+              this.jobs?.set(key, { ...job, createdAt });
+              return { meta: { changes: 1 } };
+            }
+            throw new Error(`Unexpected run SQL: ${sql}`);
+          },
+          jobs: this.jobs,
+        }),
+        jobs: this.jobs,
+      };
+    },
+  };
 }
 void test('cached pair works in either order without database or model access', async () => {
   for (const titles of [
@@ -180,4 +237,43 @@ void test('every two/three-player saved-pair permutation replays deterministical
         assert.equal(a.isComplete(), true);
       }
     }
+});
+void test('expired running jobs are reclaimed without consuming another room attempt', async () => {
+  const now = 1_000_000;
+  const db = createPixelJobDb([
+    {
+      roomId: 'room',
+      recipeKey: 'recipe',
+      status: 'running',
+      result: null,
+      createdAt: now - PIXEL_JOB_LEASE_MS,
+    },
+    {
+      roomId: 'room',
+      recipeKey: 'older-1',
+      status: 'failed',
+      result: '{"reason":"older"}',
+      createdAt: 10,
+    },
+    {
+      roomId: 'room',
+      recipeKey: 'older-2',
+      status: 'failed',
+      result: '{"reason":"older"}',
+      createdAt: 20,
+    },
+  ]);
+  const recovered = await claimPixelJob(db, 'room', 'recipe', now);
+  assert.equal(recovered.kind, 'recovered');
+  assert.equal(recovered.stored.createdAt, now);
+  assert.equal(db.jobs.size, 3);
+  const waiting = await claimPixelJob(
+    db,
+    'room',
+    'recipe',
+    now + PIXEL_JOB_LEASE_MS - 1,
+  );
+  assert.equal(waiting.kind, 'existing');
+  assert.equal(waiting.stored.status, 'running');
+  assert.equal(waiting.stored.createdAt, now);
 });
