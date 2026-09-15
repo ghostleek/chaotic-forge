@@ -7,6 +7,21 @@ export type BillingEnv = {
   FORGE_ADMIN_EMAILS?: string;
   FORGE_TRIAL_ENABLED?: string;
 };
+function configuredAdminUserIds(env: BillingEnv) {
+  return (env.FORGE_ADMIN_USER_IDS ?? '')
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+function normalizeEmail(value?: string) {
+  return value?.trim().toLowerCase() ?? '';
+}
+function configuredAdminEmails(env: BillingEnv) {
+  return (env.FORGE_ADMIN_EMAILS ?? '')
+    .split(',')
+    .map(normalizeEmail)
+    .filter(Boolean);
+}
 function secret(env: BillingEnv) {
   if (!/^[a-f0-9]{64}$/.test(env.FORGE_KEY_ENCRYPTION_SECRET ?? ''))
     throw new ForgeError(503, 'Key storage is not configured.');
@@ -62,21 +77,16 @@ export async function decryptKey(
   return new TextDecoder().decode(bytes);
 }
 export function isAdmin(env: BillingEnv, identity: Identity) {
+  const email = normalizeEmail(identity.email);
+  return !!email && configuredAdminEmails(env).includes(email);
+}
+function isOwnerAdmin(env: BillingEnv, identity: Identity) {
   return (
-    (env.FORGE_ADMIN_USER_IDS ?? '')
-      .split(',')
-      .map((v) => v.trim())
-      .filter(Boolean)
-      .includes(identity.userId) ||
-    (env.FORGE_ADMIN_EMAILS ?? '')
-      .split(',')
-      .map((v) => v.trim().toLowerCase())
-      .filter(Boolean)
-      .includes(identity.email.trim().toLowerCase())
+    configuredAdminUserIds(env).includes(identity.userId) || isAdmin(env, identity)
   );
 }
 export function requireAdmin(env: BillingEnv, identity: Identity) {
-  if (!isAdmin(env, identity))
+  if (!isOwnerAdmin(env, identity))
     throw new ForgeError(403, 'Admin access required.');
 }
 export async function billingStatus(env: BillingEnv, identity: Identity) {
