@@ -50,7 +50,9 @@ export function drawDino(
     const size = encounterSize(e.kind),
       y = C.ground - (e.altitude ?? 0) - size.height;
     if (e.x > C.width) continue;
-    if (e.kind === 'block') {
+    if (e.kind === 'meteor') {
+      drawMeteor(ctx, e.x, y, e.warningTicks ?? 0, game.tick);
+    } else if (e.kind === 'block') {
       drawDinoSpike(ctx, e.x, y);
     } else if (e.kind === 'meat') {
       drawDinoMeat(ctx, e.x, y, sprites);
@@ -105,8 +107,12 @@ export function drawDinoPlayer(
   feet: number,
   _sprites?: DinoSprites,
 ) {
+  if (game.status === 'lost' && game.growth !== undefined) {
+    drawDinoSkeleton(ctx, game.deathGrowth ?? game.growth, x, feet);
+    return;
+  }
   const size = dinoPlayerSize(game);
-  const y = feet - size.height;
+  const y = Math.round(feet - size.height);
   const stride =
     game.status === 'playing' && game.feet >= C.ground
       ? Math.sin((game.tick * Math.PI) / 6)
@@ -251,5 +257,93 @@ export function drawPterodactyl(
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(image, frame * cellWidth, motion === 'fly' ? 0 : cellHeight,
     cellWidth, cellHeight, x - 12, y - (motion === 'crawl' ? 12 : 18), 56, 56);
+  ctx.restore();
+}
+
+/** Three original bone sprites retain the silhouette of the size at the fatal hit. */
+export function drawDinoSkeleton(ctx: CanvasRenderingContext2D, growth: 0 | 1 | 2, x: number, feet: number) {
+  // Original fossil silhouettes: large eye socket, nasal opening, toothed jaw,
+  // arched ribs, separate vertebrae and bent limb joints. Each stage has its own proportions.
+  const shapes = [
+    { width: 20, height: 20, skullX: 10, hipX: 8, hipY: 13, ribs: 2 },
+    { width: 26, height: 28, skullX: 14, hipX: 10, hipY: 19, ribs: 3 },
+    { width: 48, height: 32, skullX: 34, hipX: 24, hipY: 21, ribs: 5 },
+  ];
+  const shape = shapes[growth];
+  const skull = growth === 2 ? [
+    '   ########', ' ###########', '###   #######', '##    ####  ##',
+    '###   ########', ' #############', ' ## # # # #',
+    '  #         #', '  ###########',
+  ] : growth === 1 ? [
+    '  #######', ' #########', '##   ######', '##   ###  ##',
+    ' ###########', ' ## # # # #', '  #      #', '  ########',
+  ] : [
+    '  ######', ' ########', '##  ### ##', '##  ######',
+    ' #########', ' # # # #', '  #######',
+  ];
+  const cells = new Set<string>();
+  const dot = (col: number, row: number) => cells.add(`${col},${row}`);
+  const line = (x1: number, y1: number, x2: number, y2: number) => {
+    const length = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
+    for (let i = 0; i <= length; i++) dot(Math.round(x1 + (x2 - x1) * i / Math.max(1, length)), Math.round(y1 + (y2 - y1) * i / Math.max(1, length)));
+  };
+  skull.forEach((row, y) => row.split('').forEach((cell, x) => { if (cell === '#') dot(shape.skullX + x, y); }));
+  const neckX = shape.skullX + 2, neckY = skull.length;
+  line(neckX, neckY, shape.hipX, shape.hipY);
+  // Ribs curve down from the sloping backbone, with open space between bones.
+  for (let i = 0; i < shape.ribs; i++) {
+    const t = (i + 1) / (shape.ribs + 1);
+    const rx = Math.round(neckX + (shape.hipX - neckX) * t);
+    const ry = Math.round(neckY + (shape.hipY - neckY) * t);
+    line(rx, ry, rx + 2, ry + 2);
+    line(rx + 2, ry + 2, rx + 2, ry + 4);
+    line(rx + 2, ry + 4, rx, ry + 5);
+  }
+  // A tapering chain of tail vertebrae avoids the old solid lattice silhouette.
+  for (let i = 0; i < shape.hipX - 1; i += 2) {
+    const tx = shape.hipX - i - 1;
+    const ty = shape.hipY - Math.round(i / 4);
+    dot(tx, ty); if (i < shape.hipX / 2) dot(tx, ty - 1);
+  }
+  const ankle = shape.height - 2;
+  line(shape.hipX, shape.hipY, shape.hipX - 2, shape.hipY + 3);
+  line(shape.hipX - 2, shape.hipY + 3, shape.hipX, ankle);
+  line(shape.hipX, ankle, shape.hipX - 2, shape.height - 1);
+  line(shape.hipX - 2, shape.height - 1, shape.hipX + 2, shape.height - 1);
+  line(shape.hipX + 3, shape.hipY + 1, shape.hipX + 5, shape.hipY + 4);
+  line(shape.hipX + 5, shape.hipY + 4, shape.hipX + 4, ankle);
+  line(shape.hipX + 4, ankle, shape.hipX + 7, shape.height - 1);
+  line(neckX, neckY + 2, neckX + 3, neckY + 4);
+  line(neckX + 3, neckY + 4, neckX + 5, neckY + 3);
+  const pixel = 2;
+  const left = x - (growth === 2 ? 32 : growth === 1 ? 10 : 10);
+  const top = Math.round(feet) - shape.height * pixel;
+  const points = [...cells].map(cell => cell.split(',').map(Number));
+  ctx.save();
+  // Outline the union first; a second pass keeps neighboring bones from gaining internal borders.
+  ctx.fillStyle = '#596252';
+  for (const [col, row] of points) ctx.fillRect(left + col * pixel - 1, top + row * pixel, 4, 3);
+  ctx.fillStyle = '#e6ddbd';
+  for (const [col, row] of points) ctx.fillRect(left + col * pixel, top + row * pixel, 2, 2);
+  ctx.restore();
+}
+function drawMeteor(ctx: CanvasRenderingContext2D, x: number, y: number, warning: number, tick: number) {
+  ctx.save();
+  if (warning > 0) {
+    ctx.fillStyle = '#a33c2d';
+    ctx.font = 'bold 18px monospace';
+    ctx.fillText('!', x + 6, 28);
+    ctx.fillRect(x + 8, 35, 8, 3);
+  } else {
+    ctx.fillStyle = '#ec9d3a';
+    ctx.fillRect(x + 16, y - 22, 8, 28);
+    ctx.fillRect(x + 24, y - 32 + tick % 3 * 3, 4, 23);
+    ctx.fillStyle = '#bd5733';
+    ctx.fillRect(x + 4, y, 16, 24);
+    ctx.fillRect(x, y + 4, 24, 16);
+    ctx.fillStyle = '#633f32';
+    ctx.fillRect(x + 5, y + 9, 8, 8);
+    ctx.fillRect(x + 14, y + 5, 4, 4);
+  }
   ctx.restore();
 }

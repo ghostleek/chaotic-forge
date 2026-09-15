@@ -169,7 +169,7 @@ export function DemoIntroduction({
               <b>01 / CLEAR</b> Jump over red spike traps.
             </p>
             <p>
-              <b>02 / BOUNCE</b> Stomp crawling or flying pterodactyls to bounce ahead.
+              <b>02 / BOUNCE</b> Stomp crawling or hovering pterodactyls. Watch for shuffled spikes and meteor waves after 1,500 points.
             </p>
           </div>
           <p id={`${id}-description`} className={styles.disclosure}>
