@@ -1,0 +1,25 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - run: npm run build
+      # Not yet in CI (see QUALITY.md for the full gate):
+      # - npm run test:unit: tests/party-build.test.mjs currently fails on main
+      #   (stale retained traceHash for choice-fps; Chrome-dependent replay test).
+      # - npm run test:browser / test:party: need Chrome and a local Worker + D1.
